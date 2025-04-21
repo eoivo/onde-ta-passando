@@ -3,6 +3,7 @@ import type { Metadata } from "next/types";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import { ThemeProvider } from "@/components/theme-provider";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import NavigationProvider from "@/providers/NavigationProvider";
@@ -26,12 +27,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <body className={`${inter.className} bg-black text-white antialiased`}>
+      <body
+        className={`${inter.className} bg-black text-white antialiased flex flex-col min-h-screen`}
+      >
         <ThemeProvider attribute="class" defaultTheme="dark">
           <NavigationProvider>
             <LoadingOverlay />
             <Header />
-            {children}
+            <main className="flex-grow">{children}</main>
+            <Footer />
           </NavigationProvider>
         </ThemeProvider>
       </body>
