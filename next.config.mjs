@@ -12,7 +12,6 @@ const nextConfig = {
   env: {
     API_KEY: process.env.API_KEY,
   },
-  // Desativar o bailout do CSR/Suspense que está causando o erro
   experimental: {
     missingSuspenseWithCSRBailout: false,
   },

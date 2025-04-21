@@ -4,7 +4,6 @@ import { useEffect, Suspense, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useLoadingStore } from "@/store/loading-store";
 
-// Componente que usa useSearchParams envolto em Suspense
 function SearchParamsWatcher({
   onUpdate,
 }: {
