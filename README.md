@@ -1,6 +1,9 @@
 # Onde Tá Passando?
 
-![Onde Tá Passando Logo](public/images/logo.png)
+<p align="center">
+  <img src="public/images/logo.png" alt="Onde Tá Passando Logo" width="300">
+</p>
+
 
 ## 📺 Sobre o Projeto
 
