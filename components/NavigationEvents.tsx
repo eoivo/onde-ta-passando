@@ -1,17 +1,35 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Suspense, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useLoadingStore } from "@/store/loading-store";
 
+// Componente que usa useSearchParams envolto em Suspense
+function SearchParamsWatcher({
+  onUpdate,
+}: {
+  onUpdate: (params: URLSearchParams | null) => void;
+}) {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    onUpdate(searchParams);
+  }, [searchParams, onUpdate]);
+
+  return null;
+}
+
 export default function NavigationEvents() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const { setLoading } = useLoadingStore();
+  const [params, setParams] = useState<URLSearchParams | null>(null);
+
+  const handleSearchParamsUpdate = (newParams: URLSearchParams | null) => {
+    setParams(newParams);
+  };
 
   useEffect(() => {
     const handleRouteChangeStart = () => {
-
       let title = null;
 
       if (pathname?.includes("/filme/")) {
@@ -42,7 +60,11 @@ export default function NavigationEvents() {
     return () => {
       window.removeEventListener("beforeunload", handleRouteChangeStart);
     };
-  }, [pathname, searchParams, setLoading]);
+  }, [pathname, params, setLoading]);
 
-  return null;
+  return (
+    <Suspense fallback={null}>
+      <SearchParamsWatcher onUpdate={handleSearchParamsUpdate} />
+    </Suspense>
+  );
 }

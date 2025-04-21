@@ -14,4 +14,7 @@
 # Configuração para otimização de imagens Next.js
 [build.environment]
   NEXT_USE_NETLIFY_EDGE = "true"
-  NODE_VERSION = "18" 
+  NODE_VERSION = "18"
+  # Desativa a geração estática para a página de busca que usa useSearchParams
+  NEXT_DISABLE_PREBUNDLING = "1"
+  NEXT_PUBLIC_NETLIFY_NEXT_PLUGIN_SKIP = "true" 

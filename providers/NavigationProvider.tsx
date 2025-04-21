@@ -6,6 +6,7 @@ import React, {
   createContext,
   useContext,
   ReactNode,
+  Suspense,
 } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useLoadingStore } from "@/store/loading-store";
@@ -22,6 +23,21 @@ const NavigationContext = createContext<NavigationContextType>({
 
 export const useNavigation = () => useContext(NavigationContext);
 
+// Componente que usa useSearchParams envolto em Suspense
+function NavigationEventsHandler({
+  onSearchParamsChange,
+}: {
+  onSearchParamsChange: (params: URLSearchParams | null) => void;
+}) {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    onSearchParamsChange(searchParams);
+  }, [searchParams, onSearchParamsChange]);
+
+  return null;
+}
+
 export default function NavigationProvider({
   children,
 }: {
@@ -29,10 +45,14 @@ export default function NavigationProvider({
 }) {
   const [isNavigating, setIsNavigating] = useState(false);
   const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const [searchParamsString, setSearchParamsString] = useState("");
   const { setLoading } = useLoadingStore();
 
-  const url = `${pathname}${searchParams ? `?${searchParams}` : ""}`;
+  const handleSearchParamsChange = (params: URLSearchParams | null) => {
+    setSearchParamsString(params ? `?${params}` : "");
+  };
+
+  const url = `${pathname}${searchParamsString}`;
 
   const startNavigation = (title: string | null = null) => {
     setIsNavigating(true);
@@ -113,7 +133,7 @@ export default function NavigationProvider({
       document.removeEventListener("submit", handleFormSubmit);
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [pathname, searchParams, isNavigating, setLoading]);
+  }, [pathname, searchParamsString, isNavigating, setLoading]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -126,6 +146,11 @@ export default function NavigationProvider({
 
   return (
     <NavigationContext.Provider value={{ isNavigating, startNavigation }}>
+      <Suspense fallback={null}>
+        <NavigationEventsHandler
+          onSearchParamsChange={handleSearchParamsChange}
+        />
+      </Suspense>
       {children}
     </NavigationContext.Provider>
   );
