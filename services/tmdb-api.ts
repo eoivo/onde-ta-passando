@@ -1,4 +1,4 @@
-const API_KEY = "e795978ca358e9438b906287a54b7eff";
+const API_KEY = process.env.API_KEY || "";
 const BASE_URL = "https://api.themoviedb.org/3";
 
 async function fetchFromTMDB(
