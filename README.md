@@ -4,7 +4,6 @@
   <img src="public/images/logo.png" alt="Onde Tá Passando Logo" width="300">
 </p>
 
-
 ## 📺 Sobre o Projeto
 
 **Onde Tá Passando?** é uma plataforma que ajuda usuários a descobrirem onde seus filmes e séries favoritos estão disponíveis para assistir. O sistema conecta-se à API TMDB (The Movie Database) para fornecer informações atualizadas sobre filmes, séries, avaliações e disponibilidade em serviços de streaming.
