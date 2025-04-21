@@ -12,9 +12,6 @@ const nextConfig = {
   env: {
     API_KEY: process.env.API_KEY,
   },
-  experimental: {
-    missingSuspenseWithCSRBailout: false,
-  },
 };
 
 export default nextConfig;
