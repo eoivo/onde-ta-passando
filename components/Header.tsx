@@ -101,7 +101,7 @@ export default function Header() {
             </div>
             <div className="flex flex-col">
               <h1 className="text-lg md:text-2xl font-bold bg-gradient-to-r from-red-500 to-red-700 text-transparent bg-clip-text">
-                Onde Tá Passando
+                Onde Tá Passando?
               </h1>
             </div>
           </Link>
@@ -225,7 +225,7 @@ export default function Header() {
                     />
                   </div>
                   <h2 className="text-xl font-bold bg-gradient-to-r from-red-500 to-red-700 text-transparent bg-clip-text">
-                    Onde Tá Passando
+                    Onde Tá Passando?
                   </h2>
                 </div>
 
