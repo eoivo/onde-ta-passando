@@ -161,7 +161,7 @@ export default function Header() {
                   size="icon"
                   variant="ghost"
                   onClick={clearSearch}
-                  className="h-7 w-7 p-0 mr-0.5 hover:bg-white/10 rounded-full"
+                  className="h-7 w-7 p-0 mr-1 hover:bg-white/10 rounded-full"
                 >
                   <X className="h-4 w-4 text-white/70" />
                 </Button>
@@ -240,6 +240,7 @@ export default function Header() {
                       className="w-full border-0 bg-transparent text-white pl-4 pr-14 py-2 focus:ring-0 focus:outline-none rounded-full placeholder-white/70"
                       value={searchQuery}
                       onChange={handleInputChange}
+                      onFocus={handleInputFocus}
                     />
                     {searchQuery && (
                       <Button
@@ -247,7 +248,7 @@ export default function Header() {
                         size="icon"
                         variant="ghost"
                         onClick={clearSearch}
-                        className="absolute right-9 h-6 w-6 p-0.5 hover:bg-white/10 rounded-full"
+                        className="absolute right-12 h-6 w-6 p-0.5 hover:bg-white/10 rounded-full"
                       >
                         <X className="h-4 w-4 text-white/70" />
                       </Button>
@@ -261,6 +262,11 @@ export default function Header() {
                   >
                     <Search className="h-4 w-4" />
                   </Button>
+                  <SearchSuggestions
+                    query={searchQuery}
+                    visible={showSuggestions}
+                    onItemClick={closeSuggestions}
+                  />
                 </form>
 
                 <nav className="flex flex-col gap-6 mt-8">

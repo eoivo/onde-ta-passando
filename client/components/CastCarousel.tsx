@@ -1,33 +1,39 @@
-"use client"
+"use client";
 
-import { useRef } from "react"
-import Image from "next/image"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { motion } from "framer-motion"
+import { useRef } from "react";
+import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 
 interface CastCarouselProps {
-  cast: any[]
+  cast: any[];
 }
 
 export default function CastCarousel({ cast }: CastCarouselProps) {
-  const carouselRef = useRef<HTMLDivElement>(null)
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: "left" | "right") => {
     if (carouselRef.current) {
-      const { scrollLeft, clientWidth } = carouselRef.current
-      const scrollTo = direction === "left" ? scrollLeft - clientWidth * 0.75 : scrollLeft + clientWidth * 0.75
+      const { scrollLeft, clientWidth } = carouselRef.current;
+      const scrollTo =
+        direction === "left"
+          ? scrollLeft - clientWidth * 0.75
+          : scrollLeft + clientWidth * 0.75;
 
       carouselRef.current.scrollTo({
         left: scrollTo,
         behavior: "smooth",
-      })
+      });
     }
-  }
+  };
 
   return (
     <div className="relative group">
-      <div ref={carouselRef} className="flex gap-4 overflow-x-auto scrollbar-hide snap-x pb-4">
+      <div
+        ref={carouselRef}
+        className="flex gap-4 overflow-x-auto scrollbar-hide snap-x pb-4"
+      >
         {cast.map((person, index) => (
           <motion.div
             key={person.id}
@@ -78,5 +84,5 @@ export default function CastCarousel({ cast }: CastCarouselProps) {
         <ChevronRight className="h-6 w-6" />
       </Button>
     </div>
-  )
+  );
 }
