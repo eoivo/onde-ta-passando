@@ -125,12 +125,6 @@ export default async function TVShowPage({
             )}
 
             <div className="pt-4">
-              <h2 className="text-xl font-semibold mb-3 flex items-center">
-                <span className="bg-primary px-3 py-1 rounded-md mr-2">
-                  Onde assistir
-                </span>
-                Disponível nas plataformas:
-              </h2>
               <StreamingProviders
                 providers={watchProviders}
                 title={tvShow.name}

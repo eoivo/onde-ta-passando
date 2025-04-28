@@ -137,7 +137,7 @@ export default function Header() {
             className={`relative hidden md:flex items-center transition-all duration-300 ease-in-out rounded-full 
               ${
                 isSearchFocused
-                  ? "w-72 bg-gradient-to-r from-red-800/30 to-red-600/20 border border-red-700/40"
+                  ? "w-72 bg-black/60 border border-gray-700/70"
                   : "w-64 bg-black/40 border border-gray-700/50"
               }`}
           >
@@ -231,7 +231,7 @@ export default function Header() {
 
                 <form
                   onSubmit={handleSearch}
-                  className="relative flex items-center mb-8 rounded-full bg-gradient-to-r from-red-800/30 to-red-600/20 border border-red-700/40 mx-2"
+                  className="relative flex items-center mb-8 rounded-full bg-black/60 border border-gray-700/70 mx-2"
                 >
                   <div className="relative flex items-center w-full">
                     <input

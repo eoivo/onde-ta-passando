@@ -2,18 +2,24 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { ExternalLink } from "lucide-react";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  Info,
+  PlayCircle,
+  RefreshCw,
+  ChevronDown,
+  ExternalLink,
+} from "lucide-react";
 import ProviderShareButton from "./ProviderShareButton";
 
 interface StreamingProvidersProps {
   providers: any;
   title?: string;
+}
+
+interface Provider {
+  provider_id: number;
+  provider_name: string;
+  logo_path: string;
 }
 
 const PROVIDER_URLS: Record<number, string> = {
@@ -31,11 +37,24 @@ const PROVIDER_URLS: Record<number, string> = {
   3: "https://tv.apple.com/br",
 };
 
+// Mapeamento de nomes de qualidade para plataformas específicas
+const QUALITY_MAPPING: Record<number, string> = {
+  8: "Full HD", // Netflix
+  119: "4K", // Prime Video
+  337: "4K HDR", // Disney+
+  384: "4K HDR", // HBO Max
+  350: "4K Dolby Vision", // Apple TV+
+  283: "HD", // Crunchyroll
+  531: "HD", // Paramount+
+  619: "Full HD", // Star+
+  307: "HD", // Globoplay
+};
+
 export default function StreamingProviders({
   providers,
   title = "",
 }: StreamingProvidersProps) {
-  const [showTooltip, setShowTooltip] = useState<number | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   const brProviders = providers?.results?.BR;
 
@@ -63,72 +82,131 @@ export default function StreamingProviders({
     }
   };
 
-  const renderProvider = (provider: any) => (
-    <TooltipProvider key={provider.provider_id}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div
-            className="flex flex-col items-center group cursor-pointer relative"
-            onClick={() => handleProviderClick(provider.provider_id)}
-            onMouseEnter={() => setShowTooltip(provider.provider_id)}
-            onMouseLeave={() => setShowTooltip(null)}
-          >
-            <div className="relative w-12 h-12 rounded-lg overflow-hidden group-hover:ring-2 ring-primary transition-all">
-              <Image
-                src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
-                alt={provider.provider_name}
-                fill
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <ExternalLink className="w-5 h-5" />
-              </div>
-            </div>
-            <span className="text-xs mt-1 text-center">
-              {provider.provider_name}
-            </span>
-          </div>
-        </TooltipTrigger>
-        <TooltipContent side="top">
-          {PROVIDER_URLS[provider.provider_id]
-            ? `Abrir no ${provider.provider_name}`
-            : `Link para ${provider.provider_name} não disponível`}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+  const renderProvider = (
+    provider: Provider,
+    type: "flatrate" | "rent" | "buy"
+  ) => (
+    <div
+      key={provider.provider_id}
+      className="bg-gray-800 rounded-lg p-4 hover:bg-gray-700 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl group"
+      onClick={() => handleProviderClick(provider.provider_id)}
+    >
+      <div className="flex items-center">
+        <div className="relative h-8 w-10 mr-3">
+          <Image
+            src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
+            alt={provider.provider_name}
+            fill
+            className="object-contain"
+          />
+        </div>
+        <span className="text-base font-medium">{provider.provider_name}</span>
+      </div>
+
+      <div className="flex justify-between items-center mt-2">
+        <div className="bg-gray-900 px-2 py-0.5 rounded-full text-xs w-fit">
+          {QUALITY_MAPPING[provider.provider_id] || "HD"}
+        </div>
+
+        <a
+          href={PROVIDER_URLS[provider.provider_id] || "#"}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-primary text-white py-1.5 px-4 rounded-md hover:bg-primary/80 transition duration-300 flex items-center group-hover:scale-105 text-sm"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <PlayCircle className="mr-1 h-4 w-4" />
+          Assistir
+        </a>
+      </div>
+    </div>
   );
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <div className="flex-1"></div>
+    <div className="space-y-6">
+      <h2 className="text-3xl font-bold mb-6 flex items-center justify-between">
+        <div className="flex items-center">
+          <PlayCircle className="mr-2 text-primary" />
+          Onde Assistir
+        </div>
         {providerNames.length > 0 && title && (
           <ProviderShareButton title={title} providers={providerNames} />
         )}
-      </div>
+      </h2>
 
       {flatrate.length > 0 && (
-        <div>
-          <h3 className="text-sm text-gray-400 mb-2">Streaming</h3>
-          <div className="flex flex-wrap gap-2">
-            {flatrate.map(renderProvider)}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {flatrate.map((provider: Provider) =>
+            renderProvider(provider, "flatrate")
+          )}
+        </div>
+      )}
+
+      {(rent.length > 0 || buy.length > 0) && (
+        <div className="bg-gray-800 bg-opacity-50 rounded-xl p-5 mb-6">
+          <div className="text-lg mb-3 font-medium">
+            {rent.length > 0 && buy.length > 0
+              ? "Também disponível para compra ou aluguel:"
+              : rent.length > 0
+              ? "Também disponível para aluguel:"
+              : "Também disponível para compra:"}
+          </div>
+          <div className="flex flex-wrap gap-4">
+            {[...rent, ...buy].map((provider: Provider) => (
+              <div
+                key={provider.provider_id}
+                className="flex items-center bg-gray-700 p-2 rounded-lg hover:bg-gray-600 transition-colors cursor-pointer"
+                onClick={() => handleProviderClick(provider.provider_id)}
+              >
+                <div className="relative h-6 w-6 mr-2">
+                  <Image
+                    src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
+                    alt={provider.provider_name}
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+                <span>{provider.provider_name}</span>
+              </div>
+            ))}
           </div>
         </div>
       )}
 
-      {rent.length > 0 && (
-        <div>
-          <h3 className="text-sm text-gray-400 mb-2">Alugar</h3>
-          <div className="flex flex-wrap gap-2">{rent.map(renderProvider)}</div>
+      <details
+        className="group bg-primary/20 rounded-lg cursor-pointer"
+        open={detailsOpen}
+        onClick={() => setDetailsOpen(!detailsOpen)}
+      >
+        <summary className="p-4 flex justify-between items-center font-medium list-none">
+          <span className="flex items-center">
+            <Info className="mr-2 h-5 w-5" />
+            Informações adicionais
+          </span>
+          <ChevronDown
+            className={`transition-transform duration-300 ${
+              detailsOpen ? "rotate-180" : ""
+            }`}
+          />
+        </summary>
+        <div className="p-4 pt-0 text-sm">
+          <p className="mb-2">
+            Este título pode estar disponível em diferentes qualidades e idiomas
+            dependendo da plataforma de streaming.
+          </p>
+          <p>
+            Algumas plataformas podem oferecer um período de teste gratuito ou
+            promoções especiais para novos assinantes.
+          </p>
         </div>
-      )}
+      </details>
 
-      {buy.length > 0 && (
-        <div>
-          <h3 className="text-sm text-gray-400 mb-2">Comprar</h3>
-          <div className="flex flex-wrap gap-2">{buy.map(renderProvider)}</div>
-        </div>
-      )}
+      <div className="mt-6 flex justify-end">
+        <button className="flex items-center text-primary hover:text-primary/80 transition-colors">
+          <RefreshCw className="mr-1 h-4 w-4" />
+          Atualizar disponibilidade
+        </button>
+      </div>
     </div>
   );
 }

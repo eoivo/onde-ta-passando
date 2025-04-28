@@ -1,28 +1,57 @@
-import Hero from "@/components/Hero"
-import MovieCarousel from "@/components/MovieCarousel"
-import { getTrending, getTopRated, getMoviesByGenre, getUpcoming } from "@/services/tmdb-api"
+import HeroCarousel from "@/components/HeroCarousel";
+import MovieCarousel from "@/components/MovieCarousel";
+import {
+  getTrending,
+  getTopRated,
+  getMoviesByGenre,
+  getUpcoming,
+} from "@/services/tmdb-api";
 
 export default async function Home() {
-  const trendingMovies = await getTrending("movie", "week")
-  const topRatedMovies = await getTopRated("movie")
-  const upcomingMovies = await getUpcoming()
+  // Buscar filmes e séries em alta
+  const trendingMovies = await getTrending("movie", "week");
+  const trendingTVShows = await getTrending("tv", "week");
+  const topRatedMovies = await getTopRated("movie");
+  const topRatedTVShows = await getTopRated("tv");
+  const upcomingMovies = await getUpcoming();
 
-  const actionMovies = await getMoviesByGenre(28)
-  const comedyMovies = await getMoviesByGenre(35)
-  const dramaMovies = await getMoviesByGenre(18)
-  const romanceMovies = await getMoviesByGenre(10749)
-  const sciFiMovies = await getMoviesByGenre(878)
-  const horrorMovies = await getMoviesByGenre(27)
-  const animationMovies = await getMoviesByGenre(16)
-  const documentaryMovies = await getMoviesByGenre(99)
+  const actionMovies = await getMoviesByGenre(28);
+  const comedyMovies = await getMoviesByGenre(35);
+  const dramaMovies = await getMoviesByGenre(18);
+  const romanceMovies = await getMoviesByGenre(10749);
+  const sciFiMovies = await getMoviesByGenre(878);
+  const horrorMovies = await getMoviesByGenre(27);
+  const animationMovies = await getMoviesByGenre(16);
+  const documentaryMovies = await getMoviesByGenre(99);
 
-  const heroMovie = trendingMovies[0]
+  // Criar uma mistura diversificada de filmes e séries para o carrossel
+  const combinedTrending = [
+    ...trendingMovies.slice(0, 4), // 4 filmes em alta
+    ...trendingTVShows.slice(0, 3), // 3 séries em alta
+    ...topRatedMovies.slice(0, 3), // 3 filmes bem avaliados
+    ...topRatedTVShows.slice(0, 2), // 2 séries bem avaliadas
+    ...upcomingMovies.slice(0, 2), // 2 lançamentos
+    ...sciFiMovies.slice(0, 1), // 1 filme de ficção científica
+    ...horrorMovies.slice(0, 1), // 1 filme de terror
+    ...animationMovies.slice(0, 1), // 1 filme de animação
+    ...actionMovies.slice(0, 1), // 1 filme de ação
+  ];
+
+  // Garantir que cada item tenha o campo media_type definido
+  const heroItems = combinedTrending.map((item) => ({
+    ...item,
+    media_type: item.media_type || (item.first_air_date ? "tv" : "movie"),
+  }));
+
+  // Embaralhar os itens para ter uma ordem mais variada
+  const shuffledHeroItems = [...heroItems].sort(() => Math.random() - 0.5);
 
   return (
     <main className="min-h-screen pb-20">
-      <Hero movie={heroMovie} />
+      <HeroCarousel movies={shuffledHeroItems} />
       <div className="px-4 md:px-8 space-y-8 -mt-20 relative z-10">
-        <MovieCarousel title="Em alta esta semana" movies={trendingMovies} />
+        <MovieCarousel title="Filmes em alta" movies={trendingMovies} />
+        <MovieCarousel title="Séries em alta" movies={trendingTVShows} />
         <MovieCarousel title="Mais bem avaliados" movies={topRatedMovies} />
         <MovieCarousel title="Lançamentos" movies={upcomingMovies} />
         <MovieCarousel title="Ação" movies={actionMovies} />
@@ -35,5 +64,5 @@ export default async function Home() {
         <MovieCarousel title="Documentários" movies={documentaryMovies} />
       </div>
     </main>
-  )
+  );
 }
