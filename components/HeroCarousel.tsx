@@ -17,6 +17,7 @@ export default function HeroCarousel({
   const [slideB, setSlideB] = useState({ index: 0, visible: false });
   const [showControls, setShowControls] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [trailerOpen, setTrailerOpen] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const activeSlide = slideA.visible ? "A" : "B";
 
@@ -33,7 +34,7 @@ export default function HeroCarousel({
       clearTimeout(timerRef.current);
     }
 
-    if (movies.length <= 1 || isTransitioning) return;
+    if (movies.length <= 1 || isTransitioning || trailerOpen) return;
 
     timerRef.current = setTimeout(() => {
       goToSlide((activeSlide === "A" ? slideA.index : slideB.index) + 1);
@@ -51,7 +52,12 @@ export default function HeroCarousel({
     slideB.visible,
     isTransitioning,
     movies.length,
+    trailerOpen,
   ]);
+
+  const handleTrailerStateChange = (isOpen: boolean) => {
+    setTrailerOpen(isOpen);
+  };
 
   const goToSlide = (targetIndex: number) => {
     if (isTransitioning) return;
@@ -144,7 +150,10 @@ export default function HeroCarousel({
             zIndex: slideA.visible ? 2 : 1,
           }}
         >
-          <Hero movie={movies[slideA.index]} />
+          <Hero
+            movie={movies[slideA.index]}
+            onTrailerStateChange={handleTrailerStateChange}
+          />
         </div>
 
         <div
@@ -155,7 +164,10 @@ export default function HeroCarousel({
             zIndex: slideB.visible ? 2 : 1,
           }}
         >
-          <Hero movie={movies[slideB.index]} />
+          <Hero
+            movie={movies[slideB.index]}
+            onTrailerStateChange={handleTrailerStateChange}
+          />
         </div>
 
         <div className="relative invisible">

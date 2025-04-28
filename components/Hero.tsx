@@ -10,9 +10,10 @@ import { getMovieVideos, getTvVideos } from "@/services/tmdb-api";
 
 interface HeroProps {
   movie: any;
+  onTrailerStateChange?: (isOpen: boolean) => void;
 }
 
-export default function Hero({ movie }: HeroProps) {
+export default function Hero({ movie, onTrailerStateChange }: HeroProps) {
   const [videos, setVideos] = useState<any[]>([]);
 
   useEffect(() => {
@@ -76,7 +77,10 @@ export default function Hero({ movie }: HeroProps) {
 
           <div className="flex flex-wrap gap-4 mb-16 md:mb-24">
             {videos.length > 0 ? (
-              <VideoPlayer videos={videos} />
+              <VideoPlayer
+                videos={videos}
+                onTrailerStateChange={onTrailerStateChange}
+              />
             ) : (
               <Link
                 href={`/${movie.media_type === "tv" ? "serie" : "filme"}/${

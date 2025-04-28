@@ -8,7 +8,6 @@ import {
 } from "@/services/tmdb-api";
 
 export default async function Home() {
-  // Buscar filmes e séries em alta
   const trendingMovies = await getTrending("movie", "week");
   const trendingTVShows = await getTrending("tv", "week");
   const topRatedMovies = await getTopRated("movie");
@@ -24,26 +23,23 @@ export default async function Home() {
   const animationMovies = await getMoviesByGenre(16);
   const documentaryMovies = await getMoviesByGenre(99);
 
-  // Criar uma mistura diversificada de filmes e séries para o carrossel
   const combinedTrending = [
-    ...trendingMovies.slice(0, 4), // 4 filmes em alta
-    ...trendingTVShows.slice(0, 3), // 3 séries em alta
-    ...topRatedMovies.slice(0, 3), // 3 filmes bem avaliados
-    ...topRatedTVShows.slice(0, 2), // 2 séries bem avaliadas
-    ...upcomingMovies.slice(0, 2), // 2 lançamentos
-    ...sciFiMovies.slice(0, 1), // 1 filme de ficção científica
-    ...horrorMovies.slice(0, 1), // 1 filme de terror
-    ...animationMovies.slice(0, 1), // 1 filme de animação
-    ...actionMovies.slice(0, 1), // 1 filme de ação
+    ...trendingMovies.slice(0, 4),
+    ...trendingTVShows.slice(0, 3),
+    ...topRatedMovies.slice(0, 3),
+    ...topRatedTVShows.slice(0, 2),
+    ...upcomingMovies.slice(0, 2),
+    ...sciFiMovies.slice(0, 1),
+    ...horrorMovies.slice(0, 1),
+    ...animationMovies.slice(0, 1),
+    ...actionMovies.slice(0, 1),
   ];
 
-  // Garantir que cada item tenha o campo media_type definido
   const heroItems = combinedTrending.map((item) => ({
     ...item,
     media_type: item.media_type || (item.first_air_date ? "tv" : "movie"),
   }));
 
-  // Embaralhar os itens para ter uma ordem mais variada
   const shuffledHeroItems = [...heroItems].sort(() => Math.random() - 0.5);
 
   return (

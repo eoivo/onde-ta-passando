@@ -6,9 +6,13 @@ import { Button } from "@/components/ui/button";
 
 interface VideoPlayerProps {
   videos: any[];
+  onTrailerStateChange?: (isOpen: boolean) => void;
 }
 
-export default function VideoPlayer({ videos }: VideoPlayerProps) {
+export default function VideoPlayer({
+  videos,
+  onTrailerStateChange,
+}: VideoPlayerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -24,9 +28,16 @@ export default function VideoPlayer({ videos }: VideoPlayerProps) {
 
   const handlePlay = () => {
     if (trailer) {
-      setActiveVideo(trailer.key);
-      setIsOpen(true);
-      document.body.style.overflow = "hidden";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      setTimeout(() => {
+        setActiveVideo(trailer.key);
+        setIsOpen(true);
+        document.body.style.overflow = "hidden";
+        if (onTrailerStateChange) {
+          onTrailerStateChange(true);
+        }
+      }, 300);
     }
   };
 
@@ -34,6 +45,9 @@ export default function VideoPlayer({ videos }: VideoPlayerProps) {
     setIsOpen(false);
     setActiveVideo(null);
     document.body.style.overflow = "auto";
+    if (onTrailerStateChange) {
+      onTrailerStateChange(false);
+    }
   };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
