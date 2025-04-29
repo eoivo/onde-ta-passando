@@ -16,4 +16,5 @@
   NEXT_USE_NETLIFY_EDGE = "true"
   NODE_VERSION = "18"
   NEXT_DISABLE_PREBUNDLING = "1"
-  NEXT_PUBLIC_NETLIFY_NEXT_PLUGIN_SKIP = "true" 
+  NEXT_PUBLIC_NETLIFY_NEXT_PLUGIN_SKIP = "true"
+  NEXT_PUBLIC_API_URL = "https://onde-ta-passando-api.onrender.com/api" 
