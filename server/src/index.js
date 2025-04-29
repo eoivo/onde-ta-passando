@@ -21,18 +21,21 @@ if (!fs.existsSync(tmpDir)) {
 
 const app = express();
 
-// Configuração CORS
-const corsOptions = {
-  origin:
-    process.env.NODE_ENV === "production"
-      ? ["https://onde-ta-passando.netlify.app"]
-      : ["http://localhost:3000"],
-  credentials: true,
-  optionsSuccessStatus: 200,
-};
+// Log do ambiente atual
+console.log(`NODE_ENV atual: ${process.env.NODE_ENV || "não definido"}`);
+
+// Configuração CORS mais permissiva
+app.use(
+  cors({
+    origin: "*", // Permite todas as origens (temporariamente para diagnóstico)
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    optionsSuccessStatus: 200,
+  })
+);
 
 // Middleware
-app.use(cors(corsOptions));
 app.use(express.json());
 app.use(
   fileUpload({
@@ -40,6 +43,16 @@ app.use(
     tempFileDir: path.join(__dirname, "../tmp/"),
   })
 );
+
+// Log de requisições
+app.use((req, res, next) => {
+  console.log(
+    `${new Date().toISOString()} - ${req.method} ${req.url} - Origem: ${
+      req.headers.origin || "Desconhecida"
+    }`
+  );
+  next();
+});
 
 // Rotas
 app.use("/api/auth", require("./routes/authRoutes"));
