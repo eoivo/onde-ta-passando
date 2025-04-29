@@ -1,0 +1,11 @@
+<svg width="342" height="513" viewBox="0 0 342 513" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="342" height="513" fill="#1F2937"/>
+  <rect x="71" y="156.5" width="200" height="200" rx="8" stroke="#4B5563" stroke-width="2"/>
+  <path d="M121 206.5H221" stroke="#4B5563" stroke-width="2"/>
+  <path d="M121 256.5H221" stroke="#4B5563" stroke-width="2"/>
+  <path d="M121 306.5H221" stroke="#4B5563" stroke-width="2"/>
+  <path d="M171 156.5V356.5" stroke="#4B5563" stroke-width="2"/>
+  <rect x="121" y="376.5" width="100" height="20" rx="4" fill="#4B5563"/>
+  <text x="171" y="100" font-family="Arial" font-size="14" fill="#9CA3AF" text-anchor="middle">Sem Imagem</text>
+  <path d="M149 236.5L159 226.5L169 236.5L179 226.5L189 236.5" stroke="#6B7280" stroke-width="2"/>
+</svg> 

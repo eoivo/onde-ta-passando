@@ -7,6 +7,8 @@ import Footer from "@/components/Footer";
 import { ThemeProvider } from "@/components/theme-provider";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import NavigationProvider from "@/providers/NavigationProvider";
+import { AuthProvider } from "@/context/AuthContext";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,12 +33,15 @@ export default function RootLayout({
         className={`${inter.className} bg-black text-white antialiased flex flex-col min-h-screen`}
       >
         <ThemeProvider attribute="class" defaultTheme="dark">
-          <NavigationProvider>
-            <LoadingOverlay />
-            <Header />
-            <main className="flex-grow">{children}</main>
-            <Footer />
-          </NavigationProvider>
+          <AuthProvider>
+            <NavigationProvider>
+              <LoadingOverlay />
+              <Header />
+              <main className="flex-grow">{children}</main>
+              <Footer />
+              <Toaster theme="dark" position="top-center" richColors />
+            </NavigationProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -1,6 +1,28 @@
 const API_KEY = process.env.API_KEY || "";
 const BASE_URL = "https://api.themoviedb.org/3";
 
+export interface Movie {
+  id: string;
+  title: string;
+  poster_path: string | null;
+  release_date?: string;
+  overview?: string;
+  vote_average?: number;
+  backdrop_path?: string | null;
+  genre_ids?: number[];
+}
+
+export interface TV {
+  id: string;
+  name: string;
+  poster_path: string | null;
+  first_air_date?: string;
+  overview?: string;
+  vote_average?: number;
+  backdrop_path?: string | null;
+  genre_ids?: number[];
+}
+
 async function fetchFromTMDB(
   endpoint: string,
   params: Record<string, string> = {}

@@ -14,8 +14,11 @@ import VideoPlayer from "@/components/VideoPlayer";
 import { Suspense } from "react";
 import LoadingReset from "@/components/LoadingReset";
 import ShareButton from "@/components/ShareButton";
+import DynamicMediaActions from "@/components/DynamicMediaActions";
 
-export const dynamic = "force-dynamic";
+
+export const dynamicParams = true;
+export const revalidate = 0;
 
 export default async function TVShowPage({
   params,
@@ -72,7 +75,15 @@ export default async function TVShowPage({
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h1 className="text-4xl md:text-5xl font-bold">{tvShow.name}</h1>
-              <ShareButton title={tvShow.name} />
+              <div className="flex items-center gap-2">
+                <DynamicMediaActions
+                  mediaId={id}
+                  mediaType="tv"
+                  name={tvShow.name}
+                  posterPath={tvShow.poster_path}
+                />
+                <ShareButton title={tvShow.name} />
+              </div>
             </div>
 
             <div className="flex flex-wrap gap-2 items-center">

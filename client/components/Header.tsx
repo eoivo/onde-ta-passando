@@ -6,12 +6,21 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Search, Menu, Film, Tv, Home, X } from "lucide-react";
+import { Search, Menu, Film, Tv, Home, X, User } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useMobile } from "@/hooks/use-mobile";
 import SearchSuggestions from "./SearchSuggestions";
+import { useAuth } from "@/context/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import UserAvatar from "@/components/UserAvatar";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -21,6 +30,7 @@ export default function Header() {
   const router = useRouter();
   const isMobile = useMobile();
   const searchFormRef = useRef<HTMLFormElement>(null);
+  const { user, profile, isAuthenticated, logout, refreshProfile } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -306,6 +316,65 @@ export default function Header() {
                 </nav>
               </SheetContent>
             </Sheet>
+          )}
+
+          {isAuthenticated ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative w-9 h-9 p-0 rounded-full overflow-hidden focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 hover:bg-transparent"
+                >
+                  <div className="relative flex items-center justify-center w-full h-full group">
+                    <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 bg-red-500/10 transition-opacity duration-300"></div>
+                    <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 border border-red-500/50 transition-opacity duration-300"></div>
+
+                    <UserAvatar
+                      profileImageUrl={profile?.profileImage?.url}
+                      name={profile?.name}
+                      size="sm"
+                    />
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="bg-gray-900 border-gray-800 text-white"
+              >
+                <div className="px-2 py-2 text-xs text-gray-400">
+                  Olá, {user?.name?.split(" ")[0]}
+                </div>
+                <DropdownMenuSeparator className="bg-gray-800" />
+                <DropdownMenuItem
+                  className="hover:bg-gray-800 cursor-pointer"
+                  onClick={() => {
+                    refreshProfile();
+                    router.push("/perfil");
+                  }}
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Meu Perfil</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-gray-800" />
+                <DropdownMenuItem
+                  className="hover:bg-gray-800 cursor-pointer text-red-500 hover:text-red-400"
+                  onClick={logout}
+                >
+                  Sair
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button
+              variant="ghost"
+              onClick={() => router.push("/login")}
+              className="rounded-full text-white/80 hover:bg-transparent hover:text-white flex items-center justify-center gap-2 transition-colors duration-300 relative overflow-hidden"
+            >
+              <div className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 bg-red-500/10 transition-opacity duration-300"></div>
+              <User className="h-4 w-4" />
+              <span>Entrar</span>
+            </Button>
           )}
         </div>
       </div>

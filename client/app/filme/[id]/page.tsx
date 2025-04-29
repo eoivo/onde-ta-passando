@@ -14,8 +14,10 @@ import VideoPlayer from "@/components/VideoPlayer";
 import { Suspense } from "react";
 import LoadingReset from "@/components/LoadingReset";
 import ShareButton from "@/components/ShareButton";
+import DynamicMediaActions from "@/components/DynamicMediaActions";
 
-export const dynamic = "force-dynamic";
+export const dynamicParams = true;
+export const revalidate = 0;
 
 export default async function MoviePage({
   params,
@@ -65,7 +67,15 @@ export default async function MoviePage({
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h1 className="text-4xl md:text-5xl font-bold">{movie.title}</h1>
-              <ShareButton title={movie.title} />
+              <div className="flex items-center gap-2">
+                <DynamicMediaActions
+                  mediaId={id}
+                  mediaType="movie"
+                  title={movie.title}
+                  posterPath={movie.poster_path}
+                />
+                <ShareButton title={movie.title} />
+              </div>
             </div>
 
             <div className="flex flex-wrap gap-2 items-center">
