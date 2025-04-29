@@ -112,7 +112,6 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
-// Criptografa a senha antes de salvar
 UserSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     next();
@@ -122,14 +121,12 @@ UserSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Método para gerar JWT Token
 UserSchema.methods.getSignedJwtToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE,
   });
 };
 
-// Método para verificar a senha
 UserSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

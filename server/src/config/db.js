@@ -11,7 +11,6 @@ const connectDB = async () => {
     );
   } catch (error) {
     console.error(`Erro na conexão com MongoDB: ${error.message}`);
-    // Em produção, não encerrar o processo, tentar reconectar
     if (process.env.NODE_ENV === "production") {
       console.log("Tentando reconectar em 5 segundos...");
       setTimeout(connectDB, 5000);

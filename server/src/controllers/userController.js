@@ -9,7 +9,6 @@ exports.updateProfile = async (req, res) => {
   try {
     const { name, email } = req.body;
 
-    // Verifica se o email já está em uso por outro usuário
     if (email) {
       const existingUser = await User.findOne({ email });
       if (existingUser && existingUser._id.toString() !== req.user.id) {
@@ -57,7 +56,6 @@ exports.addToFavorites = async (req, res) => {
 
     const user = await User.findById(req.user.id);
 
-    // Verifica se o item já está nos favoritos
     if (mediaType === "movie") {
       const existingMovie = user.favorites.movies.find(
         (movie) => movie.id === id
@@ -179,7 +177,6 @@ exports.addToWatchlist = async (req, res) => {
 
     const user = await User.findById(req.user.id);
 
-    // Verifica se o item já está na watchlist
     if (mediaType === "movie") {
       const existingMovie = user.watchlist.movies.find(
         (movie) => movie.id === id
@@ -301,7 +298,6 @@ exports.addToWatched = async (req, res) => {
 
     const user = await User.findById(req.user.id);
 
-    // Verifica se o item já está nos assistidos
     if (mediaType === "movie") {
       const existingMovie = user.watched.movies.find(
         (movie) => movie.id === id
@@ -419,15 +415,12 @@ exports.uploadProfileImage = async (req, res) => {
 
     const user = await User.findById(req.user.id);
 
-    // Remover imagem atual do Cloudinary se não for a default
     if (user.profileImage.public_id !== "default_profile_image") {
       await cloudinary.uploader.destroy(user.profileImage.public_id);
     }
 
-    // Upload da nova imagem
     const file = req.files.image;
 
-    // Verificar se é uma imagem
     if (!file.mimetype.startsWith("image")) {
       return res.status(400).json({
         success: false,
@@ -435,7 +428,6 @@ exports.uploadProfileImage = async (req, res) => {
       });
     }
 
-    // Verificar tamanho (máximo 2MB)
     if (file.size > 2 * 1024 * 1024) {
       return res.status(400).json({
         success: false,
@@ -450,10 +442,8 @@ exports.uploadProfileImage = async (req, res) => {
       crop: "fill",
     });
 
-    // Remover arquivo temporário
     fs.unlinkSync(file.tempFilePath);
 
-    // Atualizar perfil do usuário
     user.profileImage = {
       public_id: result.public_id,
       url: result.secure_url,

@@ -7,7 +7,6 @@ exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Verifica se o usuário já existe
     const userExists = await User.findOne({ email });
 
     if (userExists) {
@@ -17,7 +16,6 @@ exports.register = async (req, res) => {
       });
     }
 
-    // Cria o usuário
     const user = await User.create({
       name,
       email,
@@ -40,7 +38,6 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Valida email e senha
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -48,7 +45,6 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Verifica se o usuário existe
     const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
@@ -58,7 +54,6 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Verifica se a senha corresponde
     const isMatch = await user.matchPassword(password);
 
     if (!isMatch) {
@@ -106,9 +101,7 @@ exports.logout = async (req, res) => {
   });
 };
 
-// Função auxiliar para criar token e enviar resposta
 const sendTokenResponse = (user, statusCode, res) => {
-  // Cria token
   const token = user.getSignedJwtToken();
 
   res.status(statusCode).json({
