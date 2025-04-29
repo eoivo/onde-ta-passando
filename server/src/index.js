@@ -5,6 +5,7 @@ const fileUpload = require("express-fileupload");
 const path = require("path");
 const fs = require("fs");
 const connectDB = require("./config/db");
+const corsConfig = require("./cors-config");
 
 // Carrega variáveis de ambiente
 dotenv.config();
@@ -23,17 +24,10 @@ const app = express();
 
 // Log do ambiente atual
 console.log(`NODE_ENV atual: ${process.env.NODE_ENV || "não definido"}`);
+console.log(`Configuração CORS: ${JSON.stringify(corsConfig)}`);
 
-// Configuração CORS mais permissiva
-app.use(
-  cors({
-    origin: "*", // Permite todas as origens (temporariamente para diagnóstico)
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-    optionsSuccessStatus: 200,
-  })
-);
+// Middleware CORS
+app.use(cors(corsConfig));
 
 // Middleware
 app.use(express.json());
@@ -51,6 +45,23 @@ app.use((req, res, next) => {
       req.headers.origin || "Desconhecida"
     }`
   );
+
+  // Adicionar cabeçalhos CORS manualmente para maior controle (debug)
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS"
+  );
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, X-Requested-With"
+  );
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   next();
 });
 
@@ -64,6 +75,12 @@ app.get("/", (req, res) => {
     message: "API do Onde Tá Passando está rodando",
     environment: process.env.NODE_ENV || "development",
     time: new Date().toISOString(),
+    cors: {
+      enabled: true,
+      origins: Array.isArray(corsConfig.origin)
+        ? corsConfig.origin
+        : [corsConfig.origin],
+    },
   });
 });
 
