@@ -64,10 +64,10 @@ export default function ProfilePage() {
   }, [profile]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !profile) {
       refreshProfile();
     }
-  }, [isAuthenticated, refreshProfile]);
+  }, [isAuthenticated, profile, refreshProfile]);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -225,7 +225,7 @@ export default function ProfilePage() {
           onValueChange={handleTabChange}
           className="w-full"
         >
-          <div className="bg-gray-900/40 rounded-lg p-2 mb-8">
+          <div className="p-2 mb-8">
             <TabsList className="w-full bg-transparent grid grid-cols-4 gap-1">
               <TabsTrigger
                 value="profile"

@@ -27,6 +27,7 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false); // Estado para controlar o Sheet
   const router = useRouter();
   const isMobile = useMobile();
   const searchFormRef = useRef<HTMLFormElement>(null);
@@ -64,6 +65,7 @@ export default function Header() {
     if (searchQuery.trim()) {
       router.push(`/busca?q=${encodeURIComponent(searchQuery.trim())}`);
       setShowSuggestions(false);
+      setIsSheetOpen(false); // Fecha o sheet após a busca
     }
   };
 
@@ -87,6 +89,12 @@ export default function Header() {
 
   const closeSuggestions = () => {
     setShowSuggestions(false);
+    setIsSheetOpen(false); // Fecha o sheet quando clica em uma sugestão
+  };
+
+  // Função para lidar com cliques nos links de navegação
+  const handleNavClick = () => {
+    setIsSheetOpen(false);
   };
 
   return (
@@ -210,7 +218,7 @@ export default function Header() {
           )}
 
           {isMobile && (
-            <Sheet>
+            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
               <SheetTrigger asChild>
                 <Button
                   variant="ghost"
@@ -282,6 +290,7 @@ export default function Header() {
                 <nav className="flex flex-col gap-6 mt-8">
                   <Link
                     href="/"
+                    onClick={handleNavClick}
                     className="flex items-center gap-3 text-lg group transition-all duration-300 px-3 py-2 rounded-lg hover:bg-white/5"
                   >
                     <div className="p-2 rounded-full bg-gradient-to-r from-red-500/10 to-red-700/10 group-hover:from-red-500/20 group-hover:to-red-700/20 transition-all duration-300">
@@ -293,6 +302,7 @@ export default function Header() {
                   </Link>
                   <Link
                     href="/filmes"
+                    onClick={handleNavClick}
                     className="flex items-center gap-3 text-lg group transition-all duration-300 px-3 py-2 rounded-lg hover:bg-white/5"
                   >
                     <div className="p-2 rounded-full bg-gradient-to-r from-red-500/10 to-red-700/10 group-hover:from-red-500/20 group-hover:to-red-700/20 transition-all duration-300">
@@ -304,6 +314,7 @@ export default function Header() {
                   </Link>
                   <Link
                     href="/series"
+                    onClick={handleNavClick}
                     className="flex items-center gap-3 text-lg group transition-all duration-300 px-3 py-2 rounded-lg hover:bg-white/5"
                   >
                     <div className="p-2 rounded-full bg-gradient-to-r from-red-500/10 to-red-700/10 group-hover:from-red-500/20 group-hover:to-red-700/20 transition-all duration-300">
