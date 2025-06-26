@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: onde-ta-passando-frontend
+    env: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_TMDB_API_KEY
+        value: eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmYjVhYzM3YjY5NzFkNDNlOGNiYWMxMjJhYjIzNzVjNyIsIm5iZiI6MTczNjI2OTIzNi4yNjMsInN1YiI6IjY3N2RmMjI0NzI1YjczN2E2YjZjNDIzOCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.YmYWdvEKGxbfnqLXGJ8xGhOxkjWLGxJxhJOkJhGxLJ4
+      - key: NEXT_PUBLIC_GEMINI_API_KEY
+        value: AIzaSyAFlQky1K5b0MmMKZQw98LAR6yjwJP52qg
+      - key: NEXT_PUBLIC_API_URL
+        value: https://onde-ta-passando.onrender.com/api
+    healthCheckPath: /
+    region: oregon
