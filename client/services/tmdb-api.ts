@@ -28,7 +28,6 @@ async function fetchFromTMDB(
   params: Record<string, string> = {}
 ) {
   const queryParams = new URLSearchParams({
-    api_key: API_KEY,
     language: "pt-BR",
     ...params,
   });
@@ -36,7 +35,13 @@ async function fetchFromTMDB(
   const url = `${BASE_URL}${endpoint}?${queryParams}`;
 
   try {
-    const response = await fetch(url, { next: { revalidate: 60 * 60 } });
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      next: { revalidate: 60 * 60 },
+    });
     if (!response.ok) {
       throw new Error(`TMDB API error: ${response.status}`);
     }
