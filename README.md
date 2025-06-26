@@ -10,12 +10,39 @@
 
 🔗 **Site em produção:** [onde-ta-passando.netlify.app](https://onde-ta-passando.netlify.app/)
 
+## 🤖 Murphy - Assistente Cinematográfica IA
+
+Uma das funcionalidades mais inovadoras da plataforma é a **Murphy**, uma assistente de inteligência artificial inspirada na personagem Murphy Cooper do filme Interestelar. A Murphy oferece uma experiência única de conversação sobre filmes e séries:
+
+### 🎬 Características da Murphy:
+
+- **Especialização contextual:** Foca exclusivamente no filme ou série que você está visualizando
+- **Análises profundas:** Discute enredo, personagens, cinematografia, trilha sonora e aspectos técnicos
+- **Sugestões inteligentes:** Gera tópicos de conversa baseados no gênero e características do título
+- **Interface imersiva:** Avatar personalizado da Murphy com animações fluidas
+- **Powered by Gemini AI:** Utiliza a avançada tecnologia de IA do Google
+
+### 💬 Como funciona:
+
+1. Acesse qualquer página de filme ou série
+2. Clique no botão "Conversar com a Murphy"
+3. Inicie uma conversa focada exclusivamente naquele título
+4. Explore análises, teorias e discussões cinematográficas
+
+A Murphy transforma a experiência de descobrir conteúdo em uma jornada interativa e educativa sobre cinema!
+
 ## ✨ Funcionalidades
 
 - **Descoberta de conteúdo:** Navegue por filmes e séries populares, bem avaliados e lançamentos recentes
 - **Busca avançada:** Encontre conteúdo por título, gênero, ano e tipo
 - **Detalhes de mídia:** Informações detalhadas sobre filmes e séries, incluindo sinopse, elenco e avaliações
 - **Onde assistir:** Descubra em quais plataformas de streaming o conteúdo está disponível
+- **🤖 Murphy - Assistente IA:** Converse com Murphy, uma assistente cinematográfica inteligente inspirada no filme Interestelar, que oferece:
+  - Análises profundas sobre enredo, personagens e cinematografia
+  - Discussões focadas exclusivamente no título que você está visualizando
+  - Sugestões de tópicos baseadas no gênero do filme/série
+  - Interface moderna com avatar da Murphy e animações fluidas
+  - Powered by Google Gemini AI
 - **Perfil de usuário:** Cadastre-se para salvar favoritos, marcar como "assistido" e adicionar à lista de "quero assistir"
 - **Design responsivo:** Interface adaptada para dispositivos móveis e desktop
 - **Carregamento otimizado:** Sistema de carregamento eficiente com feedback visual
@@ -53,6 +80,8 @@ O projeto utiliza uma arquitetura moderna cliente-servidor:
 - **Radix UI** - Componentes primitivos acessíveis
 - **Lucide React** - Biblioteca de ícones
 - **Zustand** - Gerenciamento de estado
+- **Google Gemini AI** - Inteligência artificial para a assistente Murphy
+- **React Hot Toast** - Notificações elegantes
 
 ### Backend:
 
@@ -92,6 +121,7 @@ O projeto utiliza uma arquitetura moderna cliente-servidor:
    ```
    NEXT_PUBLIC_API_URL=http://localhost:3001/api
    NEXT_PUBLIC_TMDB_API_KEY=sua_chave_api_tmdb
+   NEXT_PUBLIC_GEMINI_API_KEY=sua_chave_api_gemini
    ```
 5. Inicie o servidor de desenvolvimento:
    ```bash
