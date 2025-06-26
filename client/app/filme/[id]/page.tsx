@@ -15,6 +15,9 @@ import { Suspense } from "react";
 import LoadingReset from "@/components/LoadingReset";
 import ShareButton from "@/components/ShareButton";
 import DynamicMediaActions from "@/components/DynamicMediaActions";
+import EnhancedStreamingProviders from "@/components/EnhancedStreamingProviders";
+import MovieChatBot from "@/components/MovieChatBot";
+import { MovieContext } from "@/services/gemini-api";
 
 export const dynamicParams = true;
 export const revalidate = 0;
@@ -36,6 +39,19 @@ export default async function MoviePage({
   const formattedRuntime = `${hours}h ${minutes}m`;
 
   const releaseDate = new Date(movie.release_date).toLocaleDateString("pt-BR");
+
+  // Preparar contexto para o chat bot
+  const movieContext: MovieContext = {
+    title: movie.title,
+    overview: movie.overview,
+    releaseDate: releaseDate,
+    genres: movie.genres.map((g: any) => g.name),
+    cast: credits.cast.slice(0, 10).map((actor: any) => actor.name),
+    director: credits.crew.find((person: any) => person.job === "Director")
+      ?.name,
+    mediaType: "movie",
+    rating: movie.vote_average,
+  };
 
   return (
     <main>
@@ -111,10 +127,18 @@ export default async function MoviePage({
               </div>
             )}
 
+            {/* Chat Bot */}
             <div className="pt-4">
-              <StreamingProviders
+              <MovieChatBot movieContext={movieContext} />
+            </div>
+
+            <div className="pt-4">
+              <EnhancedStreamingProviders
                 providers={watchProviders}
                 title={movie.title}
+                tmdbId={id}
+                imdbId={movie.imdb_id}
+                mediaType="movie"
               />
             </div>
           </div>

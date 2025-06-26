@@ -14,6 +14,8 @@ import ProviderShareButton from "./ProviderShareButton";
 interface StreamingProvidersProps {
   providers: any;
   title?: string;
+  tmdbId?: string;
+  mediaType?: 'movie' | 'tv';
 }
 
 interface Provider {
@@ -22,11 +24,12 @@ interface Provider {
   logo_path: string;
 }
 
+// Mapeamento expandido com padrões de URL mais específicos
 const PROVIDER_URLS: Record<number, string> = {
   8: "https://www.netflix.com/br/",
   119: "https://www.primevideo.com/",
   337: "https://www.disneyplus.com/pt-br",
-  384: "https://www.hbomax.com/br/pt",
+  384: "https://www.max.com/br/pt", // Atualizado para Max
   350: "https://www.appletvplus.com/",
   283: "https://www.crunchyroll.com/pt-br",
   531: "https://www.paramountplus.com/br/",
@@ -35,6 +38,11 @@ const PROVIDER_URLS: Record<number, string> = {
   100: "https://www.youtube.com/feed/storefront",
   2: "https://play.google.com/store/movies",
   3: "https://tv.apple.com/br",
+  // Novos provedores brasileiros
+  167: "https://www.plutoTV.com/br", // Pluto TV
+  613: "https://www.telecineplay.com.br", // Telecine
+  47: "https://www.clarovideo.com/brasil", // Claro Video
+  546: "https://www.discoveryplus.com/br", // Discovery+
 };
 
 // Mapeamento de nomes de qualidade para plataformas específicas
@@ -50,9 +58,51 @@ const QUALITY_MAPPING: Record<number, string> = {
   307: "HD", // Globoplay
 };
 
+// Função para gerar links mais específicos baseados no título
+const generateDirectLink = (providerId: number, title?: string, tmdbId?: string, mediaType?: 'movie' | 'tv') => {
+  const baseUrl = PROVIDER_URLS[providerId];
+  if (!baseUrl) return baseUrl;
+
+  // Netflix - tenta construir URL mais específica
+  if (providerId === 8 && tmdbId) {
+    // Netflix às vezes usa padrões previsíveis, mas não sempre
+    return `${baseUrl}title/${tmdbId}`;
+  }
+
+  // Prime Video - padrão mais específico
+  if (providerId === 119 && title) {
+    const slug = title.toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-');
+    return `${baseUrl}detail/${slug}`;
+  }
+
+  // Disney+ - padrão baseado no tipo de mídia
+  if (providerId === 337 && title) {
+    const slug = title.toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-');
+    return mediaType === 'movie' 
+      ? `${baseUrl}movies/${slug}`
+      : `${baseUrl}series/${slug}`;
+  }
+
+  // Apple TV+ - padrão mais específico
+  if (providerId === 350 && title) {
+    const slug = title.toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-');
+    return `${baseUrl}${mediaType}/${slug}`;
+  }
+
+  return baseUrl;
+};
+
 export default function StreamingProviders({
   providers,
   title = "",
+  tmdbId,
+  mediaType = 'movie',
 }: StreamingProvidersProps) {
   const [detailsOpen, setDetailsOpen] = useState(false);
 
@@ -76,9 +126,9 @@ export default function StreamingProviders({
   ];
 
   const handleProviderClick = (providerId: number) => {
-    const url = PROVIDER_URLS[providerId];
-    if (url) {
-      window.open(url, "_blank", "noopener,noreferrer");
+    const directUrl = generateDirectLink(providerId, title, tmdbId, mediaType);
+    if (directUrl) {
+      window.open(directUrl, "_blank", "noopener,noreferrer");
     }
   };
 
@@ -88,7 +138,7 @@ export default function StreamingProviders({
   ) => (
     <div
       key={provider.provider_id}
-      className="bg-gray-800 rounded-lg p-4 hover:bg-gray-700 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl group"
+      className="bg-gray-800 rounded-lg p-4 hover:bg-gray-700 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl group cursor-pointer"
       onClick={() => handleProviderClick(provider.provider_id)}
     >
       <div className="flex items-center">
@@ -108,16 +158,22 @@ export default function StreamingProviders({
           {QUALITY_MAPPING[provider.provider_id] || "HD"}
         </div>
 
-        <a
-          href={PROVIDER_URLS[provider.provider_id] || "#"}
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
           className="bg-primary text-white py-1.5 px-4 rounded-md hover:bg-primary/80 transition duration-300 flex items-center group-hover:scale-105 text-sm"
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleProviderClick(provider.provider_id);
+          }}
         >
           <PlayCircle className="mr-1 h-4 w-4" />
           Assistir
-        </a>
+        </button>
+      </div>
+
+      {/* Indicador de link direto */}
+      <div className="mt-2 flex items-center text-xs text-gray-400">
+        <ExternalLink className="mr-1 h-3 w-3" />
+        Link direto para a plataforma
       </div>
     </div>
   );

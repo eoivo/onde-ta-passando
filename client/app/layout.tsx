@@ -8,7 +8,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import NavigationProvider from "@/providers/NavigationProvider";
 import { AuthProvider } from "@/context/AuthContext";
-import { Toaster } from "sonner";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -39,7 +39,32 @@ export default function RootLayout({
               <Header />
               <main className="flex-grow">{children}</main>
               <Footer />
-              <Toaster theme="dark" position="top-center" richColors />
+              <Toaster 
+                position="top-right"
+                toastOptions={{
+                  duration: 3000,
+                  style: {
+                    background: '#363636',
+                    color: '#fff',
+                    borderRadius: '12px',
+                    padding: '12px 16px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                  },
+                  success: {
+                    iconTheme: {
+                      primary: '#10B981',
+                      secondary: '#fff',
+                    },
+                  },
+                  error: {
+                    iconTheme: {
+                      primary: '#EF4444',
+                      secondary: '#fff',
+                    },
+                  },
+                }}
+              />
             </NavigationProvider>
           </AuthProvider>
         </ThemeProvider>

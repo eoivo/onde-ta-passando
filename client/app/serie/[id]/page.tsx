@@ -15,7 +15,9 @@ import { Suspense } from "react";
 import LoadingReset from "@/components/LoadingReset";
 import ShareButton from "@/components/ShareButton";
 import DynamicMediaActions from "@/components/DynamicMediaActions";
-
+import EnhancedStreamingProviders from "@/components/EnhancedStreamingProviders";
+import MovieChatBot from "@/components/MovieChatBot";
+import { MovieContext } from "@/services/gemini-api";
 
 export const dynamicParams = true;
 export const revalidate = 0;
@@ -44,6 +46,20 @@ export default async function TVShowPage({
   };
 
   const status = statusMap[tvShow.status] || tvShow.status;
+
+  // Preparar contexto para o chat bot
+  const seriesContext: MovieContext = {
+    title: tvShow.name,
+    overview: tvShow.overview,
+    releaseDate: firstAirDate,
+    genres: tvShow.genres.map((g: any) => g.name),
+    cast: credits.cast.slice(0, 10).map((actor: any) => actor.name),
+    director: credits.crew.find(
+      (person: any) => person.job === "Executive Producer"
+    )?.name,
+    mediaType: "tv",
+    rating: tvShow.vote_average,
+  };
 
   return (
     <main>
@@ -79,7 +95,7 @@ export default async function TVShowPage({
                 <DynamicMediaActions
                   mediaId={id}
                   mediaType="tv"
-                  name={tvShow.name}
+                  title={tvShow.name}
                   posterPath={tvShow.poster_path}
                 />
                 <ShareButton title={tvShow.name} />
@@ -101,13 +117,13 @@ export default async function TVShowPage({
               </div>
 
               <div className="flex items-center gap-1 ml-2">
-                <Badge variant="secondary">{status}</Badge>
-              </div>
-
-              <div className="flex items-center gap-1 ml-2">
                 <Calendar className="w-4 h-4" />
                 <span>{firstAirDate}</span>
               </div>
+
+              <Badge variant="secondary" className="ml-2">
+                {status}
+              </Badge>
             </div>
 
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-300">
@@ -135,10 +151,18 @@ export default async function TVShowPage({
               </div>
             )}
 
+            {/* Chat Bot */}
             <div className="pt-4">
-              <StreamingProviders
+              <MovieChatBot movieContext={seriesContext} />
+            </div>
+
+            <div className="pt-4">
+              <EnhancedStreamingProviders
                 providers={watchProviders}
                 title={tvShow.name}
+                tmdbId={id}
+                imdbId={tvShow.external_ids?.imdb_id}
+                mediaType="tv"
               />
             </div>
           </div>
