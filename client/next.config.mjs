@@ -15,6 +15,7 @@ const nextConfig = {
         pathname: "/**",
       },
     ],
+    unoptimized: false, // Garante que a otimização está habilitada
   },
   env: {
     API_KEY: process.env.API_KEY,

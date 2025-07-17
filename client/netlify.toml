@@ -1,20 +1,10 @@
 [build]
   command = "next build"
-  publish = ".next"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Configurações para rotas SPA
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
 # Configuração para otimização de imagens Next.js
 [build.environment]
-  NEXT_USE_NETLIFY_EDGE = "true"
   NODE_VERSION = "18"
-  NEXT_DISABLE_PREBUNDLING = "1"
-  NEXT_PUBLIC_NETLIFY_NEXT_PLUGIN_SKIP = "true"
   NEXT_PUBLIC_API_URL = "https://onde-ta-passando.onrender.com/api" 
