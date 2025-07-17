@@ -47,7 +47,6 @@ export default async function TVShowPage({
 
   const status = statusMap[tvShow.status] || tvShow.status;
 
-  // Preparar contexto para o chat bot
   const seriesContext: MovieContext = {
     title: tvShow.name,
     overview: tvShow.overview,
