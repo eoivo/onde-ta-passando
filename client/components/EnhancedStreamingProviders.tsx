@@ -225,13 +225,18 @@ export default function EnhancedStreamingProviders({
 
   const renderProvider = (
     provider: Provider,
-    type: "flatrate" | "rent" | "buy"
+    type: "flatrate" | "rent" | "buy",
+    index?: number
   ) => {
     const quality = PROVIDER_QUALITY_MAPPING[provider.provider_id] || "HD";
+    // Cria key única combinando provider_id, type e index para evitar duplicatas
+    const uniqueKey = `${provider.provider_id}-${type}${
+      index !== undefined ? `-${index}` : ""
+    }`;
 
     return (
       <div
-        key={provider.provider_id}
+        key={uniqueKey}
         className="bg-gray-800 rounded-xl p-5 hover:bg-gray-700 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl group cursor-pointer"
         onClick={() => handleProviderClick(provider.provider_id)}
       >
@@ -319,8 +324,8 @@ export default function EnhancedStreamingProviders({
             📺 Incluído na Assinatura
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredFlatrate.map((provider: Provider) =>
-              renderProvider(provider, "flatrate")
+            {filteredFlatrate.map((provider: Provider, index: number) =>
+              renderProvider(provider, "flatrate", index)
             )}
           </div>
         </div>
@@ -333,13 +338,11 @@ export default function EnhancedStreamingProviders({
             💰 Aluguel ou Compra
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...filteredRent, ...filteredBuy].map((provider: Provider) =>
-              renderProvider(
-                provider,
-                filteredRent.find((p) => p.provider_id === provider.provider_id)
-                  ? "rent"
-                  : "buy"
-              )
+            {filteredRent.map((provider: Provider, index: number) =>
+              renderProvider(provider, "rent", index)
+            )}
+            {filteredBuy.map((provider: Provider, index: number) =>
+              renderProvider(provider, "buy", index)
             )}
           </div>
         </div>

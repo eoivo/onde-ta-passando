@@ -12,24 +12,43 @@
 
 ## 🤖 Murphy - Assistente Cinematográfica IA
 
-Uma das funcionalidades mais inovadoras da plataforma é a **Murphy**, uma assistente de inteligência artificial inspirada na personagem Murphy Cooper do filme Interestelar. A Murphy oferece uma experiência única de conversação sobre filmes e séries:
+Uma das funcionalidades mais inovadoras da plataforma é a **Murphy**, uma assistente de inteligência artificial inspirada na personagem Murphy Cooper do filme Interestelar. A Murphy oferece uma experiência única de conversação sobre filmes e séries com tecnologia de ponta:
 
-### 🎬 Características da Murphy:
+### 🎬 Capacidades Avançadas da Murphy:
 
-- **Especialização contextual:** Foca exclusivamente no filme ou série que você está visualizando
-- **Análises profundas:** Discute enredo, personagens, cinematografia, trilha sonora e aspectos técnicos
-- **Sugestões inteligentes:** Gera tópicos de conversa baseados no gênero e características do título
-- **Interface imersiva:** Avatar personalizado da Murphy com animações fluidas
-- **Powered by Gemini AI:** Utiliza a avançada tecnologia de IA do Google
+- **🎯 Inteligência Contextual:** Foca exclusivamente no filme ou série que você está visualizando, com conhecimento profundo sobre a obra
+- **🧠 Análises Cinematográficas:** Discute enredo, desenvolvimento de personagens, cinematografia, trilha sonora, direção e aspectos técnicos
+- **💡 Recomendações Inteligentes:** Sistema sofisticado que detecta pedidos de recomendação e sugere títulos similares com explicações detalhadas
+- **🔧 Correção Automática:** Entende mensagens com erros ortográficos, gírias e abreviações naturalmente
+- **📚 Tópicos Dinâmicos:** Gera sugestões de conversa baseadas no gênero, elenco e características específicas do título
+- **🎭 Personalidade Consistente:** Mantém tom amigável e especializado, adaptando-se ao contexto da conversa
+- **🛡️ Autenticação Integrada:** Acesso seguro apenas para usuários logados
+
+### 🚀 Tecnologia de Ponta:
+
+- **Google Gemini AI 2.0 Flash:** Modelo de IA mais avançado para conversas naturais
+- **Processamento de Linguagem Natural:** Compreende português brasileiro com nuances e expressões coloquiais
+- **Sistema de Prompts Inteligente:** Mais de 900 linhas de código otimizado para experiência cinematográfica
+- **Interface com Markdown:** Suporte a formatação rica nas respostas
+- **Detecção de Sentimento:** Adapta respostas baseado no tom da conversa
 
 ### 💬 Como funciona:
 
-1. Acesse qualquer página de filme ou série
-2. Clique no botão "Conversar com a Murphy"
-3. Inicie uma conversa focada exclusivamente naquele título
-4. Explore análises, teorias e discussões cinematográficas
+1. **Login Necessário:** Faça login para acessar a Murphy
+2. **Acesse qualquer título:** Navegue até a página de um filme ou série
+3. **Inicie a conversa:** Clique em "Conversar com a Murphy"
+4. **Explore sem limites:** Peça análises, recomendações, discuta teorias ou tire dúvidas
+5. **Desfrute da experiência:** Interface fluida com avatar animado e respostas formatadas
 
-A Murphy transforma a experiência de descobrir conteúdo em uma jornada interativa e educativa sobre cinema!
+### ✨ O que torna a Murphy especial:
+
+🎓 **Especialista Real:** Conhecimento cinematográfico profundo, não apenas respostas genéricas  
+🔍 **Compreensão Total:** Entende até mensagens com erros, como "oq vc acho do filmi?"  
+🎬 **Recomendações Precisas:** Sugere títulos específicos com justificativas detalhadas  
+💬 **Conversa Natural:** Interação fluida em português brasileiro  
+🎯 **Foco Contextual:** Cada conversa é única para o título que você está explorando
+
+A Murphy transforma a descoberta de conteúdo em uma jornada interativa, educativa e profundamente envolvente sobre cinema!
 
 ## ✨ Funcionalidades
 
@@ -37,12 +56,13 @@ A Murphy transforma a experiência de descobrir conteúdo em uma jornada interat
 - **Busca avançada:** Encontre conteúdo por título, gênero, ano e tipo
 - **Detalhes de mídia:** Informações detalhadas sobre filmes e séries, incluindo sinopse, elenco e avaliações
 - **Onde assistir:** Descubra em quais plataformas de streaming o conteúdo está disponível
-- **🤖 Murphy - Assistente IA:** Converse com Murphy, uma assistente cinematográfica inteligente inspirada no filme Interestelar, que oferece:
-  - Análises profundas sobre enredo, personagens e cinematografia
-  - Discussões focadas exclusivamente no título que você está visualizando
-  - Sugestões de tópicos baseadas no gênero do filme/série
-  - Interface moderna com avatar da Murphy e animações fluidas
-  - Powered by Google Gemini AI
+- **🤖 Murphy - Assistente IA Avançada:** Converse com Murphy, uma assistente cinematográfica inteligente inspirada no filme Interestelar, que oferece:
+  - Sistema de recomendações inteligente com títulos específicos e justificativas
+  - Análises profundas sobre enredo, personagens, cinematografia e aspectos técnicos
+  - Compreensão natural de português brasileiro, incluindo gírias e erros ortográficos
+  - Tópicos de conversa dinâmicos baseados no gênero e características do título
+  - Interface moderna com avatar da Murphy, animações fluidas e suporte a Markdown
+  - Powered by Google Gemini AI 2.0 Flash com autenticação integrada
 - **Perfil de usuário:** Cadastre-se para salvar favoritos, marcar como "assistido" e adicionar à lista de "quero assistir"
 - **Design responsivo:** Interface adaptada para dispositivos móveis e desktop
 - **Carregamento otimizado:** Sistema de carregamento eficiente com feedback visual
