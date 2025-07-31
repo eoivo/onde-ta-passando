@@ -7,8 +7,17 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
@@ -23,23 +32,79 @@ import {
   Brain,
   Star,
   MessageSquare,
-  Mic,
   Copy,
   Check,
+  LogIn,
+  UserPlus,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import ReactMarkdown from "react-markdown";
 import {
   MovieContext,
   generateWelcomeMessage,
   generateSuggestedTopics,
 } from "@/services/gemini-api";
 import { useMovieChat } from "@/hooks/useMovieChat";
+import { useAuth } from "@/context/AuthContext";
 import toast from "react-hot-toast";
 
 interface MovieChatBotProps {
   movieContext: MovieContext;
 }
+
+// Componente para renderizar mensagens com Markdown
+const MessageContent: React.FC<{ content: string; isAssistant: boolean }> = ({
+  content,
+  isAssistant,
+}) => {
+  if (!isAssistant) {
+    return (
+      <p className="text-sm leading-relaxed whitespace-pre-wrap">{content}</p>
+    );
+  }
+
+  return (
+    <div className="text-sm leading-relaxed">
+      <ReactMarkdown
+        components={{
+          // Customiza a renderização de parágrafos
+          p: ({ children }) => (
+            <p className="text-sm leading-relaxed mb-2 last:mb-0">{children}</p>
+          ),
+          // Customiza a renderização de listas
+          ul: ({ children }) => (
+            <ul className="text-sm leading-relaxed ml-4 mb-2 space-y-1">
+              {children}
+            </ul>
+          ),
+          li: ({ children }) => (
+            <li className="text-sm leading-relaxed list-disc marker:text-red-400">
+              {children}
+            </li>
+          ),
+          // Customiza a renderização de texto em negrito
+          strong: ({ children }) => (
+            <strong className="font-semibold text-red-300">{children}</strong>
+          ),
+          // Customiza a renderização de texto em itálico
+          em: ({ children }) => (
+            <em className="italic text-gray-200">{children}</em>
+          ),
+          // Customiza a renderização de código inline
+          code: ({ children }) => (
+            <code className="bg-gray-700 text-red-300 px-1 py-0.5 rounded text-xs">
+              {children}
+            </code>
+          ),
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
+  );
+};
 
 export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -48,10 +113,13 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
   const [hasInitialized, setHasInitialized] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [copiedMessage, setCopiedMessage] = useState<number | null>(null);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
+  const { isAuthenticated, user } = useAuth();
   const {
     messages,
     isLoading,
@@ -65,17 +133,40 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const handleChatButtonClick = () => {
+    if (!isAuthenticated) {
+      setShowAuthDialog(true);
+      return;
+    }
+    setIsOpen(true);
+  };
+
+  const handleLoginRedirect = () => {
+    setShowAuthDialog(false);
+    router.push("/login");
+  };
+
+  const handleRegisterRedirect = () => {
+    setShowAuthDialog(false);
+    router.push("/cadastro");
+  };
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
   useEffect(() => {
-    if (isOpen && !hasInitialized) {
+    if (isOpen && !hasInitialized && isAuthenticated) {
       const initializeChat = async () => {
         try {
           setIsTyping(true);
           await new Promise((resolve) => setTimeout(resolve, 1000)); // Simula digitação
-          const welcomeMessage = await generateWelcomeMessage(movieContext);
+
+          const userName = user?.name?.split(" ")[0] || "amigo";
+          const welcomeMessage = await generateWelcomeMessage(
+            movieContext,
+            userName
+          );
           const topics = generateSuggestedTopics(movieContext);
 
           addWelcomeMessage(welcomeMessage);
@@ -85,8 +176,9 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
           toast.success(`Chat iniciado sobre "${movieContext.title}"! 🎬`);
         } catch (error) {
           console.error("Erro ao inicializar chat:", error);
+          const userName = user?.name?.split(" ")[0] || "amigo";
           addWelcomeMessage(
-            `Olá! Vamos conversar sobre "${movieContext.title}"? 🎬`
+            `Olá! ${userName} ✨ Murphy aqui! Vamos conversar sobre "${movieContext.title}"? 🎬`
           );
           setIsTyping(false);
           toast.error("Erro ao inicializar chat");
@@ -95,7 +187,14 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
 
       initializeChat();
     }
-  }, [isOpen, hasInitialized, movieContext, addWelcomeMessage]);
+  }, [
+    isOpen,
+    hasInitialized,
+    movieContext,
+    addWelcomeMessage,
+    isAuthenticated,
+    user,
+  ]);
 
   const handleSendMessage = async (messageToSend?: string) => {
     const message = messageToSend || inputValue.trim();
@@ -165,18 +264,78 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
 
   return (
     <>
+      {/* Dialog de Autenticação */}
+      <AlertDialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
+        <AlertDialogContent className="bg-gray-900 border-gray-800 text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-xl">
+              <motion.div
+                animate={{
+                  scale: [1, 1.1, 1],
+                  rotate: [0, 5, -5, 0],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="w-10 h-10 rounded-full bg-gradient-to-r from-red-500 to-red-600 flex items-center justify-center"
+              >
+                <Brain className="h-5 w-5 text-white" />
+              </motion.div>
+              Login Necessário
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-300 text-base leading-relaxed">
+              Para conversar com a Murphy sobre "{movieContext.title}", você
+              precisa estar logado no sistema.
+              <br />
+              <br />
+              🎬 <strong>Com uma conta você pode:</strong>
+              <br />• Conversar com a Murphy sobre qualquer filme ou série
+              <br />• Receber recomendações personalizadas
+              <br />• Salvar suas conversas e favoritos
+              <br />
+              <br />
+              Não tem uma conta ainda? É rápido e gratuito criar uma!
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-3">
+            <AlertDialogCancel
+              className="bg-gray-800 border-gray-700 text-white hover:bg-gray-700"
+              onClick={() => setShowAuthDialog(false)}
+            >
+              Cancelar
+            </AlertDialogCancel>
+            <Button
+              variant="outline"
+              onClick={handleRegisterRedirect}
+              className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white"
+            >
+              <UserPlus className="mr-2 h-4 w-4" />
+              Criar Conta
+            </Button>
+            <AlertDialogAction
+              onClick={handleLoginRedirect}
+              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800"
+            >
+              <LogIn className="mr-2 h-4 w-4" />
+              Entrar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogTrigger asChild>
-          <Button
-            size="lg"
-            className="relative gap-3 bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white border-0 hover:from-red-700 hover:via-red-800 hover:to-red-900 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden"
-          >
-            <Sparkles className="h-5 w-5" />
-            <MessageCircle className="h-5 w-5" />
-            <span className="font-semibold">Conversar com a Murphy</span>
-            <Zap className="h-4 w-4" />
-          </Button>
-        </DialogTrigger>
+        <Button
+          onClick={handleChatButtonClick}
+          size="lg"
+          className="relative gap-3 bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white border-0 hover:from-red-700 hover:via-red-800 hover:to-red-900 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden"
+        >
+          <Sparkles className="h-5 w-5" />
+          <MessageCircle className="h-5 w-5" />
+          <span className="font-semibold">Conversar com a Murphy</span>
+          <Zap className="h-4 w-4" />
+        </Button>
 
         <DialogContent className="h-[90vh] mx-auto my-auto w-[calc(100%-2rem)] max-w-4xl flex flex-col p-0 bg-gradient-to-br from-gray-900 to-black border-0 shadow-2xl rounded-2xl overflow-hidden">
           <DialogHeader className="p-6 bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white relative">
@@ -290,9 +449,10 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
                           <div className="absolute -top-1 -left-1 w-3 h-3 bg-gradient-to-r from-red-500 to-red-600 rounded-full shadow-sm" />
                         )}
 
-                        <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                          {message.content}
-                        </p>
+                        <MessageContent
+                          content={message.content}
+                          isAssistant={message.role === "assistant"}
+                        />
 
                         <div
                           className={`flex items-center justify-between mt-2 pt-2 border-t ${
@@ -452,9 +612,6 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
                   disabled={isLoading}
                   className="h-12 pr-12 bg-gray-700/80 border-0 focus:ring-2 focus:ring-red-500/50 focus:ring-offset-0 rounded-xl shadow-sm text-sm placeholder:text-gray-400 text-white backdrop-blur-sm"
                 />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                  <Mic className="h-4 w-4 text-gray-400" />
-                </div>
               </div>
 
               <Button
@@ -484,14 +641,6 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
                   <Send className="h-4 w-4" />
                 )}
               </Button>
-            </div>
-
-            <div className="flex items-center justify-center mt-4 text-xs text-gray-400">
-              <div className="flex items-center gap-1">
-                <span>
-                  Powered by Gemini AI • Focado em "{movieContext.title}"
-                </span>
-              </div>
             </div>
           </div>
         </DialogContent>

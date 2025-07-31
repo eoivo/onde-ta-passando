@@ -155,7 +155,7 @@ export function isMessageRelatedToMovie(
     movieContext.title.toLowerCase(),
     ...movieContext.genres.map((g) => g.toLowerCase()),
     ...movieContext.cast.slice(0, 3).map((c) => c.toLowerCase()),
-    movieContext.director.toLowerCase(),
+    ...(movieContext.director ? [movieContext.director.toLowerCase()] : []),
   ];
 
   const messageWords = message.toLowerCase().split(" ");
@@ -168,12 +168,19 @@ export function isMessageRelatedToMovie(
 
 // Função para gerar mensagens de boas-vindas personalizadas
 export async function generateWelcomeMessage(
-  movieContext: MovieContext
+  movieContext: MovieContext,
+  userName?: string
 ): Promise<string> {
+  const greeting = userName ? `Olá! ${userName} ✨` : "Olá! ✨";
+
   const welcomeMessages = [
-    `Oi! 🎬 Sou a Murphy, sua assistente cinematográfica! Estou aqui para bater um papo sobre "${movieContext.title}". O que você gostaria de saber ou discutir sobre esta obra?`,
-    `Olá! ✨ Murphy aqui! Estou super animada para conversar sobre "${movieContext.title}" com você. Que tal começarmos explorando o que mais te chamou atenção?`,
-    `E aí! 🌟 Sou a Murphy e adoro uma boa conversa sobre cinema! Vamos mergulhar juntos no universo de "${movieContext.title}"?`,
+    `${greeting} Murphy aqui! Estou super animada para conversar sobre "${movieContext.title}" com você. Que tal começarmos explorando o que mais te chamou atenção?`,
+    `${greeting} Sou a Murphy, sua assistente cinematográfica! Estou aqui para bater um papo sobre "${movieContext.title}". O que você gostaria de saber ou discutir sobre esta obra? 🎬`,
+    `E aí! ${
+      userName ? `${userName} ` : ""
+    }🌟 Sou a Murphy e adoro uma boa conversa sobre cinema! Vamos mergulhar juntos no universo de "${
+      movieContext.title
+    }"?`,
   ];
 
   return welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
