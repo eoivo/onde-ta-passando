@@ -1,22 +1,52 @@
 const nodemailer = require("nodemailer");
 
+// Função para limpar variáveis de ambiente (remove aspas e espaços)
+const cleanEnvVar = (value) => {
+  if (!value) return value;
+  return value.toString().replace(/^["']|["']$/g, '').trim();
+};
+
+// Obter e limpar variáveis de ambiente
+const smtpUser = cleanEnvVar(process.env.SMTP_USER);
+const smtpPass = cleanEnvVar(process.env.SMTP_PASS);
+const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
+const smtpPort = parseInt(process.env.SMTP_PORT) || 587;
+
+// Log de configuração (sem mostrar senha completa)
+if (process.env.NODE_ENV === 'production') {
+  console.log(`Configuração SMTP: ${smtpHost}:${smtpPort}, User: ${smtpUser}, Pass: ${smtpPass ? '***' + smtpPass.slice(-3) : 'não definido'}`);
+}
+
 // Criar transporter de email
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || "smtp.gmail.com",
-  port: process.env.SMTP_PORT || 587,
+  host: smtpHost,
+  port: smtpPort,
   secure: false, // true para 465, false para outras portas
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    user: smtpUser,
+    pass: smtpPass,
   },
+  connectionTimeout: 10000, // 10 segundos para conectar
+  greetingTimeout: 10000, // 10 segundos para greeting
+  socketTimeout: 10000, // 10 segundos para socket
+  // Configurações adicionais para produção
+  pool: true,
+  maxConnections: 1,
+  maxMessages: 3,
 });
 
-// Verificar conexão
+// Verificar conexão (apenas uma vez na inicialização)
 transporter.verify(function (error, success) {
   if (error) {
-    console.log("Erro na configuração de email:", error);
+    console.error("Erro na configuração de email:", error.message);
+    console.error("Detalhes:", {
+      host: smtpHost,
+      port: smtpPort,
+      user: smtpUser,
+      hasPass: !!smtpPass,
+    });
   } else {
-    console.log("Servidor de email pronto para enviar mensagens");
+    console.log("✅ Servidor de email pronto para enviar mensagens");
   }
 });
 
@@ -151,10 +181,17 @@ const sendPasswordResetEmail = async (email, resetToken) => {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    // Adicionar timeout de 15 segundos para o envio
+    const sendPromise = transporter.sendMail(mailOptions);
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error("Timeout ao enviar email")), 15000);
+    });
+    
+    await Promise.race([sendPromise, timeoutPromise]);
+    console.log(`Email de reset enviado para: ${email}`);
     return true;
   } catch (error) {
-    console.error("Erro ao enviar email:", error);
+    console.error("Erro ao enviar email de reset:", error);
     throw error;
   }
 };
@@ -301,7 +338,14 @@ const sendWelcomeEmail = async (email, name) => {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    // Adicionar timeout de 15 segundos para o envio
+    const sendPromise = transporter.sendMail(mailOptions);
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error("Timeout ao enviar email")), 15000);
+    });
+    
+    await Promise.race([sendPromise, timeoutPromise]);
+    console.log(`Email de boas-vindas enviado para: ${email}`);
     return true;
   } catch (error) {
     console.error("Erro ao enviar email de boas-vindas:", error);
