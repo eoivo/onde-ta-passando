@@ -15,9 +15,13 @@ const smtpPort = parseInt(process.env.SMTP_PORT) || 587;
 // Log de configuração (sem mostrar senha completa)
 if (process.env.NODE_ENV === 'production') {
   console.log(`Configuração SMTP: ${smtpHost}:${smtpPort}, User: ${smtpUser}, Pass: ${smtpPass ? '***' + smtpPass.slice(-3) : 'não definido'}`);
+  console.log(`SMTP_PASS original: ${process.env.SMTP_PASS ? 'Definido (' + process.env.SMTP_PASS.length + ' chars)' : 'Não definido'}`);
+  console.log(`SMTP_PASS limpo: ${smtpPass ? 'Sim (' + smtpPass.length + ' chars)' : 'Não'}`);
+  console.log(`SMTP_PASS tem aspas: ${smtpPass && (smtpPass.includes('"') || smtpPass.includes("'")) ? 'Sim' : 'Não'}`);
 }
 
 // Criar transporter de email usando a porta configurada nas variáveis de ambiente
+// Configuração otimizada para Render.com
 const transporter = nodemailer.createTransport({
   host: smtpHost,
   port: smtpPort,
@@ -26,12 +30,25 @@ const transporter = nodemailer.createTransport({
     user: smtpUser,
     pass: smtpPass,
   },
-  connectionTimeout: 30000, // 30 segundos
-  greetingTimeout: 30000,
-  socketTimeout: 30000,
+  // Timeouts aumentados para Render
+  connectionTimeout: 60000, // 60 segundos
+  greetingTimeout: 60000,
+  socketTimeout: 60000,
+  // Configurações adicionais para melhor compatibilidade
+  pool: false, // Desabilitar pool pode ajudar em alguns casos
   tls: {
-    rejectUnauthorized: false, // Aceitar certificados auto-assinados
+    rejectUnauthorized: false,
+    minVersion: 'TLSv1.2',
   },
+  // Para porta 465 (SSL)
+  ...(smtpPort === 465 && {
+    requireTLS: false,
+  }),
+  // Para porta 587 (STARTTLS)
+  ...(smtpPort === 587 && {
+    requireTLS: true,
+    ciphers: 'SSLv3',
+  }),
 });
 
 // Não verificar conexão na inicialização (pode causar timeout em produção)
@@ -169,11 +186,11 @@ const sendPasswordResetEmail = async (email, resetToken) => {
   };
 
   try {
-    // Tentar enviar com timeout de 30 segundos
+    // Tentar enviar com timeout de 60 segundos (aumentado para Render)
     console.log(`📧 Enviando email de reset para: ${email} (porta ${smtpPort})`);
     const sendPromise = transporter.sendMail(mailOptions);
     const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error("Timeout ao enviar email (30s)")), 30000);
+      setTimeout(() => reject(new Error("Timeout ao enviar email (60s)")), 60000);
     });
     
     await Promise.race([sendPromise, timeoutPromise]);
@@ -388,7 +405,7 @@ const sendTestEmail = async (toEmail) => {
   try {
     const sendPromise = transporter.sendMail(mailOptions);
     const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error("Timeout ao enviar email de teste (30s)")), 30000);
+      setTimeout(() => reject(new Error("Timeout ao enviar email de teste (60s)")), 60000);
     });
     
     await Promise.race([sendPromise, timeoutPromise]);
