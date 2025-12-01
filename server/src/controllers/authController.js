@@ -315,6 +315,8 @@ exports.testEmail = async (req, res) => {
       });
     }
 
+    console.log(`🧪 Iniciando teste de email para: ${email}`);
+
     // Testar conexão primeiro
     const connectionTest = await testEmailConnection();
     console.log("Teste de conexão:", connectionTest);
@@ -323,19 +325,23 @@ exports.testEmail = async (req, res) => {
     const testResult = await sendTestEmail(email);
 
     if (testResult.success) {
+      console.log(`✅ Email de teste enviado com sucesso para: ${email}`);
       return res.status(200).json({
         success: true,
         message: testResult.message,
         connectionTest: connectionTest.message,
       });
     } else {
+      console.error(`❌ Falha ao enviar email de teste: ${testResult.message}`);
       return res.status(500).json({
         success: false,
         message: testResult.message,
         connectionTest: connectionTest.message,
+        error: testResult.error,
       });
     }
   } catch (error) {
+    console.error("❌ Erro no teste de email:", error);
     res.status(500).json({
       success: false,
       message: error.message,

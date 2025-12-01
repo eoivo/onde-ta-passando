@@ -17,49 +17,22 @@ if (process.env.NODE_ENV === 'production') {
   console.log(`Configuração SMTP: ${smtpHost}:${smtpPort}, User: ${smtpUser}, Pass: ${smtpPass ? '***' + smtpPass.slice(-3) : 'não definido'}`);
 }
 
-// Função para criar transporter (tenta múltiplas configurações)
-const createTransporter = () => {
-  // Tentar porta 465 com SSL primeiro (menos bloqueada em produção)
-  if (smtpPort === 465 || !smtpPort) {
-    return nodemailer.createTransport({
-      host: smtpHost,
-      port: 465,
-      secure: true, // SSL
-      auth: {
-        user: smtpUser,
-        pass: smtpPass,
-      },
-      connectionTimeout: 30000, // 30 segundos
-      greetingTimeout: 30000,
-      socketTimeout: 30000,
-      tls: {
-        rejectUnauthorized: false, // Aceitar certificados auto-assinados
-      },
-    });
-  }
-  
-  // Porta 587 com STARTTLS
-  return nodemailer.createTransport({
-    host: smtpHost,
-    port: smtpPort,
-    secure: false, // STARTTLS
-    auth: {
-      user: smtpUser,
-      pass: smtpPass,
-    },
-    connectionTimeout: 30000, // 30 segundos
-    greetingTimeout: 30000,
-    socketTimeout: 30000,
-    tls: {
-      rejectUnauthorized: false, // Aceitar certificados auto-assinados
-      ciphers: 'SSLv3', // Forçar ciphers compatíveis
-    },
-    requireTLS: true, // Forçar TLS
-  });
-};
-
-// Criar transporter de email
-const transporter = createTransporter();
+// Criar transporter de email usando a porta configurada nas variáveis de ambiente
+const transporter = nodemailer.createTransport({
+  host: smtpHost,
+  port: smtpPort,
+  secure: smtpPort === 465, // SSL para porta 465, STARTTLS para 587
+  auth: {
+    user: smtpUser,
+    pass: smtpPass,
+  },
+  connectionTimeout: 30000, // 30 segundos
+  greetingTimeout: 30000,
+  socketTimeout: 30000,
+  tls: {
+    rejectUnauthorized: false, // Aceitar certificados auto-assinados
+  },
+});
 
 // Não verificar conexão na inicialização (pode causar timeout em produção)
 // A verificação será feita automaticamente quando o primeiro email for enviado
@@ -197,6 +170,7 @@ const sendPasswordResetEmail = async (email, resetToken) => {
 
   try {
     // Tentar enviar com timeout de 30 segundos
+    console.log(`📧 Enviando email de reset para: ${email} (porta ${smtpPort})`);
     const sendPromise = transporter.sendMail(mailOptions);
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => reject(new Error("Timeout ao enviar email (30s)")), 30000);
@@ -213,36 +187,6 @@ const sendPasswordResetEmail = async (email, resetToken) => {
       errorCommand: error.command,
       errorResponse: error.response,
     });
-    
-    // Se falhar com porta 587, tentar porta 465
-    if (smtpPort === 587 && error.code !== 'ETIMEDOUT') {
-      console.log("🔄 Tentando reenviar com porta 465 (SSL)...");
-      try {
-        const sslTransporter = nodemailer.createTransport({
-          host: smtpHost,
-          port: 465,
-          secure: true,
-          auth: {
-            user: smtpUser,
-            pass: smtpPass,
-          },
-          connectionTimeout: 30000,
-          greetingTimeout: 30000,
-          socketTimeout: 30000,
-          tls: {
-            rejectUnauthorized: false,
-          },
-        });
-        
-        await sslTransporter.sendMail(mailOptions);
-        console.log(`✅ Email de reset enviado via SSL para: ${email}`);
-        return true;
-      } catch (sslError) {
-        console.error("❌ Erro ao enviar via SSL:", sslError.message);
-        throw error; // Lançar erro original
-      }
-    }
-    
     throw error;
   }
 };
@@ -390,6 +334,7 @@ const sendWelcomeEmail = async (email, name) => {
 
   try {
     // Tentar enviar com timeout de 30 segundos
+    console.log(`📧 Enviando email de boas-vindas para: ${email} (porta ${smtpPort})`);
     const sendPromise = transporter.sendMail(mailOptions);
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => reject(new Error("Timeout ao enviar email (30s)")), 30000);
@@ -406,37 +351,6 @@ const sendWelcomeEmail = async (email, name) => {
       errorCommand: error.command,
       errorResponse: error.response,
     });
-    
-    // Se falhar com porta 587, tentar porta 465
-    if (smtpPort === 587 && error.code !== 'ETIMEDOUT') {
-      console.log("🔄 Tentando reenviar com porta 465 (SSL)...");
-      try {
-        const sslTransporter = nodemailer.createTransport({
-          host: smtpHost,
-          port: 465,
-          secure: true,
-          auth: {
-            user: smtpUser,
-            pass: smtpPass,
-          },
-          connectionTimeout: 30000,
-          greetingTimeout: 30000,
-          socketTimeout: 30000,
-          tls: {
-            rejectUnauthorized: false,
-          },
-        });
-        
-        await sslTransporter.sendMail(mailOptions);
-        console.log(`✅ Email de boas-vindas enviado via SSL para: ${email}`);
-        return true;
-      } catch (sslError) {
-        console.error("❌ Erro ao enviar via SSL:", sslError.message);
-        // Não lançar erro para não quebrar o cadastro
-        return false;
-      }
-    }
-    
     // Não lançar erro para não quebrar o cadastro se o email falhar
     return false;
   }
