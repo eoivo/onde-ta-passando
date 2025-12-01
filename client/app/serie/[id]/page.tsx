@@ -34,6 +34,7 @@ export default async function TVShowPage({
   const watchProviders = await getWatchProviders(id, "tv");
   const videos = await getTvVideos(id);
 
+
   const firstAirDate = tvShow.first_air_date
     ? new Date(tvShow.first_air_date).toLocaleDateString("pt-BR")
     : "Data desconhecida";
@@ -50,7 +51,7 @@ export default async function TVShowPage({
   const seriesContext: MovieContext = {
     title: tvShow.name,
     overview: tvShow.overview,
-    releaseDate: firstAirDate,
+    releaseDate: tvShow.first_air_date || "",  // Data ISO, não formatada
     genres: tvShow.genres.map((g: any) => g.name),
     cast: credits.cast.slice(0, 10).map((actor: any) => actor.name),
     director: credits.crew.find(

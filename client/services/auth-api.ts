@@ -6,7 +6,14 @@ export interface UserData {
 
 export interface AuthResponse {
   success: boolean;
-  token: string;
+  token?: string;
+  user: UserData;
+  message?: string;
+}
+
+export interface RegisterResponse {
+  success: boolean;
+  message: string;
   user: UserData;
 }
 
@@ -90,16 +97,13 @@ export const registerUser = async (
   name: string,
   email: string,
   password: string
-): Promise<AuthResponse> => {
+): Promise<RegisterResponse> => {
   const data = await authFetch("/auth/register", {
     method: "POST",
     body: JSON.stringify({ name, email, password }),
   });
 
-  if (data.token) {
-    localStorage.setItem("auth_token", data.token);
-  }
-
+  // Não salvar token - usuário precisa fazer login manualmente
   return data;
 };
 
@@ -287,4 +291,31 @@ export const uploadProfileImage = async (
     console.error("Erro ao enviar imagem:", error);
     throw error;
   }
+};
+
+// Esqueci minha senha
+export const forgotPassword = async (email: string): Promise<{ success: boolean; message: string }> => {
+  const data = await authFetch("/auth/forgotpassword", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+
+  return data;
+};
+
+// Redefinir senha
+export const resetPassword = async (
+  resetToken: string,
+  password: string
+): Promise<AuthResponse> => {
+  const data = await authFetch(`/auth/resetpassword/${resetToken}`, {
+    method: "PUT",
+    body: JSON.stringify({ password }),
+  });
+
+  if (data.token) {
+    localStorage.setItem("auth_token", data.token);
+  }
+
+  return data;
 };

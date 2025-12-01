@@ -136,13 +136,23 @@ export default function NavigationProvider({
   }, [pathname, searchParamsString, isNavigating, setLoading]);
 
   useEffect(() => {
+    // Salvar caminho anterior no sessionStorage para uso na página 404
+    const currentPath = pathname + searchParamsString;
+    const previousPath = sessionStorage.getItem("current_path");
+    
+    if (previousPath && previousPath !== currentPath) {
+      sessionStorage.setItem("previous_path", previousPath);
+    }
+    
+    sessionStorage.setItem("current_path", currentPath);
+
     const timer = setTimeout(() => {
       setIsNavigating(false);
       setLoading(false);
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [url, setLoading]);
+  }, [url, pathname, searchParamsString, setLoading]);
 
   return (
     <NavigationContext.Provider value={{ isNavigating, startNavigation }}>

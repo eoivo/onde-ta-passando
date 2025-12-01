@@ -8,7 +8,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import NavigationProvider from "@/providers/NavigationProvider";
 import { AuthProvider } from "@/context/AuthContext";
-import { Toaster } from "react-hot-toast";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -41,27 +41,14 @@ export default function RootLayout({
               <Footer />
               <Toaster 
                 position="top-right"
+                richColors
+                closeButton
                 toastOptions={{
                   duration: 3000,
                   style: {
-                    background: '#363636',
+                    background: '#1a1a1a',
                     color: '#fff',
-                    borderRadius: '12px',
-                    padding: '12px 16px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                  },
-                  success: {
-                    iconTheme: {
-                      primary: '#10B981',
-                      secondary: '#fff',
-                    },
-                  },
-                  error: {
-                    iconTheme: {
-                      primary: '#EF4444',
-                      secondary: '#fff',
-                    },
+                    border: '1px solid #363636',
                   },
                 }}
               />

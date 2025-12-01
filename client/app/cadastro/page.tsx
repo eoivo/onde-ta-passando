@@ -2,12 +2,14 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { validatePassword } from "@/lib/password-validation";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -28,24 +30,30 @@ export default function RegisterPage() {
       return;
     }
 
-    if (password.length < 6) {
-      setError("A senha deve ter pelo menos 6 caracteres");
+    // Validar senha forte
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      setError(passwordValidation.errors.join(". "));
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      await register(name, email, password);
+      const response = await register(name, email, password);
 
       toast.success(
-        "Cadastro realizado com sucesso! Você já pode fazer login."
+        "Conta criada com sucesso! Faça login para continuar."
       );
-      router.push("/login");
+      
+      // Redirecionar para login após 2 segundos (dar tempo para o toast aparecer)
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
     } catch (err: any) {
-      setError(
-        err.message || "Erro ao criar conta. Por favor, tente novamente."
-      );
+      const errorMessage = err.message || "Erro ao criar conta. Por favor, tente novamente.";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Erro ao registrar:", err);
     } finally {
       setIsSubmitting(false);
@@ -53,8 +61,25 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen py-32 flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-gray-900/80 rounded-xl shadow-xl p-8 backdrop-blur-sm border border-gray-800">
+    <div className="relative min-h-screen py-32 flex items-center justify-center px-4 overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/images/backgroung.jpg"
+          alt="Background"
+          fill
+          className="object-cover"
+          priority
+          quality={90}
+        />
+        {/* Overlay escuro com gradiente */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black/80" />
+        {/* Efeito de blur sutil */}
+        <div className="absolute inset-0 backdrop-blur-[2px]" />
+      </div>
+
+      {/* Conteúdo */}
+      <div className="relative z-10 max-w-md w-full bg-gray-900/90 rounded-xl shadow-2xl p-8 backdrop-blur-md border border-gray-800/50">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-red-500 to-red-700 text-transparent bg-clip-text">
             Criar Conta
@@ -120,7 +145,9 @@ export default function RegisterPage() {
               required
               className="w-full bg-gray-800 border-gray-700 text-white"
             />
-            <p className="text-xs text-gray-500">Mínimo de 6 caracteres</p>
+            <p className="text-xs text-gray-500">
+              Mínimo de 8 caracteres, 1 maiúscula e 1 número
+            </p>
           </div>
 
           <div className="space-y-2">

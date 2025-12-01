@@ -315,10 +315,19 @@ export async function generateWelcomeMessage(
   userName?: string
 ): Promise<string> {
   const greeting = userName ? `Oi, ${userName}!` : "Oi!";
-  const year = new Date(movieContext.releaseDate).getFullYear();
+
+  // Extrair ano com validação para evitar NaN
+  let year = "";
+  if (movieContext.releaseDate) {
+    const releaseYear = new Date(movieContext.releaseDate).getFullYear();
+    if (!isNaN(releaseYear)) {
+      year = ` (${releaseYear})`;
+    }
+  }
+
   const mediaType = movieContext.mediaType === "movie" ? "filme" : "série";
 
-  return `${greeting} 🎬 Murphy aqui! Vejo que você escolheu "${movieContext.title}" (${year}) - ótima escolha! Estou aqui para conversar sobre qualquer coisa desse ${mediaType}. O que você gostaria de saber?`;
+  return `${greeting} 🎬 Murphy aqui! Vejo que você escolheu "${movieContext.title}"${year} - ótima escolha! Estou aqui para conversar sobre qualquer coisa desse ${mediaType}. O que você gostaria de saber?`;
 }
 
 // Tópicos sugeridos mais simples e diretos

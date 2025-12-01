@@ -48,7 +48,7 @@ import {
 } from "@/services/gemini-api";
 import { useMovieChat } from "@/hooks/useMovieChat";
 import { useAuth } from "@/context/AuthContext";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 interface MovieChatBotProps {
   movieContext: MovieContext;

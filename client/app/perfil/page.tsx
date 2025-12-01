@@ -83,8 +83,11 @@ export default function ProfilePage() {
     try {
       await updateProfile(name, email);
       setUpdateSuccess(true);
+      toast.success("Perfil atualizado com sucesso!");
     } catch (err: any) {
-      setUpdateError(err.message || "Erro ao atualizar perfil");
+      const errorMessage = err.message || "Erro ao atualizar perfil";
+      setUpdateError(errorMessage);
+      toast.error(errorMessage);
       console.error("Erro ao atualizar perfil:", err);
     } finally {
       setIsUpdating(false);

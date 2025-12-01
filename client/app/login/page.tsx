@@ -2,11 +2,13 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -23,9 +25,12 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
+      toast.success("Login realizado com sucesso!");
       router.push("/");
-    } catch (err) {
-      setError("Credenciais inválidas. Por favor, tente novamente.");
+    } catch (err: any) {
+      const errorMessage = err.message || "Credenciais inválidas. Por favor, tente novamente.";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Erro ao fazer login:", err);
     } finally {
       setIsSubmitting(false);
@@ -33,8 +38,25 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen py-32 flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-gray-900/80 rounded-xl shadow-xl p-8 backdrop-blur-sm border border-gray-800">
+    <div className="relative min-h-screen py-32 flex items-center justify-center px-4 overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/images/backgroung.jpg"
+          alt="Background"
+          fill
+          className="object-cover"
+          priority
+          quality={90}
+        />
+        {/* Overlay escuro com gradiente */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black/80" />
+        {/* Efeito de blur sutil */}
+        <div className="absolute inset-0 backdrop-blur-[2px]" />
+      </div>
+
+      {/* Conteúdo */}
+      <div className="relative z-10 max-w-md w-full bg-gray-900/90 rounded-xl shadow-2xl p-8 backdrop-blur-md border border-gray-800/50">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-red-500 to-red-700 text-transparent bg-clip-text">
             Entrar

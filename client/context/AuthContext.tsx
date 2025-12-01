@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import { useRouter } from "next/navigation";
 import * as authService from "@/services/auth-api";
-import { UserData, ProfileData, AuthResponse } from "@/services/auth-api";
+import { UserData, ProfileData, AuthResponse, RegisterResponse } from "@/services/auth-api";
 
 interface AuthContextType {
   user: UserData | null;
@@ -21,7 +21,7 @@ interface AuthContextType {
     name: string,
     email: string,
     password: string
-  ) => Promise<AuthResponse>;
+  ) => Promise<RegisterResponse>;
   logout: () => void;
   updateProfile: (name?: string, email?: string) => Promise<void>;
   uploadProfileImage: (imageFile: File) => Promise<void>;

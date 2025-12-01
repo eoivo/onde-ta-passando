@@ -18,6 +18,7 @@ Backend para a plataforma Onde Tá Passando, que ajuda usuários a descobrirem o
    npm install
    ```
 3. Configure as variáveis de ambiente (crie um arquivo `.env` baseado no exemplo abaixo):
+
    ```
    PORT=3001
    MONGODB_URI=sua_uri_do_mongodb
@@ -27,6 +28,13 @@ Backend para a plataforma Onde Tá Passando, que ajuda usuários a descobrirem o
    CLOUDINARY_API_KEY=sua_api_key
    CLOUDINARY_API_SECRET=seu_api_secret
    NODE_ENV=development
+
+   # Configuração de Email (Nodemailer)
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_USER=seu_email@gmail.com
+   SMTP_PASS=sua_senha_de_app
+   FRONTEND_URL=http://localhost:3000
    ```
 
 ## Comandos Disponíveis
@@ -66,6 +74,8 @@ Backend para a plataforma Onde Tá Passando, que ajuda usuários a descobrirem o
 
 - `POST /api/auth/register` - Cadastro de usuário
 - `POST /api/auth/login` - Login de usuário
+- `POST /api/auth/forgotpassword` - Solicitar redefinição de senha (envia email)
+- `PUT /api/auth/resetpassword/:resettoken` - Redefinir senha com token
 - `GET /api/auth/me` - Dados do usuário autenticado
 
 ### Endpoints de Usuário
