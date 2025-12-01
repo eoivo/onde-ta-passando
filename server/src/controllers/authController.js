@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
-const { sendPasswordResetEmail, sendWelcomeEmail, testEmailConnection, sendTestEmail } = require("../config/email");
+const { sendPasswordResetEmail, sendWelcomeEmail } = require("../config/email");
 
 // Função para validar senha forte
 const validatePassword = (password) => {
@@ -56,15 +56,13 @@ exports.register = async (req, res) => {
       password,
     });
 
-    // Enviar email de boas-vindas de forma assíncrona (não bloqueia o cadastro)
-    sendWelcomeEmail(user.email, user.name)
-      .then(() => {
-        console.log(`Email de boas-vindas enviado com sucesso para: ${user.email}`);
-      })
-      .catch((emailError) => {
-        console.error("Erro ao enviar email de boas-vindas:", emailError);
-        // Não bloqueia o cadastro se o email falhar
-      });
+    // Enviar email de boas-vindas (não bloqueia o cadastro se falhar)
+    try {
+      await sendWelcomeEmail(user.email, user.name);
+    } catch (emailError) {
+      console.error("Erro ao enviar email de boas-vindas:", emailError);
+      // Continua o processo mesmo se o email falhar
+    }
 
     // Retornar sucesso sem token (usuário precisa fazer login)
     res.status(201).json({
@@ -182,31 +180,27 @@ exports.forgotPassword = async (req, res) => {
     const resetToken = user.getResetPasswordToken();
     await user.save({ validateBeforeSave: false });
 
-    // Enviar email de forma assíncrona (não bloquear a resposta)
-    sendPasswordResetEmail(user.email, resetToken)
-      .then(() => {
-        console.log(`Email de reset enviado com sucesso para: ${user.email}`);
-      })
-      .catch((error) => {
-        console.error("Erro ao enviar email de reset:", error);
-        // Limpar token se falhar
-        User.findByIdAndUpdate(
-          user._id,
-          {
-            resetPasswordToken: undefined,
-            resetPasswordExpire: undefined,
-          },
-          { validateBeforeSave: false }
-        ).catch((err) => {
-          console.error("Erro ao limpar token:", err);
-        });
-      });
+    try {
+      // Enviar email
+      await sendPasswordResetEmail(user.email, resetToken);
 
-    // Responder imediatamente ao frontend
-    res.status(200).json({
-      success: true,
-      message: "Se o email existir, você receberá um link de redefinição",
-    });
+      res.status(200).json({
+        success: true,
+        message: "Email de redefinição enviado com sucesso",
+      });
+    } catch (error) {
+      console.error("Erro ao enviar email:", error);
+      
+      // Limpar token se falhar
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpire = undefined;
+      await user.save({ validateBeforeSave: false });
+
+      return res.status(500).json({
+        success: false,
+        message: "Erro ao enviar email. Tente novamente mais tarde.",
+      });
+    }
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -299,52 +293,4 @@ const sendTokenResponse = (user, statusCode, res) => {
       email: user.email,
     },
   });
-};
-
-// @desc    Testar envio de email
-// @route   POST /api/auth/test-email
-// @access  Private
-exports.testEmail = async (req, res) => {
-  try {
-    const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({
-        success: false,
-        message: "Por favor, forneça um email para teste",
-      });
-    }
-
-    console.log(`🧪 Iniciando teste de email para: ${email}`);
-
-    // Testar conexão primeiro
-    const connectionTest = await testEmailConnection();
-    console.log("Teste de conexão:", connectionTest);
-
-    // Enviar email de teste
-    const testResult = await sendTestEmail(email);
-
-    if (testResult.success) {
-      console.log(`✅ Email de teste enviado com sucesso para: ${email}`);
-      return res.status(200).json({
-        success: true,
-        message: testResult.message,
-        connectionTest: connectionTest.message,
-      });
-    } else {
-      console.error(`❌ Falha ao enviar email de teste: ${testResult.message}`);
-      return res.status(500).json({
-        success: false,
-        message: testResult.message,
-        connectionTest: connectionTest.message,
-        error: testResult.error,
-      });
-    }
-  } catch (error) {
-    console.error("❌ Erro no teste de email:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
 };

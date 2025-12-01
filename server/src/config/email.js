@@ -1,59 +1,24 @@
 const nodemailer = require("nodemailer");
 
-// Função para limpar variáveis de ambiente (remove aspas e espaços)
-const cleanEnvVar = (value) => {
-  if (!value) return value;
-  return value.toString().replace(/^["']|["']$/g, '').trim();
-};
-
-// Obter e limpar variáveis de ambiente
-const smtpUser = cleanEnvVar(process.env.SMTP_USER);
-const smtpPass = cleanEnvVar(process.env.SMTP_PASS);
-const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
-const smtpPort = parseInt(process.env.SMTP_PORT) || 587;
-
-// Log de configuração (sem mostrar senha completa)
-if (process.env.NODE_ENV === 'production') {
-  console.log(`Configuração SMTP: ${smtpHost}:${smtpPort}, User: ${smtpUser}, Pass: ${smtpPass ? '***' + smtpPass.slice(-3) : 'não definido'}`);
-  console.log(`SMTP_PASS original: ${process.env.SMTP_PASS ? 'Definido (' + process.env.SMTP_PASS.length + ' chars)' : 'Não definido'}`);
-  console.log(`SMTP_PASS limpo: ${smtpPass ? 'Sim (' + smtpPass.length + ' chars)' : 'Não'}`);
-  console.log(`SMTP_PASS tem aspas: ${smtpPass && (smtpPass.includes('"') || smtpPass.includes("'")) ? 'Sim' : 'Não'}`);
-}
-
-// Criar transporter de email usando a porta configurada nas variáveis de ambiente
-// Configuração otimizada para Render.com
+// Criar transporter de email
 const transporter = nodemailer.createTransport({
-  host: smtpHost,
-  port: smtpPort,
-  secure: smtpPort === 465, // SSL para porta 465, STARTTLS para 587
+  host: process.env.SMTP_HOST || "smtp.gmail.com",
+  port: process.env.SMTP_PORT || 587,
+  secure: false, // true para 465, false para outras portas
   auth: {
-    user: smtpUser,
-    pass: smtpPass,
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
   },
-  // Timeouts aumentados para Render
-  connectionTimeout: 60000, // 60 segundos
-  greetingTimeout: 60000,
-  socketTimeout: 60000,
-  // Configurações adicionais para melhor compatibilidade
-  pool: false, // Desabilitar pool pode ajudar em alguns casos
-  tls: {
-    rejectUnauthorized: false,
-    minVersion: 'TLSv1.2',
-  },
-  // Para porta 465 (SSL)
-  ...(smtpPort === 465 && {
-    requireTLS: false,
-  }),
-  // Para porta 587 (STARTTLS)
-  ...(smtpPort === 587 && {
-    requireTLS: true,
-    ciphers: 'SSLv3',
-  }),
 });
 
-// Não verificar conexão na inicialização (pode causar timeout em produção)
-// A verificação será feita automaticamente quando o primeiro email for enviado
-// Isso evita problemas de rede/firewall durante o deploy
+// Verificar conexão
+transporter.verify(function (error, success) {
+  if (error) {
+    console.log("Erro na configuração de email:", error);
+  } else {
+    console.log("Servidor de email pronto para enviar mensagens");
+  }
+});
 
 // Função para enviar email de reset de senha
 const sendPasswordResetEmail = async (email, resetToken) => {
@@ -186,24 +151,10 @@ const sendPasswordResetEmail = async (email, resetToken) => {
   };
 
   try {
-    // Tentar enviar com timeout de 60 segundos (aumentado para Render)
-    console.log(`📧 Enviando email de reset para: ${email} (porta ${smtpPort})`);
-    const sendPromise = transporter.sendMail(mailOptions);
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error("Timeout ao enviar email (60s)")), 60000);
-    });
-    
-    await Promise.race([sendPromise, timeoutPromise]);
-    console.log(`✅ Email de reset enviado para: ${email}`);
+    await transporter.sendMail(mailOptions);
     return true;
   } catch (error) {
-    console.error("❌ Erro ao enviar email de reset:", error.message);
-    console.error("Detalhes:", {
-      email,
-      errorCode: error.code,
-      errorCommand: error.command,
-      errorResponse: error.response,
-    });
+    console.error("Erro ao enviar email:", error);
     throw error;
   }
 };
@@ -350,77 +301,17 @@ const sendWelcomeEmail = async (email, name) => {
   };
 
   try {
-    // Tentar enviar com timeout de 30 segundos
-    console.log(`📧 Enviando email de boas-vindas para: ${email} (porta ${smtpPort})`);
-    const sendPromise = transporter.sendMail(mailOptions);
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error("Timeout ao enviar email (30s)")), 30000);
-    });
-    
-    await Promise.race([sendPromise, timeoutPromise]);
-    console.log(`✅ Email de boas-vindas enviado para: ${email}`);
+    await transporter.sendMail(mailOptions);
     return true;
   } catch (error) {
-    console.error("❌ Erro ao enviar email de boas-vindas:", error.message);
-    console.error("Detalhes:", {
-      email,
-      errorCode: error.code,
-      errorCommand: error.command,
-      errorResponse: error.response,
-    });
+    console.error("Erro ao enviar email de boas-vindas:", error);
     // Não lançar erro para não quebrar o cadastro se o email falhar
     return false;
-  }
-};
-
-// Função para testar conexão SMTP (útil para debug)
-const testEmailConnection = async () => {
-  try {
-    await transporter.verify();
-    console.log("✅ Conexão SMTP verificada com sucesso");
-    return { success: true, message: "Conexão SMTP OK" };
-  } catch (error) {
-    console.error("❌ Erro ao verificar conexão SMTP:", error.message);
-    return { success: false, message: error.message, error };
-  }
-};
-
-// Função para enviar email de teste
-const sendTestEmail = async (toEmail) => {
-  const mailOptions = {
-    from: `"Onde Tá Passando?" <${smtpUser}>`,
-    to: toEmail,
-    subject: "Teste de Email - Onde Tá Passando?",
-    html: `
-      <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #1a1a1a; color: #fff;">
-        <h2 style="color: #ef4444;">Teste de Email</h2>
-        <p>Este é um email de teste enviado do servidor de produção.</p>
-        <p>Se você recebeu este email, a configuração SMTP está funcionando corretamente! ✅</p>
-        <p><strong>Data/Hora:</strong> ${new Date().toLocaleString('pt-BR')}</p>
-      </div>
-    `,
-    text: `Teste de Email - Onde Tá Passando?\n\nEste é um email de teste. Se você recebeu este email, a configuração SMTP está funcionando!`,
-  };
-
-  try {
-    const sendPromise = transporter.sendMail(mailOptions);
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error("Timeout ao enviar email de teste (60s)")), 60000);
-    });
-    
-    await Promise.race([sendPromise, timeoutPromise]);
-    console.log(`✅ Email de teste enviado para: ${toEmail}`);
-    return { success: true, message: `Email de teste enviado para ${toEmail}` };
-  } catch (error) {
-    console.error("❌ Erro ao enviar email de teste:", error.message);
-    return { success: false, message: error.message, error };
   }
 };
 
 module.exports = {
   sendPasswordResetEmail,
   sendWelcomeEmail,
-  testEmailConnection,
-  sendTestEmail,
 };
 
