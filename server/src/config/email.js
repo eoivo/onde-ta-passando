@@ -26,29 +26,18 @@ const transporter = nodemailer.createTransport({
     user: smtpUser,
     pass: smtpPass,
   },
-  connectionTimeout: 10000, // 10 segundos para conectar
-  greetingTimeout: 10000, // 10 segundos para greeting
-  socketTimeout: 10000, // 10 segundos para socket
+  connectionTimeout: 20000, // 20 segundos para conectar (aumentado para produção)
+  greetingTimeout: 20000, // 20 segundos para greeting
+  socketTimeout: 20000, // 20 segundos para socket
   // Configurações adicionais para produção
   pool: true,
   maxConnections: 1,
   maxMessages: 3,
 });
 
-// Verificar conexão (apenas uma vez na inicialização)
-transporter.verify(function (error, success) {
-  if (error) {
-    console.error("Erro na configuração de email:", error.message);
-    console.error("Detalhes:", {
-      host: smtpHost,
-      port: smtpPort,
-      user: smtpUser,
-      hasPass: !!smtpPass,
-    });
-  } else {
-    console.log("✅ Servidor de email pronto para enviar mensagens");
-  }
-});
+// Não verificar conexão na inicialização (pode causar timeout em produção)
+// A verificação será feita automaticamente quando o primeiro email for enviado
+// Isso evita problemas de rede/firewall durante o deploy
 
 // Função para enviar email de reset de senha
 const sendPasswordResetEmail = async (email, resetToken) => {
@@ -181,17 +170,22 @@ const sendPasswordResetEmail = async (email, resetToken) => {
   };
 
   try {
-    // Adicionar timeout de 15 segundos para o envio
+    // Adicionar timeout de 20 segundos para o envio (aumentado para produção)
     const sendPromise = transporter.sendMail(mailOptions);
     const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error("Timeout ao enviar email")), 15000);
+      setTimeout(() => reject(new Error("Timeout ao enviar email (20s)")), 20000);
     });
     
     await Promise.race([sendPromise, timeoutPromise]);
-    console.log(`Email de reset enviado para: ${email}`);
+    console.log(`✅ Email de reset enviado para: ${email}`);
     return true;
   } catch (error) {
-    console.error("Erro ao enviar email de reset:", error);
+    console.error("❌ Erro ao enviar email de reset:", error.message);
+    console.error("Detalhes:", {
+      email,
+      errorCode: error.code,
+      errorCommand: error.command,
+    });
     throw error;
   }
 };
@@ -338,17 +332,22 @@ const sendWelcomeEmail = async (email, name) => {
   };
 
   try {
-    // Adicionar timeout de 15 segundos para o envio
+    // Adicionar timeout de 20 segundos para o envio (aumentado para produção)
     const sendPromise = transporter.sendMail(mailOptions);
     const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error("Timeout ao enviar email")), 15000);
+      setTimeout(() => reject(new Error("Timeout ao enviar email (20s)")), 20000);
     });
     
     await Promise.race([sendPromise, timeoutPromise]);
-    console.log(`Email de boas-vindas enviado para: ${email}`);
+    console.log(`✅ Email de boas-vindas enviado para: ${email}`);
     return true;
   } catch (error) {
-    console.error("Erro ao enviar email de boas-vindas:", error);
+    console.error("❌ Erro ao enviar email de boas-vindas:", error.message);
+    console.error("Detalhes:", {
+      email,
+      errorCode: error.code,
+      errorCommand: error.command,
+    });
     // Não lançar erro para não quebrar o cadastro se o email falhar
     return false;
   }
