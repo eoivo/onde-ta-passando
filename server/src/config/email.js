@@ -1,36 +1,43 @@
-const nodemailer = require("nodemailer");
+// Fallback automático: Se USE_SENDGRID=true, usa SendGrid, senão usa SMTP
+if (process.env.USE_SENDGRID === 'true') {
+  console.log('📧 Usando SendGrid para envio de emails');
+  module.exports = require('./email-sendgrid');
+} else {
+  console.log('📧 Usando SMTP local para envio de emails');
 
-/**
- * Cria um transporter de email dinamicamente
- * Segue o padrão do embala-fest que funciona em produção
- * Evita problemas de timeout na inicialização do app
- */
-const createTransporter = () => {
-  console.log(`Criando transporter SMTP: ${process.env.SMTP_HOST}:${process.env.SMTP_PORT}`);
+  const nodemailer = require("nodemailer");
 
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST || "smtp.gmail.com",
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: process.env.SMTP_SECURE === "true" || false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-    connectionTimeout: 10000, // 10 segundos para conectar
-    greetingTimeout: 10000, // 10 segundos para greeting
-    socketTimeout: 30000, // 30 segundos para socket (aumentado)
-  });
-};
+  /**
+   * Cria um transporter de email dinamicamente
+   * Segue o padrão do embala-fest que funciona em produção
+   * Evita problemas de timeout na inicialização do app
+   */
+  const createTransporter = () => {
+    console.log(`Criando transporter SMTP: ${process.env.SMTP_HOST}:${process.env.SMTP_PORT}`);
 
-// Função para enviar email de reset de senha
-const sendPasswordResetEmail = async (email, resetToken) => {
-  const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:3000"}/redefinir-senha/${resetToken}`;
+    return nodemailer.createTransport({
+      host: process.env.SMTP_HOST || "smtp.gmail.com",
+      port: Number(process.env.SMTP_PORT) || 587,
+      secure: process.env.SMTP_SECURE === "true" || false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+      connectionTimeout: 10000, // 10 segundos para conectar
+      greetingTimeout: 10000, // 10 segundos para greeting
+      socketTimeout: 30000, // 30 segundos para socket (aumentado)
+    });
+  };
 
-  const mailOptions = {
-    from: `"Onde Tá Passando?" <${process.env.SMTP_USER}>`,
-    to: email,
-    subject: "Redefinição de Senha - Onde Tá Passando?",
-    html: `
+  // Função para enviar email de reset de senha
+  const sendPasswordResetEmail = async (email, resetToken) => {
+    const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:3000"}/redefinir-senha/${resetToken}`;
+
+    const mailOptions = {
+      from: `"Onde Tá Passando?" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: "Redefinição de Senha - Onde Tá Passando?",
+      html: `
       <!DOCTYPE html>
       <html>
         <head>
@@ -134,7 +141,7 @@ const sendPasswordResetEmail = async (email, resetToken) => {
         </body>
       </html>
     `,
-    text: `
+      text: `
       Redefinição de Senha - Onde Tá Passando?
       
       Olá!
@@ -150,30 +157,30 @@ const sendPasswordResetEmail = async (email, resetToken) => {
       
       Este é um email automático, por favor não responda.
     `,
+    };
+
+    try {
+      // Criar transporter dinamicamente (padrão embala-fest)
+      const transporter = createTransporter();
+
+      // Enviar email
+      const info = await transporter.sendMail(mailOptions);
+
+      console.log(`Email de reset de senha enviado: ${info.messageId}`);
+      return true;
+    } catch (error) {
+      console.error("Erro ao enviar email:", error);
+      throw error;
+    }
   };
 
-  try {
-    // Criar transporter dinamicamente (padrão embala-fest)
-    const transporter = createTransporter();
-
-    // Enviar email
-    const info = await transporter.sendMail(mailOptions);
-
-    console.log(`Email de reset de senha enviado: ${info.messageId}`);
-    return true;
-  } catch (error) {
-    console.error("Erro ao enviar email:", error);
-    throw error;
-  }
-};
-
-// Função para enviar email de boas-vindas
-const sendWelcomeEmail = async (email, name) => {
-  const mailOptions = {
-    from: `"Onde Tá Passando?" <${process.env.SMTP_USER}>`,
-    to: email,
-    subject: "Bem-vindo ao Onde Tá Passando? 🎬",
-    html: `
+  // Função para enviar email de boas-vindas
+  const sendWelcomeEmail = async (email, name) => {
+    const mailOptions = {
+      from: `"Onde Tá Passando?" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: "Bem-vindo ao Onde Tá Passando? 🎬",
+      html: `
       <!DOCTYPE html>
       <html>
         <head>
@@ -284,7 +291,7 @@ const sendWelcomeEmail = async (email, name) => {
         </body>
       </html>
     `,
-    text: `
+      text: `
       Bem-vindo ao Onde Tá Passando? 🎬
       
       Olá, ${name}!
@@ -306,26 +313,26 @@ const sendWelcomeEmail = async (email, name) => {
       
       Este é um email automático, por favor não responda.
     `,
+    };
+
+    try {
+      // Criar transporter dinamicamente (padrão embala-fest)
+      const transporter = createTransporter();
+
+      // Enviar email
+      const info = await transporter.sendMail(mailOptions);
+
+      console.log(`Email de boas-vindas enviado: ${info.messageId}`);
+      return true;
+    } catch (error) {
+      console.error("Erro ao enviar email de boas-vindas:", error);
+      // Não lançar erro para não quebrar o cadastro se o email falhar
+      return false;
+    }
   };
 
-  try {
-    // Criar transporter dinamicamente (padrão embala-fest)
-    const transporter = createTransporter();
-
-    // Enviar email
-    const info = await transporter.sendMail(mailOptions);
-
-    console.log(`Email de boas-vindas enviado: ${info.messageId}`);
-    return true;
-  } catch (error) {
-    console.error("Erro ao enviar email de boas-vindas:", error);
-    // Não lançar erro para não quebrar o cadastro se o email falhar
-    return false;
-  }
-};
-
-module.exports = {
-  sendPasswordResetEmail,
-  sendWelcomeEmail,
-};
-
+  module.exports = {
+    sendPasswordResetEmail,
+    sendWelcomeEmail,
+  };
+}

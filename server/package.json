@@ -12,6 +12,7 @@
     "node": "20.x"
   },
   "dependencies": {
+    "@sendgrid/mail": "^8.1.6",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.6.0",
     "cors": "^2.8.5",
