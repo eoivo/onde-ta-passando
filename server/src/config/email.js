@@ -1,27 +1,26 @@
 const nodemailer = require("nodemailer");
 
-// Criar transporter de email com timeout configurado
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || "smtp.gmail.com",
-  port: process.env.SMTP_PORT || 587,
-  secure: false, // true para 465, false para outras portas
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-  connectionTimeout: 10000, // 10 segundos para conectar
-  greetingTimeout: 10000, // 10 segundos para greeting
-  socketTimeout: 10000, // 10 segundos para socket
-});
+/**
+ * Cria um transporter de email dinamicamente
+ * Segue o padrão do embala-fest que funciona em produção
+ * Evita problemas de timeout na inicialização do app
+ */
+const createTransporter = () => {
+  console.log(`Criando transporter SMTP: ${process.env.SMTP_HOST}:${process.env.SMTP_PORT}`);
 
-// Verificar conexão
-transporter.verify(function (error, success) {
-  if (error) {
-    console.log("Erro na configuração de email:", error);
-  } else {
-    console.log("Servidor de email pronto para enviar mensagens");
-  }
-});
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST || "smtp.gmail.com",
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: process.env.SMTP_SECURE === "true" || false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+    connectionTimeout: 10000, // 10 segundos para conectar
+    greetingTimeout: 10000, // 10 segundos para greeting
+    socketTimeout: 30000, // 30 segundos para socket (aumentado)
+  });
+};
 
 // Função para enviar email de reset de senha
 const sendPasswordResetEmail = async (email, resetToken) => {
@@ -154,7 +153,13 @@ const sendPasswordResetEmail = async (email, resetToken) => {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    // Criar transporter dinamicamente (padrão embala-fest)
+    const transporter = createTransporter();
+
+    // Enviar email
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log(`Email de reset de senha enviado: ${info.messageId}`);
     return true;
   } catch (error) {
     console.error("Erro ao enviar email:", error);
@@ -304,7 +309,13 @@ const sendWelcomeEmail = async (email, name) => {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    // Criar transporter dinamicamente (padrão embala-fest)
+    const transporter = createTransporter();
+
+    // Enviar email
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log(`Email de boas-vindas enviado: ${info.messageId}`);
     return true;
   } catch (error) {
     console.error("Erro ao enviar email de boas-vindas:", error);
