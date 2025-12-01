@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-// Criar transporter de email
+// Criar transporter de email com timeout configurado
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || "smtp.gmail.com",
   port: process.env.SMTP_PORT || 587,
@@ -9,6 +9,9 @@ const transporter = nodemailer.createTransport({
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  connectionTimeout: 10000, // 10 segundos para conectar
+  greetingTimeout: 10000, // 10 segundos para greeting
+  socketTimeout: 10000, // 10 segundos para socket
 });
 
 // Verificar conexão
