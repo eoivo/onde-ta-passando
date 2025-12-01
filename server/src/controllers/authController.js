@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
-const { sendPasswordResetEmail, sendWelcomeEmail } = require("../config/email");
+const { sendPasswordResetEmail, sendWelcomeEmail, testEmailConnection, sendTestEmail } = require("../config/email");
 
 // Função para validar senha forte
 const validatePassword = (password) => {
@@ -299,4 +299,46 @@ const sendTokenResponse = (user, statusCode, res) => {
       email: user.email,
     },
   });
+};
+
+// @desc    Testar envio de email
+// @route   POST /api/auth/test-email
+// @access  Private
+exports.testEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Por favor, forneça um email para teste",
+      });
+    }
+
+    // Testar conexão primeiro
+    const connectionTest = await testEmailConnection();
+    console.log("Teste de conexão:", connectionTest);
+
+    // Enviar email de teste
+    const testResult = await sendTestEmail(email);
+
+    if (testResult.success) {
+      return res.status(200).json({
+        success: true,
+        message: testResult.message,
+        connectionTest: connectionTest.message,
+      });
+    } else {
+      return res.status(500).json({
+        success: false,
+        message: testResult.message,
+        connectionTest: connectionTest.message,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
