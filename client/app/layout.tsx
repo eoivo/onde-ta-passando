@@ -9,6 +9,7 @@ import LoadingOverlay from "@/components/LoadingOverlay";
 import NavigationProvider from "@/providers/NavigationProvider";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "sonner";
+import SmoothScroll from "@/components/SmoothScroll";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -35,23 +36,25 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark">
           <AuthProvider>
             <NavigationProvider>
-              <LoadingOverlay />
-              <Header />
-              <main className="flex-grow">{children}</main>
-              <Footer />
-              <Toaster 
-                position="top-right"
-                richColors
-                closeButton
-                toastOptions={{
-                  duration: 3000,
-                  style: {
-                    background: '#1a1a1a',
-                    color: '#fff',
-                    border: '1px solid #363636',
-                  },
-                }}
-              />
+              <SmoothScroll>
+                <LoadingOverlay />
+                <Header />
+                <main className="flex-grow">{children}</main>
+                <Footer />
+                <Toaster
+                  position="top-right"
+                  richColors
+                  closeButton
+                  toastOptions={{
+                    duration: 3000,
+                    style: {
+                      background: '#1a1a1a',
+                      color: '#fff',
+                      border: '1px solid #363636',
+                    },
+                  }}
+                />
+              </SmoothScroll>
             </NavigationProvider>
           </AuthProvider>
         </ThemeProvider>
