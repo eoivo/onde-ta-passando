@@ -6,5 +6,5 @@
 
 # Configuração para otimização de imagens Next.js
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
   NEXT_PUBLIC_API_URL = "https://onde-ta-passando.onrender.com/api" 
