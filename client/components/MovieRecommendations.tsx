@@ -13,10 +13,12 @@ export default async function MovieRecommendations({
   movieId,
   mediaType = "movie",
 }: MovieRecommendationsProps) {
-  const recommendations =
+  const recsData =
     mediaType === "movie"
       ? await getMovieRecommendations(movieId)
       : await getTvRecommendations(movieId);
+
+  const recommendations = recsData.results || [];
 
   if (recommendations.length === 0) {
     return <p className="text-gray-400">Nenhuma recomendação disponível.</p>;

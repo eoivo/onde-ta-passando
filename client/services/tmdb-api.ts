@@ -180,14 +180,33 @@ export async function getWatchProviders(id: string, mediaType: "movie" | "tv") {
   return data;
 }
 
+export async function searchMovies(query: string, page: number = 1, year?: string, genre?: string) {
+  const params: Record<string, string> = { query, page: page.toString(), include_adult: "false" };
+  if (year) params.primary_release_year = year;
+  if (genre) params.with_genres = genre;
+  return await fetchFromTMDB("/search/movie", params);
+}
+
+export async function searchTVShows(query: string, page: number = 1, year?: string, genre?: string) {
+  const params: Record<string, string> = { query, page: page.toString(), include_adult: "false" };
+  if (year) params.first_air_date_year = year;
+  if (genre) params.with_genres = genre;
+  return await fetchFromTMDB("/search/tv", params);
+}
+
 export async function searchMulti(
   query: string,
   type?: string,
   genre?: string,
-  year?: string
+  year?: string,
+  page: number = 1
 ) {
   let endpoint = "/search/multi";
-  const params: Record<string, string> = { query };
+  const params: Record<string, string> = {
+    query,
+    page: page.toString(),
+    include_adult: "false"
+  };
 
   if (type && type !== "all") {
     if (type === "movies") {
@@ -211,21 +230,26 @@ export async function searchMulti(
     }
   }
 
-  const data = await fetchFromTMDB(endpoint, params);
-  return data.results || [];
+  return await fetchFromTMDB(endpoint, params);
 }
 
-export async function getMovieRecommendations(movieId: string) {
-  const data = await fetchFromTMDB(`/movie/${movieId}/recommendations`);
-  return data.results || [];
+export async function getMovieRecommendations(movieId: string, page: number = 1) {
+  const data = await fetchFromTMDB(`/movie/${movieId}/recommendations`, { page: page.toString() });
+  return data;
 }
 
-export async function getTvRecommendations(tvId: string) {
-  const data = await fetchFromTMDB(`/tv/${tvId}/recommendations`);
-  return data.results || [];
+export async function getTvRecommendations(tvId: string, page: number = 1) {
+  const data = await fetchFromTMDB(`/tv/${tvId}/recommendations`, { page: page.toString() });
+  return data;
 }
 
 export async function getGenres(mediaType: "movie" | "tv") {
   const data = await fetchFromTMDB(`/genre/${mediaType}/list`);
   return data.genres || [];
+}
+
+export async function getMediaKeywords(id: string, mediaType: "movie" | "tv") {
+  const data = await fetchFromTMDB(`/${mediaType}/${id}/keywords`);
+  // Movies return { keywords: [] }, TV shows return { results: [] }
+  return data.keywords || data.results || [];
 }

@@ -18,6 +18,7 @@ import DynamicMediaActions from "@/components/DynamicMediaActions";
 import EnhancedStreamingProviders from "@/components/EnhancedStreamingProviders";
 import MovieChatBot from "@/components/MovieChatBot";
 import { MovieContext } from "@/services/gemini-api";
+import SintonizeButton from "@/components/SintonizeButton";
 
 export const dynamicParams = true;
 export const revalidate = 0;
@@ -90,6 +91,7 @@ export default async function MoviePage({
                   title={movie.title}
                   posterPath={movie.poster_path}
                 />
+                <SintonizeButton id={id} mediaType="movie" />
                 <ShareButton title={movie.title} />
               </div>
             </div>

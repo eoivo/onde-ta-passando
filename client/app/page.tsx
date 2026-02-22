@@ -9,9 +9,9 @@ import {
 } from "@/services/tmdb-api";
 import { getContentFromMultipleProviders } from "@/services/streaming-sections";
 import { FEATURED_PROVIDERS } from "@/services/streaming-api";
-import { 
-  FEATURED_UNIVERSES, 
-  getMultipleUniverses 
+import {
+  FEATURED_UNIVERSES,
+  getMultipleUniverses
 } from "@/services/collections-api";
 
 export default async function Home() {
@@ -30,7 +30,7 @@ export default async function Home() {
   const horrorMovies = await getMoviesByGenre(27);
   const animationMovies = await getMoviesByGenre(16);
   const documentaryMovies = await getMoviesByGenre(99);
-  
+
   // Gêneros adicionais com títulos chamativos
   const thrillerMovies = await getMoviesByGenre(53); // Thriller
   const fantasyMovies = await getMoviesByGenre(14); // Fantasia
@@ -85,12 +85,14 @@ export default async function Home() {
         <MovieCarousel title="Lançamentos" movies={upcomingMovies} />
 
         {/* Seção de Coleções e Universos com Grid */}
-        <CollectionsGrid
-          collections={Object.values(universes).filter(
-            (u) => u && u.movies.length > 0
-          )}
-          configs={FEATURED_UNIVERSES}
-        />
+        <div id="colecoes" className="scroll-mt-24">
+          <CollectionsGrid
+            collections={Object.values(universes).filter(
+              (u) => u && u.movies.length > 0
+            )}
+            configs={FEATURED_UNIVERSES}
+          />
+        </div>
 
         {/* Seções com títulos chamativos - Ordem aleatória misturada */}
         <MovieCarousel title="Ação" movies={actionMovies} />

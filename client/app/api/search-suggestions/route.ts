@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { searchMulti } from "@/services/tmdb-api";
+import { sortAndFilterResults } from "@/utils/media-utils";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -13,13 +14,19 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const results = await searchMulti(query);
+    const data = await searchMulti(query);
+    const results = data.results || [];
 
-    const filteredResults = results.filter(
+    // Filtra apenas filmes e séries
+    const mediaResults = results.filter(
       (item: any) => item.media_type === "movie" || item.media_type === "tv"
     );
 
-    return NextResponse.json({ results: filteredResults });
+    // Aplica ordenação e filtro inteligente de qualidade
+    const sortedResults = sortAndFilterResults(mediaResults);
+
+    // Retorna apenas os top 10 para o dropdown
+    return NextResponse.json({ results: sortedResults.slice(0, 10) });
   } catch (error) {
     console.error("Error fetching search suggestions:", error);
     return NextResponse.json(
