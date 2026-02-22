@@ -394,7 +394,7 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
             </DialogTitle>
           </DialogHeader>
 
-          <ScrollArea className="flex-1 bg-gray-900">
+          <ScrollArea className="flex-1 bg-gray-900" data-lenis-prevent>
             <div className="p-6 pt-8 space-y-6">
               <AnimatePresence mode="popLayout">
                 {messages.map((message, index) => (
@@ -405,9 +405,8 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
                     animate="visible"
                     exit="exit"
                     layout
-                    className={`flex gap-4 items-start ${
-                      message.role === "user" ? "justify-end" : "justify-start"
-                    }`}
+                    className={`flex gap-4 items-start ${message.role === "user" ? "justify-end" : "justify-start"
+                      }`}
                   >
                     {message.role === "assistant" && (
                       <div className="flex-shrink-0 mt-1">
@@ -434,16 +433,14 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
                     )}
 
                     <div
-                      className={`max-w-[75%] ${
-                        message.role === "user" ? "order-2" : ""
-                      }`}
+                      className={`max-w-[75%] ${message.role === "user" ? "order-2" : ""
+                        }`}
                     >
                       <div
-                        className={`relative p-4 rounded-2xl shadow-lg ${
-                          message.role === "user"
+                        className={`relative p-4 rounded-2xl shadow-lg ${message.role === "user"
                             ? "bg-gradient-to-r from-red-600 to-red-700 text-white ml-auto"
                             : "bg-gray-800 text-gray-100 border border-gray-700"
-                        }`}
+                          }`}
                       >
                         {message.role === "assistant" && (
                           <div className="absolute -top-1 -left-1 w-3 h-3 bg-gradient-to-r from-red-500 to-red-600 rounded-full shadow-sm" />
@@ -455,18 +452,16 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
                         />
 
                         <div
-                          className={`flex items-center justify-between mt-2 pt-2 border-t ${
-                            message.role === "user"
+                          className={`flex items-center justify-between mt-2 pt-2 border-t ${message.role === "user"
                               ? "border-white/20"
                               : "border-gray-600"
-                          }`}
+                            }`}
                         >
                           <p
-                            className={`text-xs ${
-                              message.role === "user"
+                            className={`text-xs ${message.role === "user"
                                 ? "text-white/70"
                                 : "text-gray-400"
-                            }`}
+                              }`}
                           >
                             {formatTime(message.timestamp)}
                           </p>
@@ -478,11 +473,10 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
                               onClick={() =>
                                 copyToClipboard(message.content, index)
                               }
-                              className={`h-6 w-6 p-0 hover:bg-gray-700 ${
-                                copiedMessage === index
+                              className={`h-6 w-6 p-0 hover:bg-gray-700 ${copiedMessage === index
                                   ? "text-green-400"
                                   : "text-gray-400"
-                              }`}
+                                }`}
                             >
                               {copiedMessage === index ? (
                                 <Check className="h-3 w-3" />
