@@ -34,7 +34,7 @@ Uma das funcionalidades mais inovadoras da plataforma é a **Murphy**, uma assis
 
 ### 🚀 Tecnologia Inteligente:
 
-- **Google Gemini AI 2.0 Flash:** Modelo de IA mais avançado para conversas naturais
+- **Google Gemini AI 2.5 Flash Lite:** Modelo de IA mais estável e avançado para conversas naturais
 - **Prompt Engineering Enxuto:** Sistema simplificado focado em personalidade e contexto
 - **Processamento Temporal:** Awareness automático de datas e status de lançamento
 - **Validação Inteligente:** Identifica tópicos cinematográficos sem over-engineering
@@ -50,32 +50,38 @@ Uma das funcionalidades mais inovadoras da plataforma é a **Murphy**, uma assis
 
 ### ✨ O que torna a Murphy única:
 
-� **Conversas Reais:** Como conversar com uma amiga cinéfila, não um robô programado  
-� **Informações Práticas:** Sabe distinguir filmes em cartaz vs disponíveis em streaming  
-🧠 **Inteligência Adaptiva:** Se autocorrige quando recebe informações conflitantes  
+🎬 **Conversas Reais:** Como conversar com uma amiga cinéfila, não um robô programado  
+📍 **Informações Práticas:** Sabe distinguir filmes em cartaz vs disponíveis em streaming  
+🧠 **Inteligência Adaptiva:** Se autocorrege quando recebe informações conflitantes  
 💬 **Linguagem Viva:** Usa "Eita!", "fica ligado" e outras expressões brasileiras  
 🎯 **Foco Preciso:** Cada conversa é única para o título específico que você está explorando
 
-A Murphy transformou de uma IA robótica para uma companheira cinematográfica natural e inteligente!## ✨ Funcionalidades
+A Murphy transformou de uma IA robótica para uma companheira cinematográfica natural e inteligente!
 
-- **Descoberta de conteúdo:** Navegue por filmes e séries populares, bem avaliados e lançamentos recentes
-- **Busca avançada:** Encontre conteúdo por título, gênero, ano e tipo
-- **Detalhes de mídia:** Informações detalhadas sobre filmes e séries, incluindo sinopse, elenco e avaliações
-- **Onde assistir:** Descubra em quais plataformas de streaming o conteúdo está disponível
-- **🤖 Murphy - IA Cinematográfica Natural:** Converse com Murphy, uma assistente inspirada no filme Interestelar, que oferece:
-  - Conversas naturais e adaptáveis como uma amiga especialista em cinema
-  - Contexto temporal inteligente com awareness de datas de lançamento
-  - Compreensão de português brasileiro coloquial, gírias e expressões
-  - Informações práticas sobre onde assistir (cinemas vs streaming)
-  - Recomendações personalizadas quando solicitadas
-  - Sistema simplificado: 350 linhas vs 900+ anteriores
-  - Botão de encerrar chat para conversas frescas
-  - Powered by Google Gemini AI 2.0 Flash
-- **Perfil de usuário:** Cadastre-se para salvar favoritos, marcar como "assistido" e adicionar à lista de "quero assistir"
-- **Design responsivo:** Interface adaptada para dispositivos móveis e desktop
-- **Carregamento otimizado:** Sistema de carregamento eficiente com feedback visual
-- **Trailers:** Visualize trailers dos títulos diretamente na plataforma
+## 🚀 Sintonize - Curadoria Inteligente (CineDNA)
 
+A funcionalidade **Sintonize** é o coração da descoberta no Onde Tá Passando?. Ela permite que você encontre sua próxima obra favorita utilizando o conceito de **CineDNA**:
+
+- **🎯 Busca por Referência:** Escolha um filme ou série que você ama para servir de "molde" para as recomendações.
+- **🧬 Mapeamento de DNA:** Nosso algoritmo analisa as palavras-chave (keywords), gêneros, tom e estilo da obra de referência para encontrar similares de verdade.
+- **⭐ Smart Sorting & Filtering:** Resultados filtrados automaticamente para remover obras "obscuras", sem posters ou de baixa qualidade, priorizando o que realmente importa.
+- **📄 Paginação Robusta:** Explore dezenas de páginas de resultados altamente relevantes para nunca ficar sem opções.
+- **✨ Interface Premium:** Experiência de busca fluida e dinâmica, inspirada nas melhores plataformas de curadoria do mundo.
+
+## ✨ Funcionalidades
+
+- **🚀 Sintonize seu Gosto (CineDNA):** Encontre obras similares baseadas em um título que você ama, com mapeamento inteligente de estilo e palavras-chave.
+- **🤖 Murphy - IA Cinematográfica:** Converse com nossa assistente inspirada no filme Interestelar (Powered by Gemini AI 2.5 Flash Lite):
+  - Conversas naturais e adaptáveis como uma amiga especialista.
+  - Contexto temporal inteligente (sabe o que lançou hoje!).
+  - Linguagem brasileira coloquial e gírias.
+  - Informações de streaming vs cinema.
+- **🔍 Curadoria Inteligente:** Sistema global de ordenação por relevância e qualidade em todas as buscas do site.
+- **🎨 Design de Elite:** Interface moderna, responsiva e com micro-animações em todas as interações.
+- **📅 Onde Assistir:** Dados em tempo real sobre plataformas de streaming e disponibilidade.
+- **🎬 Detalhes Completos:** Sinopses, elenco, trailers, avaliações e metadados ricos do TMDB.
+- **👤 Perfil Personalizado:** Salve favoritos, crie listas de "quero assistir" e marque o que já viu.
+- **⚡ Performance Otimizada:** Build rápido e carregamento fluido com filtragem inteligente no server-side.
 ## 🧩 Arquitetura do Sistema
 
 O projeto utiliza uma arquitetura moderna cliente-servidor:
