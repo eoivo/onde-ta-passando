@@ -77,7 +77,7 @@ A funcionalidade **Sintonize** é o coração da descoberta no Onde Tá Passando
   - Linguagem brasileira coloquial e gírias.
   - Informações de streaming vs cinema.
 - **🔍 Curadoria Inteligente:** Sistema global de ordenação por relevância e qualidade em todas as buscas do site.
-- **🎨 Design de Elite:** Interface moderna, responsiva e com micro-animações em todas as interações.
+- **🎨 Design de Elite:** Interface moderna e responsiva com micro-animações, **Smooth Scroll (Lenis)** para rolagem fluida e barra de rolagem personalizada.
 - **📅 Onde Assistir:** Dados em tempo real sobre plataformas de streaming e disponibilidade.
 - **🎬 Detalhes Completos:** Sinopses, elenco, trailers, avaliações e metadados ricos do TMDB.
 - **👤 Perfil Personalizado:** Salve favoritos, crie listas de "quero assistir" e marque o que já viu.
@@ -116,6 +116,7 @@ O projeto utiliza uma arquitetura moderna cliente-servidor:
 - **Zustand** - Gerenciamento de estado
 - **Google Gemini AI** - Inteligência artificial para a assistente Murphy
 - **React Hot Toast** - Notificações elegantes
+- **Lenis** - Smooth scroll e experiência de rolagem premium
 
 ### Backend:
 
