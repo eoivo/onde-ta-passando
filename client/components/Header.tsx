@@ -116,7 +116,7 @@ export default function Header() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 pb-4 ${isScrolled
+        className={`fixed top-0 left-0 right-0 z-[40] transition-all duration-500 pb-4 ${isScrolled
           ? "bg-gray-950/95 backdrop-blur-md pb-0 shadow-lg"
           : "bg-gradient-to-b from-black/95 via-black/40 to-transparent"
           }`}
