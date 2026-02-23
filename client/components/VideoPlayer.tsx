@@ -78,7 +78,7 @@ export default function VideoPlayer({
     <>
       <Button
         onClick={handlePlay}
-        className="bg-white text-black hover:bg-white/90 flex items-center gap-2"
+        className="bg-white text-black hover:bg-white/90 flex items-center justify-center gap-2 w-[280px]"
         size="lg"
       >
         <Play className="h-5 w-5 fill-black" />

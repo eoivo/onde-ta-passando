@@ -1,5 +1,6 @@
 const API_KEY = process.env.API_KEY || "";
 const BASE_URL = "https://api.themoviedb.org/3";
+import { sortAndFilterResults } from "@/utils/media-utils";
 
 export interface Movie {
   id: string;
@@ -52,27 +53,28 @@ export async function getTrending(
   timeWindow: "day" | "week" = "week"
 ) {
   const data = await fetchFromTMDB(`/trending/${mediaType}/${timeWindow}`);
-  return data.results || [];
+  return sortAndFilterResults(data.results || []);
 }
 
 export async function getTopRated(mediaType: "movie" | "tv") {
   const data = await fetchFromTMDB(`/${mediaType}/top_rated`);
-  return data.results || [];
+  return sortAndFilterResults(data.results || []);
 }
 
 export async function getUpcoming() {
   const data = await fetchFromTMDB("/movie/upcoming", {
     region: "BR",
   });
-  return data.results || [];
+  return sortAndFilterResults(data.results || []);
 }
 
 export async function getMoviesByGenre(genreId: number) {
   const data = await fetchFromTMDB("/discover/movie", {
     with_genres: genreId.toString(),
     sort_by: "popularity.desc",
+    "vote_count.gte": "10"
   });
-  return data.results || [];
+  return sortAndFilterResults(data.results || []);
 }
 
 interface DiscoverMoviesParams {
@@ -80,6 +82,8 @@ interface DiscoverMoviesParams {
   sortBy?: string;
   year?: string;
   page?: number;
+  providerId?: string;
+  keywords?: string;
 }
 
 export async function discoverMovies({
@@ -87,6 +91,8 @@ export async function discoverMovies({
   sortBy,
   year,
   page = 1,
+  providerId,
+  keywords,
 }: DiscoverMoviesParams) {
   const params: Record<string, string> = {
     sort_by: sortBy || "popularity.desc",
@@ -102,7 +108,30 @@ export async function discoverMovies({
     params.primary_release_year = year;
   }
 
-  return await fetchFromTMDB("/discover/movie", params);
+  if (providerId) {
+    params.with_watch_providers = providerId;
+    params.watch_region = "BR";
+  }
+
+  if (keywords) {
+    params.with_keywords = keywords;
+  }
+
+  // Melhora a qualidade dos resultados:
+  // 1. Exige pelo menos um número mínimo de votos para evitar "cascas vazias"
+  // 2. Garante que o conteúdo seja minimamente relevante
+  if (!sortBy || sortBy.includes("popularity") || sortBy.includes("vote_average")) {
+    params["vote_count.gte"] = "10";
+  }
+
+  const data = await fetchFromTMDB("/discover/movie", params);
+
+  // Aplica filtro de qualidade para remover itens sem imagem ou sinopse
+  if (data.results) {
+    data.results = sortAndFilterResults(data.results);
+  }
+
+  return data;
 }
 
 interface DiscoverTVShowsParams {
@@ -110,6 +139,8 @@ interface DiscoverTVShowsParams {
   sortBy?: string;
   year?: string;
   page?: number;
+  providerId?: string;
+  keywords?: string;
 }
 
 export async function discoverTVShows({
@@ -117,6 +148,8 @@ export async function discoverTVShows({
   sortBy,
   year,
   page = 1,
+  providerId,
+  keywords,
 }: DiscoverTVShowsParams) {
   const params: Record<string, string> = {
     sort_by: sortBy || "popularity.desc",
@@ -132,7 +165,29 @@ export async function discoverTVShows({
     params.first_air_date_year = year;
   }
 
-  return await fetchFromTMDB("/discover/tv", params);
+  if (providerId) {
+    params.with_watch_providers = providerId;
+    params.watch_region = "BR";
+  }
+
+  if (keywords) {
+    params.with_keywords = keywords;
+  }
+
+  // Melhora a qualidade dos resultados em séries:
+  // Séries costumam ter menos votos que filmes, então usamos um limite menor (5)
+  if (!sortBy || sortBy.includes("popularity") || sortBy.includes("vote_average")) {
+    params["vote_count.gte"] = "5";
+  }
+
+  const data = await fetchFromTMDB("/discover/tv", params);
+
+  // Aplica filtro de qualidade para remover itens sem imagem ou sinopse
+  if (data.results) {
+    data.results = sortAndFilterResults(data.results);
+  }
+
+  return data;
 }
 
 export async function getMovieDetails(movieId: string) {

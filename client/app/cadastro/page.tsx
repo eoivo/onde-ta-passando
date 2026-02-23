@@ -45,7 +45,7 @@ export default function RegisterPage() {
       toast.success(
         "Conta criada com sucesso! Faça login para continuar."
       );
-      
+
       // Redirecionar para login após 2 segundos (dar tempo para o toast aparecer)
       setTimeout(() => {
         router.push("/login");
@@ -81,7 +81,7 @@ export default function RegisterPage() {
       {/* Conteúdo */}
       <div className="relative z-10 max-w-md w-full bg-gray-900/90 rounded-xl shadow-2xl p-8 backdrop-blur-md border border-gray-800/50">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-red-500 to-red-700 text-transparent bg-clip-text">
+          <h1 className="text-4xl md:text-5xl font-normal font-bebas tracking-wide bg-gradient-to-r from-red-500 to-red-700 text-transparent bg-clip-text uppercase">
             Criar Conta
           </h1>
           <p className="text-gray-400 mt-2">

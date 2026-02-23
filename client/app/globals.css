@@ -23,6 +23,13 @@
   --input: 0 0% 14.9%;
   --ring: 0 72.2% 50.6%;
   --radius: 0.5rem;
+  --font-bebas: var(--font-bebas);
+}
+
+@layer utilities {
+  .font-bebas {
+    font-family: var(--font-bebas);
+  }
 }
 
 .dark {

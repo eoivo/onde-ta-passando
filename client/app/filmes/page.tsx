@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export default async function MoviesPage({
   searchParams,
 }: {
-  searchParams: { genre?: string; sort?: string; year?: string; page?: string };
+  searchParams: { genre?: string; sort?: string; year?: string; page?: string; provider?: string };
 }) {
   const genres = await getGenres("movie");
 
@@ -17,17 +17,19 @@ export default async function MoviesPage({
   const sortBy = params.sort || "popularity.desc";
   const year = params.year || "";
   const page = Number.parseInt(params.page || "1");
+  const providerId = params.provider || "";
 
   const { results: movies, total_pages } = await discoverMovies({
     genreId,
     sortBy,
     year,
     page,
+    providerId,
   });
 
   return (
-    <main className="min-h-screen pt-24 pb-16 px-4 md:px-8">
-      <div className="max-w-7xl mx-auto">
+    <main className="min-h-screen pt-24 pb-16 px-4 md:px-12">
+      <div className="max-w-[1600px] mx-auto">
         <h1 className="text-4xl font-bold mb-8">Filmes</h1>
 
         <FilterBar
@@ -47,7 +49,7 @@ export default async function MoviesPage({
           <MovieGrid
             movies={movies}
             currentPage={page}
-            totalPages={total_pages > 100 ? 100 : total_pages}
+            totalPages={total_pages > 500 ? 500 : total_pages}
             baseUrl="/filmes"
             currentFilters={params}
             mediaType="movie"

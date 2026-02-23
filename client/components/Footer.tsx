@@ -8,119 +8,78 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-black border-t border-gray-800 mt-auto py-8">
-      <div className="container px-4 md:px-6 mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Image
-                src="/images/logo.png"
-                alt="Onde Tá Passando? Logo"
-                width={32}
-                height={32}
-                className="rounded-sm"
-                onError={(e) => {
-                  // Fallback para favicon se o logo não for encontrado
-                  e.currentTarget.src = "/favicon.ico";
-                }}
-              />
-              <h3 className="text-lg font-medium text-white">
-                Onde Tá Passando?
-              </h3>
+    <footer className="bg-black border-t border-gray-800/50 mt-auto py-12">
+      <div className="max-w-[1600px] px-4 md:px-12 mx-auto">
+        <div className="flex flex-col items-center text-center space-y-10">
+          {/* Brand & Social Section */}
+          <div className="space-y-6 max-w-2xl">
+            <div className="space-y-4 flex flex-col items-center">
+              <div className="flex flex-col items-center gap-3">
+                <Image
+                  src="/images/logo.png"
+                  alt="Onde Tá Passando? Logo"
+                  width={40}
+                  height={40}
+                  className="rounded-lg shadow-2xl shadow-red-600/20"
+                  onError={(e) => {
+                    e.currentTarget.src = "/favicon.ico";
+                  }}
+                />
+                <h3 className="text-2xl md:text-3xl font-normal font-bebas tracking-widest uppercase italic leading-none">
+                  <span className="text-white">Onde Tá </span>
+                  <span className="text-red-600">Passando?</span>
+                </h3>
+              </div>
+              <p className="text-sm md:text-base text-gray-400 leading-relaxed font-light max-w-md">
+                Encontre onde assistir seus filmes e séries favoritos em diversas
+                plataformas de streaming.
+              </p>
             </div>
-            <p className="text-sm text-gray-400">
-              Encontre onde assistir seus filmes e séries favoritos em diversas
-              plataformas de streaming.
+
+            {/* Social Icons - Centered under text */}
+            <div className="flex justify-center gap-4">
+              {[
+                { icon: <Github className="h-5 w-5" />, label: "GitHub" },
+                { icon: <Twitter className="h-5 w-5" />, label: "Twitter" },
+                { icon: <Mail className="h-5 w-5" />, label: "Email" },
+              ].map((social, i) => (
+                <button
+                  key={i}
+                  className="w-11 h-11 flex items-center justify-center rounded-xl border border-gray-800 bg-gray-900/30 text-gray-400 hover:border-red-600/50 hover:text-white hover:bg-red-600/5 transition-all duration-300"
+                  aria-label={social.label}
+                >
+                  {social.icon}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Navigation - Centered Horizontal Line */}
+          <nav className="flex flex-wrap justify-center items-center gap-x-10 gap-y-4 border-y border-gray-800/50 py-6 w-full max-w-4xl">
+            {[
+              { href: "/", label: "Início" },
+              { href: "/filmes", label: "Filmes" },
+              { href: "/series", label: "Séries" },
+              { href: "/#collections", label: "Coleções" },
+              { href: "/termos", label: "Termos" },
+              { href: "/privacidade", label: "Privacidade" },
+            ].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-[13px] font-bold text-gray-400 hover:text-white transition-colors uppercase tracking-[0.2em]"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Copyright */}
+          <div className="pt-2">
+            <p className="text-[11px] text-gray-600 font-bold tracking-[0.3em] uppercase">
+              © {currentYear} Onde Tá Passando? • Todos os direitos reservados.
             </p>
           </div>
-
-          <div className="space-y-3">
-            <h3 className="text-lg font-medium text-white">Links</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/"
-                  className="text-sm text-gray-400 hover:text-white transition-colors"
-                >
-                  Início
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/filmes"
-                  className="text-sm text-gray-400 hover:text-white transition-colors"
-                >
-                  Filmes
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/series"
-                  className="text-sm text-gray-400 hover:text-white transition-colors"
-                >
-                  Séries
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div className="space-y-3">
-            <h3 className="text-lg font-medium text-white">Legal</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/termos"
-                  className="text-sm text-gray-400 hover:text-white transition-colors"
-                >
-                  Termos de Uso
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/privacidade"
-                  className="text-sm text-gray-400 hover:text-white transition-colors"
-                >
-                  Política de Privacidade
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div className="space-y-3">
-            <h3 className="text-lg font-medium text-white">Contato</h3>
-            <div className="flex space-x-4">
-              <button
-                className="text-gray-400 hover:text-white transition-colors"
-                aria-label="GitHub"
-              >
-                <Github className="h-5 w-5" />
-                <span className="sr-only">GitHub</span>
-              </button>
-              <button
-                className="text-gray-400 hover:text-white transition-colors"
-                aria-label="Twitter"
-              >
-                <Twitter className="h-5 w-5" />
-                <span className="sr-only">Twitter</span>
-              </button>
-              <button
-                className="text-gray-400 hover:text-white transition-colors"
-                aria-label="Email"
-              >
-                <Mail className="h-5 w-5" />
-                <span className="sr-only">Email</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-8 pt-6 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-gray-400">
-            © {currentYear} Onde Tá Passando? Todos os direitos reservados.
-          </p>
-          <p className="text-sm text-gray-400 flex items-center mt-4 md:mt-0">
-            Feito com <Heart className="h-4 w-4 mx-1 text-red-500" /> no Brasil
-          </p>
         </div>
       </div>
     </footer>

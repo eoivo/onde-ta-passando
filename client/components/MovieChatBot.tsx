@@ -329,12 +329,10 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
         <Button
           onClick={handleChatButtonClick}
           size="lg"
-          className="relative gap-3 bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white border-0 hover:from-red-700 hover:via-red-800 hover:to-red-900 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden"
+          className="relative gap-3 bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white border-0 hover:from-red-700 hover:via-red-800 hover:to-red-900 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden w-[280px] justify-center"
         >
-          <Sparkles className="h-5 w-5" />
           <MessageCircle className="h-5 w-5" />
           <span className="font-semibold">Conversar com a Murphy</span>
-          <Zap className="h-4 w-4" />
         </Button>
 
         <DialogContent className="h-[90vh] mx-auto my-auto w-[calc(100%-2rem)] max-w-4xl flex flex-col p-0 bg-gradient-to-br from-gray-900 to-black border-0 shadow-2xl rounded-2xl overflow-hidden">
@@ -438,8 +436,8 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
                     >
                       <div
                         className={`relative p-4 rounded-2xl shadow-lg ${message.role === "user"
-                            ? "bg-gradient-to-r from-red-600 to-red-700 text-white ml-auto"
-                            : "bg-gray-800 text-gray-100 border border-gray-700"
+                          ? "bg-gradient-to-r from-red-600 to-red-700 text-white ml-auto"
+                          : "bg-gray-800 text-gray-100 border border-gray-700"
                           }`}
                       >
                         {message.role === "assistant" && (
@@ -453,14 +451,14 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
 
                         <div
                           className={`flex items-center justify-between mt-2 pt-2 border-t ${message.role === "user"
-                              ? "border-white/20"
-                              : "border-gray-600"
+                            ? "border-white/20"
+                            : "border-gray-600"
                             }`}
                         >
                           <p
                             className={`text-xs ${message.role === "user"
-                                ? "text-white/70"
-                                : "text-gray-400"
+                              ? "text-white/70"
+                              : "text-gray-400"
                               }`}
                           >
                             {formatTime(message.timestamp)}
@@ -474,8 +472,8 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
                                 copyToClipboard(message.content, index)
                               }
                               className={`h-6 w-6 p-0 hover:bg-gray-700 ${copiedMessage === index
-                                  ? "text-green-400"
-                                  : "text-gray-400"
+                                ? "text-green-400"
+                                : "text-gray-400"
                                 }`}
                             >
                               {copiedMessage === index ? (

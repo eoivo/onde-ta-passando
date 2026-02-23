@@ -30,7 +30,7 @@ export default function MovieCarousel({ title, movies }: MovieCarouselProps) {
 
   return (
     <div className="space-y-2 py-4">
-      <h2 className="text-xl md:text-2xl font-bold">{title}</h2>
+      <h2 className="text-2xl md:text-3xl font-normal font-bebas tracking-wider uppercase">{title}</h2>
 
       <div className="relative group">
         <div

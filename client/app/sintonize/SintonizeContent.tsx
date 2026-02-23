@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Search, Sparkles, Filter, ArrowRight, Film, Tv, Info, Star, ChevronLeft, ChevronRight, X } from "lucide-react";
-import { getMovieDetails, getTvDetails, getMediaKeywords, searchMulti, getMovieRecommendations, getTvRecommendations } from "@/services/tmdb-api";
+import { getMovieDetails, getTvDetails, getMediaKeywords, searchMulti, getMovieRecommendations, getTvRecommendations, getTrending, discoverMovies, discoverTVShows } from "@/services/tmdb-api";
 import { sortAndFilterResults } from "@/utils/media-utils";
 import { motion, AnimatePresence } from "framer-motion";
 import MovieCard from "@/components/MovieCard";
@@ -27,6 +28,7 @@ export default function SintonizeContent() {
     const [searchPage, setSearchPage] = useState(1);
     const [searchTotalPages, setSearchTotalPages] = useState(1);
     const [isSearching, setIsSearching] = useState(false);
+    const [examples, setExamples] = useState<any[]>([]);
     const searchInputRef = useRef<HTMLInputElement>(null);
 
     // Reset do estado quando volta para a página sem parâmetros (clique no Header)
@@ -81,16 +83,50 @@ export default function SintonizeContent() {
     }
 
     async function fetchRecs(id: string, type: "movie" | "tv", page: number) {
+        setLoading(true);
         try {
-            const recsData = type === "movie"
-                ? await getMovieRecommendations(id, page)
-                : await getTvRecommendations(id, page);
+            // 1. Buscamos duas páginas da API oficial para garantir "gordura" para o filtro de qualidade
+            const [recsData, nextRecsData] = await Promise.all([
+                type === "movie" ? getMovieRecommendations(id, (page * 2) - 1) : getTvRecommendations(id, (page * 2) - 1),
+                type === "movie" ? getMovieRecommendations(id, page * 2) : getTvRecommendations(id, page * 2)
+            ]);
 
-            const sortedRecs = sortAndFilterResults(recsData.results || []);
-            setRecommendations(sortedRecs);
-            setRecsTotalPages(Math.min(recsData.total_pages || 1, 50));
+            let results = [...(recsData.results || []), ...(nextRecsData.results || [])];
+            let rawTotalPages = recsData.total_pages || 1;
+
+            // 2. Filtra por qualidade
+            let highQualityResults = sortAndFilterResults(results);
+
+            // 3. BACKFILL: Se após o filtro tivermos menos de 24 itens, usamos o DISCOVER para completar a página
+            if (highQualityResults.length < 24) {
+                const tags = keywords.length > 0 ? keywords : await getMediaKeywords(id, type);
+                const genresIds = targetMedia?.genres?.map((g: any) => g.id).join(",") || "";
+                const keywordsIds = tags.slice(0, 5).map((kw: any) => kw.id).join("|");
+
+                const discoverData = type === "movie"
+                    ? await discoverMovies({ genreId: genresIds, keywords: keywordsIds, page: page, sortBy: "popularity.desc" })
+                    : await discoverTVShows({ genreId: genresIds, keywords: keywordsIds, page: page, sortBy: "popularity.desc" });
+
+                const discoverFiltered = sortAndFilterResults(discoverData.results || []);
+
+                // Adiciona itens do discover que não sejam duplicatas até completar 24
+                discoverFiltered.forEach((item: any) => {
+                    if (highQualityResults.length < 24 && !highQualityResults.some(r => r.id === item.id) && item.id.toString() !== id) {
+                        highQualityResults.push(item);
+                    }
+                });
+            }
+
+            // 4. Garante o corte de exatamente 24 por página
+            setRecommendations(highQualityResults.slice(0, 24));
+
+            // Ajustamos o total de páginas para refletir a nova densidade
+            setRecsTotalPages(Math.min(Math.max(Math.ceil(rawTotalPages / 2), 10), 10));
+
         } catch (error) {
             console.error("Erro ao buscar recomendações:", error);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -143,33 +179,57 @@ export default function SintonizeContent() {
         searchInputRef.current?.focus();
     };
 
+    // Busca exemplos de tendências para inspiração
+    useEffect(() => {
+        if (!targetId && examples.length === 0) {
+            getTrending("all", "week").then(res => {
+                setExamples(res.slice(0, 12));
+            });
+        }
+    }, [targetId, examples.length]);
+
     // UI Inicial / Busca de Referência
     if (!targetId) {
         return (
-            <div className="min-h-[90vh] flex flex-col items-center pt-32 px-4">
+            <div className="relative min-h-[85vh] flex flex-col items-center justify-center pt-24 pb-20 px-4 overflow-hidden">
+                {/* Background Wall */}
+                <div className="absolute inset-0 z-0">
+                    <Image
+                        src="/images/backgroung.jpg"
+                        alt="Background Wall"
+                        fill
+                        className="object-cover"
+                        priority
+                        quality={90}
+                    />
+                    {/* Dark Overlays & Strong Blur */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-black via-black/80 to-black" />
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+                </div>
+
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="w-full max-w-3xl text-center"
+                    className="w-full max-w-5xl text-center relative z-10"
                 >
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 border border-red-500/20 text-red-500 mb-6 text-sm font-bold tracking-widest uppercase">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 border border-red-500/20 text-red-500 mb-6 text-sm font-bold tracking-widest uppercase backdrop-blur-md">
                         <Sparkles className="w-4 h-4" />
                         Sintonize seu Gosto
                     </div>
-                    <h1 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tighter">
+                    <h1 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tighter uppercase font-bebas drop-shadow-2xl">
                         Qual obra você <span className="text-red-600 italic">amou?</span>
                     </h1>
-                    <p className="text-white/40 mb-12 text-lg">
+                    <p className="text-white/60 mb-10 text-lg md:text-xl font-light drop-shadow-lg">
                         Digite o nome de uma obra e selecione como sua referência de estilo.
                     </p>
 
-                    <div className="relative group mb-12">
+                    <div className="relative group mb-16 max-w-3xl mx-auto shadow-2xl">
                         <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-white/30 group-focus-within:text-red-500 transition-colors" />
                         <input
                             ref={searchInputRef}
                             type="text"
                             placeholder="Ex: Crepúsculo, Interestelar, Breaking Bad..."
-                            className="w-full bg-white/5 border border-white/10 rounded-3xl py-6 pl-16 pr-16 text-xl text-white placeholder-white/20 focus:outline-none focus:border-red-500/50 focus:ring-4 focus:ring-red-500/10 transition-all shadow-2xl"
+                            className="w-full bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl py-6 pl-16 pr-16 text-xl text-white placeholder-white/20 focus:outline-none focus:border-red-500/50 focus:ring-4 focus:ring-red-500/10 transition-all shadow-2xl"
                             value={searchQuery}
                             onChange={(e) => { setSearchQuery(e.target.value); setSearchPage(1); }}
                             autoFocus
@@ -190,7 +250,7 @@ export default function SintonizeContent() {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                className="flex justify-center py-10"
+                                className="flex justify-center py-20"
                             >
                                 <div className="flex gap-1.5">
                                     {[0, 1, 2].map((i) => (
@@ -203,7 +263,7 @@ export default function SintonizeContent() {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0 }}
-                                className="space-y-6 w-full text-left bg-gray-950/40 backdrop-blur-xl rounded-[2rem] border border-white/5 p-6 shadow-2xl overflow-hidden"
+                                className="space-y-6 w-full max-w-3xl mx-auto text-left bg-gray-950/60 backdrop-blur-2xl rounded-[2rem] border border-white/10 p-6 shadow-2xl overflow-hidden"
                             >
                                 <div className="divide-y divide-white/5">
                                     {searchResults.map((item) => (
@@ -259,8 +319,50 @@ export default function SintonizeContent() {
                                     </div>
                                 )}
                             </motion.div>
-                        ) : searchQuery.length >= 2 && !isSearching && (
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-20 text-white/20 italic">
+                        ) : !searchQuery && examples.length > 0 && (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="w-full space-y-8"
+                            >
+                                <div className="flex items-center justify-center gap-4">
+                                    <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent flex-grow" />
+                                    <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.4em] px-4 drop-shadow-md">
+                                        Obras para te inspirar
+                                    </p>
+                                    <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent flex-grow" />
+                                </div>
+
+                                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
+                                    {examples.map((item, idx) => (
+                                        <motion.div
+                                            key={item.id}
+                                            initial={{ opacity: 0, scale: 0.9 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            transition={{ delay: idx * 0.05 }}
+                                            onClick={() => selectTarget(item)}
+                                            className="cursor-pointer group relative aspect-[2/3] overflow-hidden rounded-2xl border border-white/10 hover:border-red-600/50 transition-all duration-500 shadow-xl backdrop-blur-sm"
+                                        >
+                                            <img
+                                                src={`https://image.tmdb.org/t/p/w342${item.poster_path}`}
+                                                alt={item.title || item.name}
+                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100"
+                                            />
+                                            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/60 to-transparent h-24 translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex items-end p-3">
+                                                <p className="text-[10px] text-white font-bold leading-tight line-clamp-2 uppercase tracking-tighter">
+                                                    {item.title || item.name}
+                                                </p>
+                                            </div>
+                                            <div className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 scale-50 group-hover:scale-100 border border-white/10">
+                                                <Sparkles className="w-4 h-4 text-red-500" />
+                                            </div>
+                                        </motion.div>
+                                    ))}
+                                </div>
+                            </motion.div>
+                        )}
+                        {!searchResults.length && searchQuery.length >= 2 && !isSearching && (
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-20 text-white/20 italic bg-black/20 backdrop-blur-md rounded-3xl border border-white/5">
                                 Nenhuma obra encontrada com este nome.
                             </motion.div>
                         )}

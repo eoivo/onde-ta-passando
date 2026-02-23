@@ -137,9 +137,10 @@ export default function Header() {
                   priority
                 />
               </div>
-              <div className="flex flex-col">
-                <h1 className="text-lg md:text-xl font-black bg-gradient-to-r from-red-500 to-red-700 text-transparent bg-clip-text leading-tight max-w-[120px] md:max-w-none tracking-tighter uppercase">
-                  Onde Tá Passando?
+              <div className="flex flex-col translate-y-[1.5px]">
+                <h1 className="text-xl md:text-2xl font-normal font-bebas leading-none tracking-wider uppercase">
+                  <span className="text-white">Onde Tá </span>
+                  <span className="text-red-600">Passando?</span>
                 </h1>
               </div>
             </Link>

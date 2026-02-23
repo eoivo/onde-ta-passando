@@ -1,6 +1,6 @@
 import type React from "react";
 import type { Metadata } from "next/types";
-import { Inter } from "next/font/google";
+import { Inter, Bebas_Neue } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -11,7 +11,12 @@ import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "sonner";
 import SmoothScroll from "@/components/SmoothScroll";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const bebas = Bebas_Neue({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-bebas"
+});
 
 export const metadata: Metadata = {
   title: "Onde Tá Passando? - Descubra onde assistir seus filmes e séries",
@@ -31,7 +36,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body
-        className={`${inter.className} bg-black text-white antialiased flex flex-col min-h-screen`}
+        className={`${inter.variable} ${bebas.variable} font-sans bg-black text-white antialiased flex flex-col min-h-screen`}
       >
         <ThemeProvider attribute="class" defaultTheme="dark">
           <AuthProvider>

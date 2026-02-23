@@ -19,7 +19,7 @@ export default function CollectionsGrid({
   configs,
 }: CollectionsGridProps) {
   const router = useRouter();
-  
+
   // Filtrar coleções válidas
   const validCollections = collections.filter(
     (c) => c.movies.length > 0
@@ -54,14 +54,14 @@ export default function CollectionsGrid({
   const backdropUrl = featuredCollection.backdrop_path
     ? `https://image.tmdb.org/t/p/w1280${featuredCollection.backdrop_path}`
     : featuredCollection.movies[0]?.backdrop_path
-    ? `https://image.tmdb.org/t/p/w1280${featuredCollection.movies[0].backdrop_path}`
-    : null;
+      ? `https://image.tmdb.org/t/p/w1280${featuredCollection.movies[0].backdrop_path}`
+      : null;
 
   return (
     <div className="space-y-8 py-8">
       <div className="flex items-center gap-3">
         <Sparkles className="w-6 h-6 text-red-500" />
-        <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-red-500 to-red-700 text-transparent bg-clip-text">
+        <h2 className="text-3xl md:text-5xl font-normal font-bebas tracking-wide bg-gradient-to-r from-red-500 to-red-700 text-transparent bg-clip-text uppercase">
           Universos & Coleções
         </h2>
       </div>
@@ -81,54 +81,54 @@ export default function CollectionsGrid({
         <div className="mt-12">
           <div className="flex items-center gap-3 mb-6">
             <Sparkles className="w-5 h-5 text-red-500" />
-            <h2 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-red-500 to-red-700 text-transparent bg-clip-text">
+            <h2 className="text-2xl md:text-3xl font-normal font-bebas tracking-wide bg-gradient-to-r from-red-500 to-red-700 text-transparent bg-clip-text uppercase">
               Explore Outras Coleções
             </h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {otherCollections.map((collection) => {
-            const config = configs.find((c) => c.id === collection.id);
-            const posterUrl = collection.poster_path
-              ? `https://image.tmdb.org/t/p/w500${collection.poster_path}`
-              : collection.movies[0]?.poster_path
-              ? `https://image.tmdb.org/t/p/w500${collection.movies[0].poster_path}`
-              : null;
+            {otherCollections.map((collection) => {
+              const config = configs.find((c) => c.id === collection.id);
+              const posterUrl = collection.poster_path
+                ? `https://image.tmdb.org/t/p/w500${collection.poster_path}`
+                : collection.movies[0]?.poster_path
+                  ? `https://image.tmdb.org/t/p/w500${collection.movies[0].poster_path}`
+                  : null;
 
-            return (
-              <motion.div
-                key={collection.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                whileHover={{ scale: 1.05 }}
-                className="relative aspect-[2/3] rounded-lg overflow-hidden group cursor-pointer"
-                onClick={() => router.push(`/colecao/${collection.id}`)}
-              >
-                {posterUrl ? (
-                  <Image
-                    src={posterUrl}
-                    alt={collection.name}
-                    fill
-                    className="object-cover transition-transform duration-300"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                    <span className="text-gray-500 text-sm text-center px-2">
-                      {collection.name}
-                    </span>
+              return (
+                <motion.div
+                  key={collection.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  whileHover={{ scale: 1.05 }}
+                  className="relative aspect-[2/3] rounded-lg overflow-hidden group cursor-pointer"
+                  onClick={() => router.push(`/colecao/${collection.id}`)}
+                >
+                  {posterUrl ? (
+                    <Image
+                      src={posterUrl}
+                      alt={collection.name}
+                      fill
+                      className="object-cover transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                      <span className="text-gray-500 text-sm text-center px-2">
+                        {collection.name}
+                      </span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute bottom-0 left-0 right-0 p-3 transform translate-y-full group-hover:translate-y-0 transition-transform">
+                    <h4 className="text-white font-normal font-bebas text-lg mb-1 uppercase tracking-tight">
+                      {getCollectionName(collection)}
+                    </h4>
+                    <p className="text-gray-300 text-xs">
+                      {collection.movies.length} filmes
+                    </p>
                   </div>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="absolute bottom-0 left-0 right-0 p-3 transform translate-y-full group-hover:translate-y-0 transition-transform">
-                  <h4 className="text-white font-semibold text-sm mb-1">
-                    {getCollectionName(collection)}
-                  </h4>
-                  <p className="text-gray-300 text-xs">
-                    {collection.movies.length} filmes
-                  </p>
-                </div>
-              </motion.div>
-            );
-          })}
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -188,7 +188,7 @@ function FeaturedCollectionCard({
       <div className="relative z-10 p-6 md:p-12 pb-6">
         {/* Header da Coleção */}
         <div className="mb-6">
-          <h3 className="text-3xl md:text-5xl font-bold mb-3 text-white">
+          <h3 className="text-4xl md:text-6xl font-normal font-bebas mb-3 text-white uppercase tracking-tighter">
             {getCollectionName()}
           </h3>
           {collection.overview && (
