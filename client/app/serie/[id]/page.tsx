@@ -79,7 +79,7 @@ export default async function TVShowPage({
         />
       </div>
 
-      <div className="relative z-20 -mt-80 md:-mt-[600px] px-4 md:px-12 max-w-[1600px] mx-auto">
+      <div className="relative z-20 -mt-[400px] md:-mt-[62vh] px-4 md:px-12 max-w-[1600px] mx-auto pt-4">
         <div className="flex flex-col md:flex-row gap-8">
           <div className="hidden md:block flex-shrink-0">
             <Image
@@ -195,7 +195,7 @@ export default async function TVShowPage({
 
             <div className="flex flex-col gap-3 items-stretch md:items-start">
               {videos.length > 0 && (
-                <VideoPlayer videos={videos} />
+                <VideoPlayer videos={videos} btnWidth="md:w-[280px]" />
               )}
 
               {/* Chat Bot */}

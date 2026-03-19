@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 interface VideoPlayerProps {
   videos: any[];
   onTrailerStateChange?: (isOpen: boolean) => void;
+  btnWidth?: string;
 }
 
 export default function VideoPlayer({
   videos,
   onTrailerStateChange,
+  btnWidth = "md:w-[170px]",
 }: VideoPlayerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
@@ -78,7 +80,7 @@ export default function VideoPlayer({
     <>
       <Button
         onClick={handlePlay}
-        className="bg-white text-black hover:bg-white/90 flex items-center justify-center gap-2 w-full md:w-[280px]"
+        className={`bg-white text-black hover:bg-white/90 flex items-center justify-center gap-2 w-full ${btnWidth}`}
         size="lg"
       >
         <Play className="h-5 w-5 fill-black" />

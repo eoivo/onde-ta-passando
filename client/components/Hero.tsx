@@ -58,12 +58,12 @@ export default function Hero({ movie, onTrailerStateChange, priority = false }: 
       />
 
       {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent z-10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10" />
 
       {/* Content */}
-      <div className="absolute inset-0 flex items-end pb-28 md:pb-44 pt-24 md:pt-16">
-        <div className="max-w-2xl mx-auto px-4 md:px-8 md:ml-16 space-y-4">
+      <div className="absolute inset-0 z-20 flex items-end pb-16 md:pb-24 pt-8 md:pt-20">
+        <div className="max-w-2xl w-full px-4 md:px-8 md:ml-16 space-y-4">
           <h1 className="text-4xl md:text-6xl font-black leading-tight tracking-tight uppercase">
             {movie.title || movie.name}
           </h1>
