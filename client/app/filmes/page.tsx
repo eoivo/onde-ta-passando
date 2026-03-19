@@ -19,7 +19,7 @@ export default async function MoviesPage({
   const page = Number.parseInt(params.page || "1");
   const providerId = params.provider || "";
 
-  const { results: movies, total_pages } = await discoverMovies({
+  const { results: movies, total_pages, total_results } = await discoverMovies({
     genreId,
     sortBy,
     year,
@@ -30,13 +30,13 @@ export default async function MoviesPage({
   return (
     <main className="min-h-screen pt-24 pb-16 px-4 md:px-12">
       <div className="max-w-[1600px] mx-auto">
-        <h1 className="text-4xl font-bold mb-8">Filmes</h1>
-
         <FilterBar
           genres={genres}
           currentFilters={params}
           baseUrl="/filmes"
           mediaType="movie"
+          totalResults={total_results}
+          title="Filmes"
         />
 
         <Suspense

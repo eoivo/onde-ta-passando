@@ -78,7 +78,7 @@ export default async function Home() {
   return (
     <main className="min-h-screen pb-20">
       <HeroCarousel movies={shuffledHeroItems} />
-      <div className="px-4 md:px-12 space-y-12 -mt-20 relative z-10">
+      <div className="px-4 md:px-12 space-y-3 md:space-y-10 -mt-24 md:-mt-20 relative z-10">
         <MovieCarousel title="Filmes em alta" movies={trendingMovies} />
         <MovieCarousel title="Séries em alta" movies={trendingTVShows} />
         <MovieCarousel title="Mais bem avaliados" movies={topRatedMovies} />

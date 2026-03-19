@@ -69,6 +69,7 @@ export default async function TVShowPage({
       <div className="relative h-[85vh] w-full overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/50 to-transparent z-10" />
         <Image
           src={`https://image.tmdb.org/t/p/original${tvShow.backdrop_path}`}
           alt={tvShow.name}
@@ -78,7 +79,7 @@ export default async function TVShowPage({
         />
       </div>
 
-      <div className="relative z-20 -mt-[600px] px-4 md:px-12 max-w-[1600px] mx-auto">
+      <div className="relative z-20 -mt-80 md:-mt-[600px] px-4 md:px-12 max-w-[1600px] mx-auto">
         <div className="flex flex-col md:flex-row gap-8">
           <div className="hidden md:block flex-shrink-0">
             <Image
@@ -192,7 +193,7 @@ export default async function TVShowPage({
               {tvShow.overview}
             </p>
 
-            <div className="flex flex-col gap-3 items-start">
+            <div className="flex flex-col gap-3 items-stretch md:items-start">
               {videos.length > 0 && (
                 <VideoPlayer videos={videos} />
               )}

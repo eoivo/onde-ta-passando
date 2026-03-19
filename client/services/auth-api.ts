@@ -186,9 +186,9 @@ export const removeFromFavorites = async (
   return data.data;
 };
 
-export const getFavorites = async () => {
-  const data = await authFetch("/users/favorites");
-  return data.data;
+export const getFavorites = async (page: number = 1, limit: number = 20) => {
+  const data = await authFetch(`/users/favorites?page=${page}&limit=${limit}`);
+  return data;
 };
 
 export const addToWatchlist = async (
@@ -223,9 +223,9 @@ export const removeFromWatchlist = async (
   return data.data;
 };
 
-export const getWatchlist = async () => {
-  const data = await authFetch("/users/watchlist");
-  return data.data;
+export const getWatchlist = async (page: number = 1, limit: number = 20) => {
+  const data = await authFetch(`/users/watchlist?page=${page}&limit=${limit}`);
+  return data;
 };
 
 export const addToWatched = async (
@@ -260,9 +260,9 @@ export const removeFromWatched = async (
   return data.data;
 };
 
-export const getWatched = async () => {
-  const data = await authFetch("/users/watched");
-  return data.data;
+export const getWatched = async (page: number = 1, limit: number = 20) => {
+  const data = await authFetch(`/users/watched?page=${page}&limit=${limit}`);
+  return data;
 };
 
 export const uploadProfileImage = async (
@@ -319,3 +319,15 @@ export const resetPassword = async (
 
   return data;
 };
+
+export const changePassword = async (
+  currentPassword: string,
+  newPassword: string
+): Promise<{ success: boolean; message: string }> => {
+  const data = await authFetch("/auth/updatepassword", {
+    method: "PUT",
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+
+  return data;
+};

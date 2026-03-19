@@ -99,19 +99,7 @@ export default function Header() {
     setIsSheetOpen(false);
   };
 
-  const scrollToCollections = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsSheetOpen(false);
 
-    if (pathname === "/") {
-      const element = document.getElementById("colecoes");
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
-      }
-    } else {
-      router.push("/#colecoes");
-    }
-  };
 
   return (
     <>
@@ -133,6 +121,7 @@ export default function Header() {
                   src="/images/logo.png"
                   alt="Onde Tá Passando? Logo"
                   fill
+                  sizes="(max-width: 768px) 32px, 40px"
                   className="object-contain"
                   priority
                 />
@@ -166,72 +155,66 @@ export default function Header() {
                     <span className={`absolute -bottom-1.5 left-0 h-0.5 bg-red-600 transition-all duration-300 group-hover:w-full ${pathname === href ? "w-full opacity-100" : "w-0 opacity-0 group-hover:opacity-100"}`}></span>
                   </Link>
                 ))}
-                <button
-                  onClick={scrollToCollections}
-                  className="text-[13px] font-bold text-white/60 hover:text-white transition-all duration-300 tracking-[0.1em] uppercase relative group"
+
+
+                {/* Busca no Desktop integrada ao NAV */}
+                <form
+                  ref={searchFormRef}
+                  onSubmit={handleSearch}
+                  className="relative hidden md:flex items-center"
                 >
-                  Coleções
-                  <span className="absolute -bottom-1.5 left-0 w-0 h-0.5 bg-red-600 transition-all duration-300 group-hover:w-full opacity-0 group-hover:opacity-100"></span>
-                </button>
+                  <div className="flex items-center relative">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!isSearchFocused) {
+                          searchFormRef.current?.querySelector('input')?.focus();
+                        }
+                      }}
+                      className="p-1 transition-transform duration-300 z-10"
+                    >
+                      <Search className="h-4 w-4 text-red-600" />
+                    </button>
+                    
+                    <input
+                      type="text"
+                      placeholder="Buscar filme ou série..."
+                      className={`bg-transparent text-white text-sm py-1 focus:ring-0 focus:outline-none transition-all duration-500 ease-in-out ${isSearchFocused
+                          ? "w-64 opacity-100 ml-2"
+                          : "w-0 opacity-0 pointer-events-none ml-0"
+                        }`}
+                      value={searchQuery}
+                      onChange={handleInputChange}
+                      onFocus={handleInputFocus}
+                      onBlur={() => setIsSearchFocused(false)}
+                    />
+
+                    {searchQuery && isSearchFocused && (
+                      <button
+                        type="button"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          clearSearch();
+                        }}
+                        className="p-1 hover:bg-white/10 rounded-full transition-colors flex-shrink-0"
+                      >
+                        <X className="h-3 w-3 text-white/40" />
+                      </button>
+                    )}
+                  </div>
+
+                  <SearchSuggestions
+                    query={searchQuery}
+                    visible={showSuggestions && isSearchFocused}
+                    onItemClick={closeSuggestions}
+                  />
+                </form>
               </nav>
             )}
           </div>
 
           <div className="flex items-center gap-2 md:gap-8">
-            {!isMobile && (
-              <form
-                ref={searchFormRef}
-                onSubmit={handleSearch}
-                className={`relative hidden md:flex items-center transition-all duration-500 ease-out rounded-full border border-white/10
-                ${isSearchFocused
-                    ? "w-80 bg-black/60 border-red-500/40 ring-4 ring-red-500/5 shadow-[0_0_20px_rgba(239,68,68,0.1)]"
-                    : "w-10 hover:w-64 bg-white/5 hover:bg-white/10"
-                  }`}
-              >
-                <div className="flex items-center w-full relative">
-                  <div className="absolute left-3 pointer-events-none">
-                    <Search className={`h-4 w-4 transition-colors duration-300 ${isSearchFocused ? "text-red-500" : "text-white/40"}`} />
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Buscar filme ou série..."
-                    className={`w-full border-0 bg-transparent text-white text-sm py-2.5 focus:ring-0 focus:outline-none rounded-full transition-all duration-300 ${isSearchFocused
-                      ? "pl-10 pr-14 opacity-100"
-                      : "pl-10 pr-4 opacity-0 hover:opacity-100 placeholder-transparent hover:placeholder-white/20"
-                      }`}
-                    value={searchQuery}
-                    onChange={handleInputChange}
-                    onFocus={handleInputFocus}
-                    onBlur={() => setIsSearchFocused(false)}
-                  />
 
-                  {searchQuery && isSearchFocused && (
-                    <button
-                      type="button"
-                      onClick={clearSearch}
-                      className="absolute right-12 p-1 hover:bg-white/10 rounded-full transition-colors"
-                    >
-                      <X className="h-3 w-3 text-white/40" />
-                    </button>
-                  )}
-
-                  {isSearchFocused && (
-                    <button
-                      type="submit"
-                      className="absolute right-1.5 p-1.5 bg-red-600 rounded-full text-white hover:bg-red-700 transition-colors shadow-lg shadow-red-600/20"
-                    >
-                      <Search className="h-3.5 w-3.5" />
-                    </button>
-                  )}
-                </div>
-
-                <SearchSuggestions
-                  query={searchQuery}
-                  visible={showSuggestions}
-                  onItemClick={closeSuggestions}
-                />
-              </form>
-            )}
 
             {isMobile && (
               <Button
@@ -261,6 +244,7 @@ export default function Header() {
                 <SheetContent
                   side="right"
                   className="bg-gray-900 text-white border-gray-800 flex flex-col h-full overflow-y-auto"
+                  data-lenis-prevent
                 >
                   {/* Logo */}
                   <div className="flex flex-col items-center justify-center pt-2 pb-6 border-b border-gray-800">
@@ -269,6 +253,7 @@ export default function Header() {
                         src="/images/logo.png"
                         alt="Onde Tá Passando? Logo"
                         fill
+                        sizes="56px"
                         className="object-contain"
                       />
                     </div>
@@ -302,17 +287,7 @@ export default function Header() {
                         </span>
                       </Link>
                     ))}
-                    <button
-                      onClick={scrollToCollections}
-                      className="flex items-center gap-4 px-3 py-3.5 rounded-xl group transition-all duration-200 hover:bg-white/5 active:bg-white/10 text-left"
-                    >
-                      <div className="p-2.5 rounded-xl bg-gradient-to-br from-red-500/10 to-red-700/10 group-hover:from-red-500/20 group-hover:to-red-700/20 transition-all duration-200">
-                        <BookMarked className="h-5 w-5 text-red-500" />
-                      </div>
-                      <span className="text-lg font-medium text-white/90 group-hover:text-white transition-colors duration-200">
-                        Coleções
-                      </span>
-                    </button>
+
                   </nav>
 
                   {/* Zona de conta */}
@@ -409,12 +384,12 @@ export default function Header() {
 
 
             {isAuthenticated ? (
-              <DropdownMenu>
+              <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="relative w-9 h-9 p-0 rounded-full overflow-hidden focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 hover:bg-transparent"
+                    className="relative w-9 h-9 p-0 rounded-full overflow-hidden focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 hover:bg-transparent hidden md:flex"
                   >
                     <div className="relative flex items-center justify-center w-full h-full group">
                       <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 bg-red-500/10 transition-opacity duration-300"></div>
@@ -459,7 +434,7 @@ export default function Header() {
               <Button
                 variant="ghost"
                 onClick={() => router.push("/login")}
-                className="rounded-full text-white/80 hover:bg-transparent hover:text-white flex items-center justify-center gap-2 transition-colors duration-300 relative overflow-hidden"
+                className="rounded-full text-white/80 hover:bg-transparent hover:text-white hidden md:flex items-center justify-center gap-2 transition-colors duration-300 relative overflow-hidden"
               >
                 <div className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 bg-red-500/10 transition-opacity duration-300"></div>
                 <User className="h-4 w-4" />

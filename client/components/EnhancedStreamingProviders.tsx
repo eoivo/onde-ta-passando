@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getWatchmodeSources, WatchmodeSource } from "@/services/watchmode-api";
 import {
   Info,
   PlayCircle,
@@ -191,6 +192,38 @@ export default function EnhancedStreamingProviders({
   mediaType = "movie",
 }: EnhancedStreamingProvidersProps) {
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [watchmodeLinks, setWatchmodeLinks] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const fetchWatchmodeLinks = async () => {
+      if (!imdbId) return;
+      
+      const sources = await getWatchmodeSources(imdbId);
+      const links: Record<string, string> = {};
+      
+      sources.forEach((source: WatchmodeSource) => {
+        // Normalizar nomes para garantir compatibilidade com o TMDB (ex: Disney+ vs Disney Plus)
+        let normalizedName = source.name
+          .replace("+", " Plus")
+          .replace(" Video", "")
+          .trim();
+          
+        if (normalizedName === "Disney Plus") links["Disney Plus"] = source.web_url;
+        if (normalizedName === "Star Plus") links["Star Plus"] = source.web_url;
+        if (normalizedName === "Amazon Prime") links["Prime Video"] = source.web_url;
+        if (normalizedName === "HBO Max" || normalizedName === "Max") {
+          links["Max"] = source.web_url;
+        }
+        
+        // Também salva o original por segurança
+        links[source.name] = source.web_url;
+      });
+      
+      setWatchmodeLinks(links);
+    };
+
+    fetchWatchmodeLinks();
+  }, [imdbId]);
 
   const brProviders = providers?.results?.BR;
 
@@ -216,7 +249,16 @@ export default function EnhancedStreamingProviders({
   const filteredRent = filterMainProviders(rent);
   const filteredBuy = filterMainProviders(buy);
 
-  const handleProviderClick = (providerId: number) => {
+  const handleProviderClick = (providerId: number, providerName: string) => {
+    // Tentar primeiro o link da Watchmode (Direct link)
+    const directLink = watchmodeLinks[providerName];
+    
+    if (directLink) {
+      window.open(directLink, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    // Se não tiver, tentar o link estático
     const url = PROVIDER_URLS[providerId];
     if (url) {
       window.open(url, "_blank", "noopener,noreferrer");
@@ -238,7 +280,7 @@ export default function EnhancedStreamingProviders({
       <div
         key={uniqueKey}
         className="bg-gray-800 rounded-xl p-5 hover:bg-gray-700 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl group cursor-pointer"
-        onClick={() => handleProviderClick(provider.provider_id)}
+        onClick={() => handleProviderClick(provider.provider_id, provider.provider_name)}
       >
         {/* Header do provedor */}
         <div className="flex items-center mb-4">

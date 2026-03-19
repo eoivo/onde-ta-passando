@@ -19,7 +19,7 @@ export default async function TVShowsPage({
   const page = Number.parseInt(params.page || "1");
   const providerId = params.provider || "";
 
-  const { results: tvShows, total_pages } = await discoverTVShows({
+  const { results: tvShows, total_pages, total_results } = await discoverTVShows({
     genreId,
     sortBy,
     year,
@@ -30,13 +30,13 @@ export default async function TVShowsPage({
   return (
     <main className="min-h-screen pt-24 pb-16 px-4 md:px-12">
       <div className="max-w-[1600px] mx-auto">
-        <h1 className="text-4xl font-bold mb-8">Séries</h1>
-
         <FilterBar
           genres={genres}
           currentFilters={params}
           baseUrl="/series"
           mediaType="tv"
+          totalResults={total_results}
+          title="Séries"
         />
 
         <Suspense

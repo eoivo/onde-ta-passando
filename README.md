@@ -67,6 +67,15 @@ A funcionalidade **Sintonize** é o coração da descoberta no Onde Tá Passando
 - **⭐ Smart Sorting & Filtering:** Resultados filtrados automaticamente para remover obras "obscuras", sem posters ou de baixa qualidade, priorizando o que realmente importa.
 - **📄 Paginação Robusta:** Explore dezenas de páginas de resultados altamente relevantes para nunca ficar sem opções.
 - **✨ Interface Premium:** Experiência de busca fluida e dinâmica, inspirada nas melhores plataformas de curadoria do mundo.
+70: 
+71: ## 🔗 Diretórios Inteligentes - Watchmode API
+72: 
+73: Elevamos a experiência de redirecionamento para o próximo nível com a integração da **Watchmode API**:
+74: 
+75: - **🚀 Deep Linking Real:** Diferente de outros sistemas que mandam apenas para a Home do streaming, o Onde Tá Passando? te leva **diretamente para a página da obra** na Netflix, Prime Video, Disney+, etc.
+76: - **🇧🇷 Geolocalização (BR):** Priorização inteligente de links e disponibilidade para o território brasileiro.
+77: - **🧩 Fallback Inteligente:** Caso um link direto não esteja disponível, o sistema utiliza mapeamento estático e links de busca para garantir que o usuário nunca fique na mão.
+78: - **⚡ Sincronização em Tempo Real:** Verificação dinâmica de fontes a cada acesso à página de detalhes.
 
 ## ✨ Funcionalidades
 
@@ -77,10 +86,16 @@ A funcionalidade **Sintonize** é o coração da descoberta no Onde Tá Passando
   - Linguagem brasileira coloquial e gírias.
   - Informações de streaming vs cinema.
 - **🔍 Curadoria Inteligente:** Sistema global de ordenação por relevância e qualidade em todas as buscas do site.
-- **🎨 Design de Elite:** Interface moderna e responsiva com micro-animações, **Smooth Scroll (Lenis)** para rolagem fluida e barra de rolagem personalizada.
-- **📅 Onde Assistir:** Dados em tempo real sobre plataformas de streaming e disponibilidade.
+- **🎨 Design de Elite & Legibilidade:** Interface Moderna com:
+  - **Gradients de Legibilidade:** Camadas inteligentes de degradê lateral e vertical para garantir leitura perfeita sobre qualquer cenário de fundo.
+  - **Alinhamento Premium:** Padronização cirúrgica de botões de ação e elementos visuais.
+  - **Smooth Scroll (Lenis):** Rolagem fluida e barra de rolagem personalizada.
+- **📅 Onde Assistir (Deep Links):** Redirecionamento direto para a obra via Watchmode API em tempo real.
 - **🎬 Detalhes Completos:** Sinopses, elenco, trailers, avaliações e metadados ricos do TMDB.
-- **👤 Perfil Personalizado:** Salve favoritos, crie listas de "quero assistir" e marque o que já viu.
+- **👤 Perfil Personalizado Avançado:** 
+  - Salve favoritos e listas com **Paginação Inteligente**.
+  - Estatísticas de coleção em tempo real (Total de assistidos, favoritos e quero ver).
+  - Gestão intuitiva com remoção rápida e navegação fluida.
 - **⚡ Performance Otimizada:** Build rápido e carregamento fluido com filtragem inteligente no server-side.
 ## 🧩 Arquitetura do Sistema
 
@@ -115,6 +130,7 @@ O projeto utiliza uma arquitetura moderna cliente-servidor:
 - **Lucide React** - Biblioteca de ícones
 - **Zustand** - Gerenciamento de estado
 - **Google Gemini AI** - Inteligência artificial para a assistente Murphy
+- **Watchmode API** - Redirecionamento dinâmico e Deep Links de streaming
 - **React Hot Toast** - Notificações elegantes
 - **Lenis** - Smooth scroll e experiência de rolagem premium
 
@@ -154,10 +170,11 @@ O projeto utiliza uma arquitetura moderna cliente-servidor:
    ```
 4. Configure as variáveis de ambiente (crie um arquivo `.env.local`):
    ```
-   NEXT_PUBLIC_API_URL=http://localhost:3001/api
-   NEXT_PUBLIC_TMDB_API_KEY=sua_chave_api_tmdb
-   NEXT_PUBLIC_GEMINI_API_KEY=sua_chave_api_gemini
-   ```
+    NEXT_PUBLIC_API_URL=http://localhost:3001/api
+    NEXT_PUBLIC_TMDB_API_KEY=sua_chave_api_tmdb
+    NEXT_PUBLIC_GEMINI_API_KEY=sua_chave_api_gemini
+    NEXT_PUBLIC_WATCHMODE_API_KEY=sua_chave_api_watchmode
+    ```
 5. Inicie o servidor de desenvolvimento:
    ```bash
    npm run dev

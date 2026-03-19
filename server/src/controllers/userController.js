@@ -142,16 +142,47 @@ exports.removeFromFavorites = async (req, res) => {
   }
 };
 
+// Helper para paginar coleções unificadas (filmes + séries)
+const paginateCollection = (collection, page = 1, limit = 20) => {
+  // Combinar e adicionar tipo para diferenciação
+  const combined = [
+    ...collection.movies.map(m => ({ ...m.toObject ? m.toObject() : m, mediaType: 'movie' })),
+    ...collection.tvShows.map(t => ({ ...t.toObject ? t.toObject() : t, mediaType: 'tv' }))
+  ];
+
+  // Ordenar por data de adição (mais recente primeiro)
+  combined.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt));
+
+  const totalItems = combined.length;
+  const totalPages = Math.ceil(totalItems / limit);
+  const startIndex = (page - 1) * limit;
+  const items = combined.slice(startIndex, startIndex + limit);
+
+  return {
+    items,
+    pagination: {
+      totalItems,
+      totalPages,
+      currentPage: Number(page),
+      limit: Number(limit)
+    }
+  };
+};
+
 // @desc    Obter favoritos do usuário
 // @route   GET /api/users/favorites
 // @access  Private
 exports.getFavorites = async (req, res) => {
   try {
+    const { page = 1, limit = 20 } = req.query;
     const user = await User.findById(req.user.id);
+
+    const result = paginateCollection(user.favorites, page, limit);
 
     res.status(200).json({
       success: true,
-      data: user.favorites,
+      data: result.items,
+      pagination: result.pagination
     });
   } catch (error) {
     res.status(500).json({
@@ -268,11 +299,15 @@ exports.removeFromWatchlist = async (req, res) => {
 // @access  Private
 exports.getWatchlist = async (req, res) => {
   try {
+    const { page = 1, limit = 20 } = req.query;
     const user = await User.findById(req.user.id);
+
+    const result = paginateCollection(user.watchlist, page, limit);
 
     res.status(200).json({
       success: true,
-      data: user.watchlist,
+      data: result.items,
+      pagination: result.pagination
     });
   } catch (error) {
     res.status(500).json({
@@ -387,11 +422,15 @@ exports.removeFromWatched = async (req, res) => {
 // @access  Private
 exports.getWatched = async (req, res) => {
   try {
+    const { page = 1, limit = 20 } = req.query;
     const user = await User.findById(req.user.id);
+
+    const result = paginateCollection(user.watched, page, limit);
 
     res.status(200).json({
       success: true,
-      data: user.watched,
+      data: result.items,
+      pagination: result.pagination
     });
   } catch (error) {
     res.status(500).json({

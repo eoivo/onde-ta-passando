@@ -108,6 +108,7 @@ export default function CollectionsGrid({
                       src={posterUrl}
                       alt={collection.name}
                       fill
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw"
                       className="object-cover transition-transform duration-300"
                     />
                   ) : (
@@ -178,8 +179,8 @@ function FeaturedCollectionCard({
             src={backdropUrl}
             alt={collection.name}
             fill
+            sizes="100vw"
             className="object-cover"
-            priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/90 to-black/60" />
         </div>

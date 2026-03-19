@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Movie, TV } from "@/services/tmdb-api";
-import { X, AlertCircle } from "lucide-react";
+import { X, AlertCircle, Eye, ChevronRight } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -41,6 +42,7 @@ export default function MediaCard({
   onRemove,
   collection,
 }: MediaCardProps) {
+  const router = useRouter();
   const [isHovering, setIsHovering] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const title = item.title || item.name || "Título desconhecido";
@@ -100,70 +102,85 @@ export default function MediaCard({
   return (
     <>
       <div
-        className="relative group rounded-lg overflow-hidden transition-all duration-300 shadow-md hover:shadow-xl bg-gray-900 hover:bg-gray-800"
+        className="relative group rounded-2xl overflow-hidden transition-all duration-300 shadow-lg bg-white/5 border border-white/5 hover:border-red-600/30 hover:shadow-red-600/10 backdrop-blur-sm"
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
         <Link href={href} className="block">
-          <div className="aspect-[2/3] relative">
+          <div className="aspect-[2/3] relative overflow-hidden">
             <Image
               src={posterPath}
               alt={title}
               fill
-              className="object-cover"
+              className="object-cover transition-transform duration-500 group-hover:scale-110"
               sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
             />
-            {isHovering && onRemove && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={handleRemoveClick}
-                      className="absolute top-2 right-2 rounded-full bg-black/80 p-1 text-red-500 hover:bg-red-500 hover:text-white transition-colors z-10"
-                    >
-                      <X className="h-5 w-5" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Remover dos {getCollectionLabel()}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute inset-0 h-full w-full bg-black/70 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-[6px] flex flex-col items-center justify-center p-4 z-20 gap-3">
+              <button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  router.push(href);
+                }}
+                className="w-full max-w-[140px] bg-white text-black text-[10px] font-black uppercase tracking-widest py-2.5 rounded-full flex items-center justify-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 active:scale-95 shadow-lg hover:bg-gray-200"
+              >
+                <Eye className="w-3 h-3" />
+                Ver Detalhes
+              </button>
+              
+              {onRemove && (
+                <button
+                  onClick={handleRemoveClick}
+                  className="w-full max-w-[140px] bg-red-600/10 text-red-500 text-[10px] font-black uppercase tracking-widest py-2.5 rounded-full border border-red-500/30 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 active:scale-95 hover:bg-red-600 hover:text-white hover:border-red-600"
+                >
+                  Remover
+                </button>
+              )}
+            </div>
           </div>
-          <div className="p-3">
-            <h3 className="font-medium text-sm truncate">{title}</h3>
-            <div className="text-xs text-gray-400 mt-1 flex items-center justify-between">
-              <span>{type === "movie" ? "Filme" : "Série"}</span>
-              {date && <span>Adicionado em: {date}</span>}
+          <div className="p-3 space-y-2">
+            <h3 className="font-bold text-white text-xs md:text-sm truncate group-hover:text-red-500 transition-colors">
+              {title}
+            </h3>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-[10px] font-black uppercase tracking-[0.15em] text-red-500/80">
+                {type === "movie" ? "Filme" : "Série"}
+              </span>
+              {date && (
+                <span className="text-[9px] font-bold text-white/30 uppercase tracking-widest flex items-center gap-1.5">
+                  <span className="w-1 h-1 rounded-full bg-white/10" />
+                  {date}
+                </span>
+              )}
             </div>
           </div>
         </Link>
       </div>
 
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-        <AlertDialogContent className="bg-gray-900 border-gray-800 text-white">
+        <AlertDialogContent className="bg-[#0f0f0f] border-white/5 text-white rounded-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-red-500" />
+            <AlertDialogTitle className="text-white flex items-center gap-3 font-black uppercase tracking-widest text-base">
+              <div className="w-10 h-10 rounded-full bg-red-600/10 flex items-center justify-center">
+                <AlertCircle className="h-5 w-5 text-red-600" />
+              </div>
               Confirmar remoção
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-300">
+            <AlertDialogDescription className="text-white/40 font-medium">
               Deseja realmente remover{" "}
-              <strong className="text-white">{title}</strong> da sua lista de{" "}
-              {getCollectionLabel()}?
+              <strong className="text-white font-bold">{title}</strong> da sua lista de{" "}
+              <span className="text-red-500 font-bold italic">{getCollectionLabel()}</span>?
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="bg-gray-800 text-white hover:bg-gray-700 border-gray-700">
+          <AlertDialogFooter className="mt-4">
+            <AlertDialogCancel className="bg-white/5 text-white/40 hover:text-white hover:bg-white/10 border-white/5 rounded-xl font-bold uppercase tracking-widest text-[10px]">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmRemove}
-              className="bg-red-600 text-white hover:bg-red-700"
+              className="bg-red-600 text-white hover:bg-red-700 rounded-xl font-bold uppercase tracking-widest text-[10px]"
             >
-              Remover
+              Remover dos {getCollectionLabel()}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

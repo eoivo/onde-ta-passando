@@ -20,6 +20,7 @@ import {
 import { useMobile } from "@/hooks/use-mobile";
 import { useLoadingStore } from "@/store/loading-store";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 interface FilterBarProps {
   genres: any[];
@@ -32,6 +33,8 @@ interface FilterBarProps {
   };
   baseUrl: string;
   mediaType: "movie" | "tv";
+  totalResults?: number;
+  title?: string;
 }
 
 const providers = [
@@ -78,6 +81,8 @@ export default function FilterBar({
   currentFilters,
   baseUrl,
   mediaType,
+  totalResults,
+  title,
 }: FilterBarProps) {
   const router = useRouter();
   const isMobile = useMobile();
@@ -179,215 +184,114 @@ export default function FilterBar({
     selectedProvider;
 
   const selectTriggerClass = "bg-gray-900/40 backdrop-blur-md border-gray-800 hover:border-red-500/50 hover:bg-gray-800/60 transition-all duration-300 rounded-xl h-11 text-sm focus:ring-red-500/20";
-  const selectContentClass = "bg-gray-900/95 backdrop-blur-xl border-gray-800 rounded-xl shadow-2xl animate-in fade-in zoom-in-95 duration-200";
+  const selectContentClass = "bg-gray-900/95 backdrop-blur-xl border-gray-800 rounded-xl shadow-2xl animate-in fade-in zoom-in-95 duration-200 z-[60] max-h-[280px]";
 
   return (
-    <div className="space-y-6 mb-8">
-      {isMobile ? (
-        <div className="flex justify-between items-center">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-2 bg-gray-900/40 backdrop-blur-md border-gray-800 rounded-xl h-11">
-                <Filter className="w-4 h-4 text-red-500" />
-                <span>Filtros</span>
-                {hasActiveFilters && (
-                  <span className="flex h-2 w-2 rounded-full bg-red-600 animate-pulse"></span>
+    <div className="space-y-4 mb-10">
+      {/* Opção A: Título */}
+      <div className="flex items-baseline gap-3 mb-6">
+        <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white uppercase tabular-nums">
+          {title || (mediaType === "movie" ? "Filmes" : "Séries")}
+        </h1>
+      </div>
+
+      {/* Opção A: Gêneros como Pills (Envolvendo em múltiplas linhas para evitar corte) */}
+      <div className="mb-6">
+        <div className="flex flex-wrap items-center gap-2 md:gap-3">
+          <button
+            onClick={() => setSelectedGenre("")}
+            className={cn(
+              "px-5 py-2 rounded-full text-[10px] md:text-xs font-bold whitespace-nowrap transition-all duration-300 border uppercase tracking-widest",
+              !selectedGenre
+                ? "bg-red-600 border-red-500 text-white shadow-lg shadow-red-900/40"
+                : "bg-gray-900/40 border-gray-800 text-gray-400 hover:border-gray-700 hover:bg-gray-800/60"
+            )}
+          >
+            Todos
+          </button>
+          {genres.map((g) => {
+            const isActive = selectedGenre === g.id.toString();
+            return (
+              <button
+                key={g.id}
+                onClick={() => setSelectedGenre(isActive ? "" : g.id.toString())}
+                className={cn(
+                  "px-5 py-2 rounded-full text-[10px] md:text-xs font-bold whitespace-nowrap transition-all duration-300 border uppercase tracking-widest",
+                  isActive
+                    ? "bg-red-600 border-red-500 text-white shadow-lg shadow-red-900/40"
+                    : "bg-gray-900/40 border-gray-800 text-gray-400 hover:border-gray-700 hover:bg-gray-800/60"
                 )}
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="bottom" className="h-[85vh] bg-gray-950 border-gray-800 rounded-t-[2.5rem] p-0 overflow-hidden">
-              <div className="h-full flex flex-col">
-                <div className="p-6 border-b border-gray-800 flex justify-between items-center">
-                  <h3 className="text-xl font-bold flex items-center gap-2">
-                    <Filter className="w-5 h-5 text-red-600" />
-                    Refinar Busca
-                  </h3>
-                  <SheetClose className="text-gray-400 hover:text-white transition-colors">
-                    <X className="w-6 h-6" />
-                  </SheetClose>
-                </div>
-
-                <div className="flex-1 overflow-y-auto p-6 space-y-8">
-                  {/* Streaming Filter Mobile */}
-                  <div className="space-y-3">
-                    <label className="text-sm font-semibold text-gray-400">
-                      Plataforma
-                    </label>
-                    <Select value={selectedProvider || "all"} onValueChange={(val) => setSelectedProvider(val === "all" ? "" : val)}>
-                      <SelectTrigger className={selectTriggerClass}>
-                        <SelectValue placeholder="Onde assistir" />
-                      </SelectTrigger>
-                      <SelectContent className={selectContentClass}>
-                        {providers.map((p) => (
-                          <SelectItem key={p.id} value={p.id} className="focus:bg-red-500/10 focus:text-red-100">
-                            <div className="flex items-center gap-2">
-                              {p.logo && <Image src={p.logo} alt="" width={20} height={20} className="rounded-md" />}
-                              {p.name}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Genre Filter Mobile */}
-                  <div className="space-y-3">
-                    <label className="text-sm font-semibold text-gray-400">Gênero</label>
-                    <Select value={selectedGenre || "all"} onValueChange={(val) => setSelectedGenre(val === "all" ? "" : val)}>
-                      <SelectTrigger className={selectTriggerClass}>
-                        <SelectValue placeholder="Escolha um gênero" />
-                      </SelectTrigger>
-                      <SelectContent className={selectContentClass}>
-                        <SelectItem value="all">Todos os gêneros</SelectItem>
-                        {genres.map((g) => (
-                          <SelectItem key={g.id} value={g.id.toString()}>{g.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Sort Filter Mobile */}
-                  <div className="space-y-3">
-                    <label className="text-sm font-semibold text-gray-400">Ordenar por</label>
-                    <Select value={selectedSort} onValueChange={setSelectedSort}>
-                      <SelectTrigger className={selectTriggerClass}>
-                        <SelectValue placeholder="Como listar" />
-                      </SelectTrigger>
-                      <SelectContent className={selectContentClass}>
-                        {sortOptions.map((o) => (
-                          <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Year Filter Mobile */}
-                  <div className="space-y-3">
-                    <label className="text-sm font-semibold text-gray-400">Ano</label>
-                    <Select value={selectedYear || "all"} onValueChange={(val) => setSelectedYear(val === "all" ? "" : val)}>
-                      <SelectTrigger className={selectTriggerClass}>
-                        <SelectValue placeholder="Lançamento" />
-                      </SelectTrigger>
-                      <SelectContent className={selectContentClass}>
-                        <SelectItem value="all">Qualquer ano</SelectItem>
-                        {years.map((y) => (
-                          <SelectItem key={y} value={y}>{y}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="p-6 bg-gray-900/50 backdrop-blur-md border-t border-gray-800">
-                  <SheetClose asChild>
-                    <Button onClick={applyFilters} className="w-full h-12 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold shadow-lg shadow-red-900/20">
-                      Ver Resultados
-                    </Button>
-                  </SheetClose>
-                  {hasActiveFilters && (
-                    <Button variant="ghost" onClick={clearFilters} className="w-full mt-2 text-gray-400">
-                      Limpar Filtros
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
-
-          {hasActiveFilters && (
-            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-red-500 hover:text-red-400 hover:bg-red-500/5">
-              <X className="w-4 h-4 mr-1" /> Limpar
-            </Button>
-          )}
+              >
+                {g.name}
+              </button>
+            );
+          })}
         </div>
-      ) : (
-        <div className="flex flex-wrap items-center gap-4">
-          {/* Desktop Filters */}
-          <div className="flex flex-wrap gap-3 p-1 bg-gray-900/40 backdrop-blur-md border border-gray-800 rounded-2xl">
-            {/* Streaming Filter */}
-            <div className="w-52">
-              <Select value={selectedProvider || "all"} onValueChange={(val) => setSelectedProvider(val === "all" ? "" : val)}>
-                <SelectTrigger className="border-0 bg-transparent hover:bg-white/5 h-11 focus:ring-0 focus:ring-offset-0 rounded-xl transition-all">
-                  <div className="flex items-center gap-2 px-1">
-                    <SelectValue placeholder="Streamings" />
-                  </div>
-                </SelectTrigger>
-                <SelectContent className={selectContentClass}>
-                  {providers.map((p) => (
-                    <SelectItem key={p.id} value={p.id} className="focus:bg-red-500/10 focus:text-red-100">
-                      <div className="flex items-center gap-2">
-                        {p.logo && <Image src={p.logo} alt="" width={18} height={18} className="rounded-sm" />}
-                        {p.name}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+      </div>
 
-            <div className="w-[1px] h-6 bg-gray-800 my-auto" />
-
-            {/* Genre Filter */}
-            <div className="w-48">
-              <Select value={selectedGenre || "all"} onValueChange={(val) => setSelectedGenre(val === "all" ? "" : val)}>
-                <SelectTrigger className="border-0 bg-transparent hover:bg-white/5 h-11 focus:ring-0 focus:ring-offset-0 rounded-xl transition-all">
-                  <SelectValue placeholder="Gênero" />
-                </SelectTrigger>
-                <SelectContent className={selectContentClass}>
-                  <SelectItem value="all">Todos os gêneros</SelectItem>
-                  {genres.map((g) => (
-                    <SelectItem key={g.id} value={g.id.toString()}>{g.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="w-[1px] h-6 bg-gray-800 my-auto" />
-
-            {/* Sort Filter */}
-            <div className="w-52">
-              <Select value={selectedSort} onValueChange={setSelectedSort}>
-                <SelectTrigger className="border-0 bg-transparent hover:bg-white/5 h-11 focus:ring-0 focus:ring-offset-0 rounded-xl transition-all">
-                  <SelectValue placeholder="Ordenar por" />
-                </SelectTrigger>
-                <SelectContent className={selectContentClass}>
-                  {sortOptions.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="w-[1px] h-6 bg-gray-800 my-auto" />
-
-            {/* Year Filter */}
-            <div className="w-40">
-              <Select value={selectedYear || "all"} onValueChange={(val) => setSelectedYear(val === "all" ? "" : val)}>
-                <SelectTrigger className="border-0 bg-transparent hover:bg-white/5 h-11 focus:ring-0 focus:ring-offset-0 rounded-xl transition-all">
-                  <SelectValue placeholder="Ano" />
-                </SelectTrigger>
-                <SelectContent className={selectContentClass}>
-                  <SelectItem value="all">Qualquer ano</SelectItem>
-                  {years.map((y) => (
-                    <SelectItem key={y} value={y}>{y}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+      {/* Opção A: Dropdowns Secundários */}
+      <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-white/5">
+        <div className="flex flex-wrap items-center gap-2 md:gap-4 w-full sm:w-auto">
+          {/* Streaming Filter */}
+          <div className="w-full sm:w-auto min-w-[170px]">
+            <Select value={selectedProvider || "all"} onValueChange={(val) => setSelectedProvider(val === "all" ? "" : val)}>
+              <SelectTrigger className="bg-gray-900/40 backdrop-blur-md border border-gray-800 hover:border-red-500/50 hover:bg-gray-800/60 transition-all duration-300 rounded-xl h-11 text-xs font-semibold focus:ring-0">
+                <SelectValue placeholder="Onde assistir" />
+              </SelectTrigger>
+              <SelectContent className={selectContentClass} side="bottom" position="popper" sideOffset={10} collisionPadding={20}>
+                {providers.map((p) => (
+                  <SelectItem key={p.id} value={p.id} className="focus:bg-red-500/10 focus:text-red-100">
+                    <div className="flex items-center gap-2">
+                      {p.logo && <Image src={p.logo} alt="" width={16} height={16} className="rounded-sm" />}
+                      {p.name}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
-          {hasActiveFilters && (
-            <Button
-              variant="ghost"
-              onClick={clearFilters}
-              className="group h-11 px-4 hover:bg-red-500/5 text-gray-400 hover:text-red-500 transition-all duration-300 rounded-xl"
-            >
-              <X className="w-4 h-4 mr-2 group-hover:rotate-90 transition-transform duration-300" />
-              Limpar Filtros
-            </Button>
-          )}
+          {/* Sort Filter */}
+          <div className="w-full sm:w-auto min-w-[180px]">
+            <Select value={selectedSort} onValueChange={setSelectedSort}>
+              <SelectTrigger className="bg-gray-900/40 backdrop-blur-md border border-gray-800 hover:border-red-500/50 hover:bg-gray-800/60 transition-all duration-300 rounded-xl h-11 text-xs font-semibold focus:ring-0">
+                <SelectValue placeholder="Ordenar por" />
+              </SelectTrigger>
+              <SelectContent className={selectContentClass} side="bottom" position="popper" sideOffset={10} collisionPadding={20}>
+                {sortOptions.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Year Filter */}
+          <div className="w-full sm:w-auto min-w-[130px]">
+            <Select value={selectedYear || "all"} onValueChange={(val) => setSelectedYear(val === "all" ? "" : val)}>
+              <SelectTrigger className="bg-gray-900/40 backdrop-blur-md border border-gray-800 hover:border-red-500/50 hover:bg-gray-800/60 transition-all duration-300 rounded-xl h-11 text-xs font-semibold focus:ring-0">
+                <SelectValue placeholder="Ano" />
+              </SelectTrigger>
+              <SelectContent className={selectContentClass} side="bottom" position="popper" sideOffset={10} collisionPadding={20}>
+                <SelectItem value="all">Qualquer ano</SelectItem>
+                {years.map((y) => (
+                  <SelectItem key={y} value={y}>{y}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-      )}
+
+        {hasActiveFilters && (
+          <Button
+            variant="ghost"
+            onClick={clearFilters}
+            className="group h-11 px-6 hover:bg-red-500/5 text-gray-400 hover:text-red-500 transition-all duration-300 rounded-xl flex items-center justify-center w-full sm:w-auto text-xs font-bold"
+          >
+            <X className="w-4 h-4 mr-2 group-hover:rotate-90 transition-transform duration-300" />
+            Limpar Filtros
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

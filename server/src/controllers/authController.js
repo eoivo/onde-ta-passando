@@ -269,6 +269,58 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
+// @desc    Atualizar senha (usuário logado)
+// @route   PUT /api/auth/updatepassword
+// @access  Private
+exports.updatePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Por favor, forneça a senha atual e a nova senha",
+      });
+    }
+
+    // Buscar usuário com senha
+    const user = await User.findById(req.user.id).select("+password");
+
+    // Verificar senha atual
+    const isMatch = await user.matchPassword(currentPassword);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Senha atual incorreta",
+      });
+    }
+
+    // Validar nova senha
+    const passwordValidation = validatePassword(newPassword);
+    if (!passwordValidation.isValid) {
+      return res.status(400).json({
+        success: false,
+        message: passwordValidation.errors.join(". "),
+      });
+    }
+
+    // Definir nova senha
+    user.password = newPassword;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Senha atualizada com sucesso!",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
 const sendTokenResponse = (user, statusCode, res) => {
   const token = user.getSignedJwtToken();
 

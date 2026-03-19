@@ -153,6 +153,7 @@ export default function HeroCarousel({
           <Hero
             movie={movies[slideA.index]}
             onTrailerStateChange={handleTrailerStateChange}
+            priority={slideA.index === 0}
           />
         </div>
 
@@ -167,11 +168,12 @@ export default function HeroCarousel({
           <Hero
             movie={movies[slideB.index]}
             onTrailerStateChange={handleTrailerStateChange}
+            priority={false}
           />
         </div>
 
         <div className="relative invisible">
-          <Hero movie={movies[0]} />
+          <Hero movie={movies[0]} priority={false} />
         </div>
       </div>
 

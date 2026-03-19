@@ -191,7 +191,7 @@ export default function SintonizeContent() {
     // UI Inicial / Busca de Referência
     if (!targetId) {
         return (
-            <div className="relative min-h-[85vh] flex flex-col items-center justify-center pt-24 pb-20 px-4 overflow-hidden">
+            <div className="relative min-h-[85vh] flex flex-col items-center justify-center pt-40 pb-20 px-4 overflow-hidden">
                 {/* Background Wall */}
                 <div className="absolute inset-0 z-0">
                     <Image
@@ -212,18 +212,15 @@ export default function SintonizeContent() {
                     animate={{ opacity: 1, y: 0 }}
                     className="w-full max-w-5xl text-center relative z-10"
                 >
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 border border-red-500/20 text-red-500 mb-6 text-sm font-bold tracking-widest uppercase backdrop-blur-md">
-                        <Sparkles className="w-4 h-4" />
-                        Sintonize seu Gosto
-                    </div>
-                    <h1 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tighter uppercase font-bebas drop-shadow-2xl">
+
+                    <h1 className="text-5xl md:text-7xl font-black text-white mb-3 tracking-tighter uppercase font-bebas drop-shadow-2xl">
                         Qual obra você <span className="text-red-600 italic">amou?</span>
                     </h1>
-                    <p className="text-white/60 mb-10 text-lg md:text-xl font-light drop-shadow-lg">
+                    <p className="text-white/60 mb-5 text-lg md:text-xl font-light drop-shadow-lg">
                         Digite o nome de uma obra e selecione como sua referência de estilo.
                     </p>
 
-                    <div className="relative group mb-16 max-w-3xl mx-auto shadow-2xl">
+                    <div className="relative group mb-2 max-w-3xl mx-auto shadow-2xl transition-all duration-300">
                         <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-white/30 group-focus-within:text-red-500 transition-colors" />
                         <input
                             ref={searchInputRef}
@@ -323,7 +320,7 @@ export default function SintonizeContent() {
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                className="w-full space-y-8"
+                                className="w-full space-y-8 mt-10"
                             >
                                 <div className="flex items-center justify-center gap-4">
                                     <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent flex-grow" />

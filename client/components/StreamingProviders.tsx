@@ -147,6 +147,7 @@ export default function StreamingProviders({
             src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
             alt={provider.provider_name}
             fill
+            sizes="40px"
             className="object-contain"
           />
         </div>
@@ -219,6 +220,7 @@ export default function StreamingProviders({
                     src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
                     alt={provider.provider_name}
                     fill
+                    sizes="24px"
                     className="object-contain"
                   />
                 </div>

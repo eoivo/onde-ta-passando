@@ -120,12 +120,13 @@ export default function MovieCard({ movie, index = 0 }: MovieCardProps) {
         <a
           href={`/${mediaType === "tv" ? "serie" : "filme"}/${id}`}
           onClick={handleNavigateToDetails}
-          className="cursor-pointer"
+          className="cursor-pointer relative block w-full h-full"
         >
           <Image
             src={imageUrl || "/placeholder.svg"}
             alt={title}
             fill
+            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw"
             className="object-cover transition-transform duration-300 ease-in-out"
             style={{ transform: isHovered ? "scale(1.05)" : "scale(1)" }}
           />

@@ -93,7 +93,7 @@ export default async function CollectionPage({
 
       {/* Hero Section com Backdrop */}
       {backdropUrl && (
-        <div className="relative h-[60vh] w-full">
+        <div className="relative h-[50vh] w-full">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black z-10" />
           <Image
             src={backdropUrl}
@@ -105,7 +105,7 @@ export default async function CollectionPage({
         </div>
       )}
 
-      <div className="relative z-20 px-4 md:px-8 max-w-7xl mx-auto -mt-32 md:-mt-48">
+      <div className="relative z-20 px-4 md:px-8 max-w-7xl mx-auto -mt-48 md:-mt-64">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Poster */}
           {posterUrl && (
@@ -135,7 +135,7 @@ export default async function CollectionPage({
                       : "Franchise"}
                   </Badge>
                 </div>
-                <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                <h1 className="text-3xl md:text-5xl font-bold mb-4">
                   {collectionName}
                 </h1>
               </div>

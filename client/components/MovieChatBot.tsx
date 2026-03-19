@@ -329,7 +329,7 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
         <Button
           onClick={handleChatButtonClick}
           size="lg"
-          className="relative gap-3 bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white border-0 hover:from-red-700 hover:via-red-800 hover:to-red-900 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden w-[280px] justify-center"
+          className="relative gap-3 bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white border-0 hover:from-red-700 hover:via-red-800 hover:to-red-900 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden w-full md:w-[280px] justify-center"
         >
           <MessageCircle className="h-5 w-5" />
           <span className="font-semibold">Conversar com a Murphy</span>
