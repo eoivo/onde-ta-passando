@@ -8,6 +8,7 @@ export default function LoadingReset() {
 
   useEffect(() => {
     setLoading(false)
+    window.scrollTo(0, 0)
   }, [setLoading])
 
   return null
