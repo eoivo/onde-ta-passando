@@ -102,7 +102,7 @@ export default async function TVShowPage({
                   <DynamicMediaActions
                     mediaId={id}
                     mediaType="tv"
-                    title={tvShow.name}
+                    name={tvShow.name}
                     posterPath={tvShow.poster_path}
                   />
                   <SintonizeButton id={id} mediaType="tv" />

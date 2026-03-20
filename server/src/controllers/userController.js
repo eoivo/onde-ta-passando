@@ -56,6 +56,9 @@ exports.addToFavorites = async (req, res) => {
 
     const user = await User.findById(req.user.id);
 
+    const finalTitle = title || name;
+    const finalName = name || title;
+
     if (mediaType === "movie") {
       const existingMovie = user.favorites.movies.find(
         (movie) => movie.id === id
@@ -68,7 +71,7 @@ exports.addToFavorites = async (req, res) => {
       }
       user.favorites.movies.push({
         id,
-        title,
+        title: finalTitle,
         poster_path,
       });
     } else {
@@ -83,7 +86,7 @@ exports.addToFavorites = async (req, res) => {
       }
       user.favorites.tvShows.push({
         id,
-        name,
+        name: finalName,
         poster_path,
       });
     }
@@ -208,6 +211,9 @@ exports.addToWatchlist = async (req, res) => {
 
     const user = await User.findById(req.user.id);
 
+    const finalTitle = title || name;
+    const finalName = name || title;
+
     if (mediaType === "movie") {
       const existingMovie = user.watchlist.movies.find(
         (movie) => movie.id === id
@@ -220,7 +226,7 @@ exports.addToWatchlist = async (req, res) => {
       }
       user.watchlist.movies.push({
         id,
-        title,
+        title: finalTitle,
         poster_path,
       });
     } else {
@@ -235,7 +241,7 @@ exports.addToWatchlist = async (req, res) => {
       }
       user.watchlist.tvShows.push({
         id,
-        name,
+        name: finalName,
         poster_path,
       });
     }
@@ -333,6 +339,9 @@ exports.addToWatched = async (req, res) => {
 
     const user = await User.findById(req.user.id);
 
+    const finalTitle = title || name;
+    const finalName = name || title;
+
     if (mediaType === "movie") {
       const existingMovie = user.watched.movies.find(
         (movie) => movie.id === id
@@ -345,7 +354,7 @@ exports.addToWatched = async (req, res) => {
       }
       user.watched.movies.push({
         id,
-        title,
+        title: finalTitle,
         poster_path,
       });
     } else {
@@ -358,7 +367,7 @@ exports.addToWatched = async (req, res) => {
       }
       user.watched.tvShows.push({
         id,
-        name,
+        name: finalName,
         poster_path,
       });
     }
