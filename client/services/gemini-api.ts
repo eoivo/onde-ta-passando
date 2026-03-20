@@ -1,9 +1,8 @@
 // Serviço para integração com Google Gemini AI - VERSÃO SIMPLIFICADA
 // Foco na naturalidade e liberdade, não em regras rígidas
 
-const GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-const GEMINI_API_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent";
+const GEMINI_API_KEY = undefined; // Removido por segurança (usando proxy no backend)
+const GEMINI_API_URL = undefined; 
 
 export interface ChatMessage {
   role: "user" | "assistant";
@@ -226,84 +225,47 @@ export function isMessageRelatedToMovie(
   return mentionsTitle || hasCinemaKeywords || isStreamingQuestion;
 }
 
-// Função principal - MUITO SIMPLIFICADA
+// Função principal que agora chama o nosso BACKEND para maior segurança e rate limiting
 export const sendMessageToGemini = async (
   message: string,
   movieContext: MovieContext,
   conversationHistory: ChatMessage[] = []
 ): Promise<string> => {
   try {
-    const systemPrompt = createSystemPrompt(movieContext);
-
-    // Histórico simples e direto
-    const recentHistory = conversationHistory
-      .slice(-6)
-      .map(
-        (msg) => `${msg.role === "user" ? "Usuário" : "Murphy"}: ${msg.content}`
-      )
-      .join("\n");
-
-    const fullPrompt = `${systemPrompt}
-
-${recentHistory ? `Conversa anterior:\n${recentHistory}\n` : ""}
-
-Usuário: ${message}
-
-Murphy:`;
-
-    const requestBody = {
-      contents: [
-        {
-          parts: [{ text: fullPrompt }],
-        },
-      ],
-      generationConfig: {
-        temperature: 0.7,
-        topK: 40,
-        topP: 0.9,
-        maxOutputTokens: 800,
-      },
-      safetySettings: [
-        {
-          category: "HARM_CATEGORY_HARASSMENT",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE",
-        },
-        {
-          category: "HARM_CATEGORY_HATE_SPEECH",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE",
-        },
-        {
-          category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE",
-        },
-        {
-          category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE",
-        },
-      ],
-    };
-
-    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
+    
+    const response = await fetch(`${API_URL}/ai/chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(requestBody),
+      body: JSON.stringify({
+        message,
+        movieContext,
+        conversationHistory
+      }),
     });
-
-    if (!response.ok) {
-      throw new Error(`Erro na API: ${response.status}`);
-    }
 
     const data = await response.json();
 
-    if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
-      return data.candidates[0].content.parts[0].text.trim();
-    } else {
-      throw new Error("Resposta inválida da API");
+    if (!response.ok) {
+      // Se caiu no rate limit ou outro erro do servidor
+      throw new Error(data.message || `Erro no servidor: ${response.status}`);
     }
-  } catch (error) {
-    console.error("Erro:", error);
+
+    if (data.success && data.data) {
+      return data.data;
+    } else {
+      throw new Error("Resposta inválida do servidor");
+    }
+  } catch (error: any) {
+    console.error("Erro na comunicação com a IA:", error);
+    
+    // Fallback amigável se for erro de rate limit (429)
+    if (error.message && error.message.includes("Murphy está um pouco sobrecarregada")) {
+        throw error;
+    }
+
     throw new Error(
       "Não consegui processar sua mensagem no momento. Tente novamente!"
     );

@@ -1,5 +1,5 @@
-const WATCHMODE_API_KEY = process.env.NEXT_PUBLIC_WATCHMODE_API_KEY || "";
-const BASE_URL = "https://api.watchmode.com/v1";
+// [FIX C-01] Todas as chamadas ao Watchmode passam pelo proxy interno do Next.js.
+// A chave da API fica APENAS no servidor (WATCHMODE_API_KEY sem prefixo NEXT_PUBLIC_).
 
 export interface WatchmodeSource {
   source_id: number;
@@ -15,18 +15,18 @@ export interface WatchmodeSource {
 
 export const getWatchmodeSources = async (imdbId: string): Promise<WatchmodeSource[]> => {
   if (!imdbId) return [];
-  
+
   try {
-    // A Watchmode permite buscar diretamente pelo IMDB ID (prefixo tt)
+    // Usa o proxy seguro do Next.js — a chave nunca vai pro browser
     const response = await fetch(
-      `${BASE_URL}/title/${imdbId}/sources/?apiKey=${WATCHMODE_API_KEY}&regions=BR`
+      `/api/watchmode/title/${imdbId}/sources?regions=BR`
     );
-    
+
     if (!response.ok) {
       console.error("Erro na API Watchmode:", response.statusText);
       return [];
     }
-    
+
     const data = await response.json();
     return data as WatchmodeSource[];
   } catch (error) {

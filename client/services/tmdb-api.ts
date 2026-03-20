@@ -1,5 +1,5 @@
-const API_KEY = process.env.API_KEY || "";
-const BASE_URL = "https://api.themoviedb.org/3";
+// [FIX C-01] Todas as chamadas ao TMDB passam pelo proxy interno do Next.js.
+// A chave da API fica APENAS no servidor (TMDB_API_KEY sem prefixo NEXT_PUBLIC_).
 import { sortAndFilterResults } from "@/utils/media-utils";
 
 export interface Movie {
@@ -28,23 +28,54 @@ async function fetchFromTMDB(
   endpoint: string,
   params: Record<string, string> = {}
 ) {
-  const queryParams = new URLSearchParams({
-    api_key: API_KEY,
-    language: "pt-BR",
-    ...params,
-  });
+  // Detectar se estamos no servidor (SSR) ou no cliente
+  const isServer = typeof window === "undefined";
 
-  const url = `${BASE_URL}${endpoint}?${queryParams}`;
+  let url: string;
 
-  try {
-    const response = await fetch(url, { next: { revalidate: 60 * 60 } });
-    if (!response.ok) {
-      throw new Error(`TMDB API error: ${response.status}`);
+  if (isServer) {
+    // No servidor: chamar TMDB diretamente com o Bearer Token v4 (protegido)
+    const TMDB_API_KEY = process.env.TMDB_API_KEY || "";
+    const queryParams = new URLSearchParams({
+      language: "pt-BR",
+      ...params,
+    });
+    url = `https://api.themoviedb.org/3${endpoint}?${queryParams}`;
+
+    try {
+      const response = await fetch(url, {
+        next: { revalidate: 60 * 60 },
+        headers: {
+          "Authorization": `Bearer ${TMDB_API_KEY}`,
+          "Accept": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`TMDB Proxy error: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching from TMDB:", error);
+      return { results: [] };
     }
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching from TMDB:", error);
-    return { results: [] };
+  } else {
+    // No cliente (browser): usar o proxy seguro do Next.js
+    const queryParams = new URLSearchParams({
+      language: "pt-BR",
+      ...params,
+    });
+    url = `/api/tmdb${endpoint}?${queryParams}`;
+
+    try {
+      const response = await fetch(url, { next: { revalidate: 60 * 60 } });
+      if (!response.ok) {
+        throw new Error(`TMDB Proxy error: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching from TMDB:", error);
+      return { results: [] };
+    }
   }
 }
 

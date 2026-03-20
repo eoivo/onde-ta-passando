@@ -143,6 +143,8 @@ O projeto utiliza uma arquitetura moderna cliente-servidor:
 - **JWT** - Autenticação com tokens
 - **Bcrypt** - Criptografia de senhas
 - **Cloudinary** - Armazenamento de imagens
+- **Helmet** - Headers de segurança HTTP
+- **express-rate-limit** - Rate limiting por IP
 
 ### Infraestrutura:
 
@@ -170,11 +172,13 @@ O projeto utiliza uma arquitetura moderna cliente-servidor:
    ```
 4. Configure as variáveis de ambiente (crie um arquivo `.env.local`):
    ```
-    NEXT_PUBLIC_API_URL=http://localhost:3001/api
-    NEXT_PUBLIC_TMDB_API_KEY=sua_chave_api_tmdb
-    NEXT_PUBLIC_GEMINI_API_KEY=sua_chave_api_gemini
-    NEXT_PUBLIC_WATCHMODE_API_KEY=sua_chave_api_watchmode
-    ```
+   NEXT_PUBLIC_API_URL=http://localhost:3001/api
+
+   # Chaves de API — sem prefixo NEXT_PUBLIC_ (ficam apenas no servidor Next.js)
+   TMDB_API_KEY=seu_read_access_token_v4_do_tmdb
+   WATCHMODE_API_KEY=sua_chave_api_watchmode
+   ```
+   > ⚠️ **Importante:** Nunca use `NEXT_PUBLIC_` para chaves TMDB ou Watchmode. Elas são protegidas por proxies internos do Next.js (`/api/tmdb` e `/api/watchmode`) que mantêm as chaves exclusivamente no servidor.
 5. Inicie o servidor de desenvolvimento:
    ```bash
    npm run dev
@@ -194,17 +198,45 @@ O projeto utiliza uma arquitetura moderna cliente-servidor:
    ```
    PORT=3001
    MONGODB_URI=sua_uri_do_mongodb
-   JWT_SECRET=seu_segredo_jwt
-   JWT_EXPIRE=30d
+   JWT_SECRET=seu_segredo_jwt_minimo_32_chars
+   JWT_EXPIRE=7d
    CLOUDINARY_CLOUD_NAME=seu_cloudname
    CLOUDINARY_API_KEY=sua_api_key
    CLOUDINARY_API_SECRET=seu_api_secret
    NODE_ENV=development
+
+   # Chave Gemini AI — protegida no servidor (proxy para a Murphy)
+   GEMINI_API_KEY=sua_chave_api_gemini
    ```
 4. Inicie o servidor de desenvolvimento:
    ```bash
    npm run dev
    ```
+
+## 🔒 Segurança
+
+O projeto implementa as seguintes camadas de segurança:
+
+### Proteção de Chaves de API
+- **Proxy interno no Next.js:** As chaves do TMDB e Watchmode são acessadas exclusivamente pelo servidor Next.js via API Routes (`/api/tmdb` e `/api/watchmode`). O browser nunca recebe ou envia essas chaves diretamente.
+- **Gemini AI no backend:** O assistente Murphy se comunica com o Google Gemini exclusivamente pelo servidor Express — a chave nunca é exposta ao frontend.
+
+### Rate Limiting (Express)
+| Rota | Limite | Janela |
+|---|---|---|
+| Global (`/api/*`) | 200 requisições/IP | 15 minutos |
+| Autenticação (login, registro) | 10 tentativas/IP | 15 minutos |
+| Murphy IA (`/api/ai/chat`) | 15 mensagens/IP | 15 minutos |
+
+### Headers de Segurança
+- **Helmet.js** configurado no Express, adicionando automaticamente headers como `X-Frame-Options`, `X-Content-Type-Options`, `Strict-Transport-Security`, entre outros.
+
+### Autenticação
+- Senhas armazenadas com **bcrypt** (salt 10)
+- Tokens JWT com expiração de 7 dias
+- Campo `password` com `select: false` no schema — nunca retornado em queries
+- Validação de senha forte no backend (mínimo: 8 caracteres, 1 maiúscula, 1 número)
+- Token de reset de senha com hash SHA-256 e expiração de 10 minutos
 
 ## 🌐 Deploy
 
