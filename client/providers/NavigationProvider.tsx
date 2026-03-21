@@ -59,55 +59,56 @@ export default function NavigationProvider({
     setLoading(true, title);
   };
 
+  const getTitleFromPath = (path: string): string | null => {
+    if (path.includes("/filme/")) return "filme";
+    if (path.includes("/serie/")) return "série";
+    if (path.includes("/filmes")) return "filmes";
+    if (path.includes("/series")) return "séries";
+    if (path.includes("/busca")) return "resultados";
+    if (path.includes("/sintonize")) return "recomendações";
+    if (path.includes("/perfil")) return "perfil";
+    if (path.includes("/login")) return "login";
+    if (path.includes("/cadastro")) return "cadastro";
+    if (path === "/") return "início";
+    return null;
+  };
+
   useEffect(() => {
-    const handleStartNavigation = () => {
-      setIsNavigating(true);
-
-      let title = null;
-
-      if (pathname?.includes("/filme/")) {
-        title = "filme";
-      } else if (pathname?.includes("/serie/")) {
-        title = "série";
-      } else if (pathname?.includes("/filmes")) {
-        title = "filmes";
-      } else if (pathname?.includes("/series")) {
-        title = "séries";
-      } else if (pathname?.includes("/busca")) {
-        title = "resultados";
-      }
-
-      setLoading(true, title);
-    };
-
-    const handleCompleteNavigation = () => {
-      setIsNavigating(false);
-    };
-
     const handleLinkClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const link = target.closest("a");
-      const button = target.closest("button");
 
-      if (
-        (link &&
-          !link.target &&
-          link.href &&
-          link.href.startsWith(window.location.origin) &&
-          !link.hasAttribute("download") &&
-          !e.ctrlKey &&
-          !e.metaKey &&
-          !e.shiftKey) ||
+      const isInternalLink =
+        link &&
+        !link.target &&
+        link.href &&
+        link.href.startsWith(window.location.origin) &&
+        !link.hasAttribute("download") &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.shiftKey;
+
+      const isSearchResult =
         target.closest("[data-navigate]") ||
         target.closest(".search-result-item") ||
-        target.closest("[data-search-result]")
-      ) {
-        handleStartNavigation();
+        target.closest("[data-search-result]");
+
+      if (isInternalLink || isSearchResult) {
+        // Ler o path de DESTINO do link clicado, não o pathname atual
+        const destinationPath = link
+          ? new URL(link.href).pathname
+          : pathname;
+
+        const title = getTitleFromPath(destinationPath);
+
+        setIsNavigating(true);
+        setLoading(true, title);
       }
     };
 
     const handleFormSubmit = () => {
-      handleStartNavigation();
+      setIsNavigating(true);
+      setLoading(true, null);
     };
 
     document.addEventListener("click", handleLinkClick, { capture: true });
@@ -123,7 +124,8 @@ export default function NavigationProvider({
     }
 
     const handleBeforeUnload = () => {
-      handleStartNavigation();
+      setIsNavigating(true);
+      setLoading(true, null);
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
