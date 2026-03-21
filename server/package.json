@@ -1,6 +1,7 @@
 {
   "name": "onde-ta-passando-server",
   "version": "1.0.0",
+  "author": "Ivo Fernandes <ivo.fernandes.dev@gmail.com>",
   "description": "Backend para o sistema Onde Tá Passando",
   "main": "src/index.js",
   "scripts": {

@@ -23,9 +23,12 @@ export const metadata: Metadata = {
   description:
     "Encontre facilmente em quais plataformas de streaming seus filmes e séries favoritos estão disponíveis",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/images/logos/icon.png", type: "image/png" },
+    ],
+    apple: "/images/logos/icon.png",
+    shortcut: "/images/logos/icon.png",
   },
-  generator: "v0.dev",
 };
 
 export default function RootLayout({

@@ -114,11 +114,11 @@ export default function Header() {
             <Link
               href="/"
               onClick={handleNavClick}
-              className="flex items-center gap-2 group shrink-0"
+              className="flex items-center gap-2 group shrink-0 translate-y-[3px]"
             >
               <div className="relative w-8 h-8 md:w-10 md:h-10 transition-transform duration-300 group-hover:scale-110">
                 <Image
-                  src="/images/logo.png"
+                  src="/images/logos/icon.png"
                   alt="Onde Tá Passando? Logo"
                   fill
                   sizes="(max-width: 768px) 32px, 40px"
@@ -250,7 +250,7 @@ export default function Header() {
                   <div className="flex flex-col items-center justify-center pt-2 pb-6 border-b border-gray-800">
                     <div className="relative w-14 h-14 mb-2">
                       <Image
-                        src="/images/logo.png"
+                        src="/images/logos/icon.png"
                         alt="Onde Tá Passando? Logo"
                         fill
                         sizes="56px"

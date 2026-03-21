@@ -1,263 +1,231 @@
 # Onde Tá Passando?
 
 <p align="center">
-  <img src="client/public/images/logo.png" alt="Onde Tá Passando Logo" width="300">
+  <img src="client/public/images/logos/icon_full_name.png" alt="Onde Tá Passando" width="380">
 </p>
 
-## 📺 Sobre o Projeto
+<p align="center">
+  Platform for discovering where to watch movies and TV shows across streaming services in Brazil.
+</p>
 
-**Onde Tá Passando?** é uma plataforma completa que ajuda usuários a descobrirem onde seus filmes e séries favoritos estão disponíveis para assistir. O sistema conecta-se à API TMDB (The Movie Database) para fornecer informações atualizadas sobre filmes, séries, avaliações e disponibilidade em serviços de streaming.
+<p align="center">
+  <a href="https://onde-ta-passando.netlify.app/">Live Demo</a> ·
+  <a href="#installation">Installation</a> ·
+  <a href="#security">Security</a>
+</p>
 
-🔗 **Site em produção:** [onde-ta-passando.netlify.app](https://onde-ta-passando.netlify.app/)
+---
 
-## 🤖 Murphy - Assistente Cinematográfica IA
+## Table of Contents
 
-Uma das funcionalidades mais inovadoras da plataforma é a **Murphy**, uma assistente de inteligência artificial inspirada na personagem Murphy Cooper do filme Interestelar. A Murphy oferece conversas naturais e inteligentes sobre filmes e séries:
+- [Overview](#overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Installation](#installation)
+- [Environment Variables](#environment-variables)
+- [Security](#security)
+- [Deploy](#deploy)
+- [Author](#author)
+- [License](#license)
 
-### � A Nova Murphy - Conversas Naturais:
+---
 
-- **🗣️ Comunicação Natural:** Conversa como uma amiga especialista em cinema, sem robótica ou rigidez
-- **📅 Contexto Temporal Inteligente:** Compreende automaticamente datas de lançamento e disponibilidade atual
-- **🎯 Resposta Direta:** Responde exatamente o que você pergunta - não força outros assuntos
-- **🇧🇷 Linguagem Brasileira:** Usa expressões coloquiais e compreende gírias naturalmente
-- **🎬 Especialização Contextual:** Foca exclusivamente no filme ou série que você está visualizando
-- **�️ Autenticação Integrada:** Acesso seguro apenas para usuários logados
+## Overview
 
-### 🧠 Filosofia de Design Revolucionária:
+**Onde Tá Passando?** is a full-stack streaming discovery platform built with Next.js 15 and Node.js. It connects to the TMDB API for movie and TV show metadata, Watchmode for real-time streaming availability, and Google Gemini for an AI-powered cinema companion named Murphy.
 
-**"Ao invés de ensinar 1000 coisas que DEVE fazer, ensinamos apenas o que NÃO PODE fazer"**
+**Live:** [onde-ta-passando.netlify.app](https://onde-ta-passando.netlify.app/)
 
-- **Sistema Simplificado:** De 900+ para 350 linhas de código limpo e eficiente
-- **Naturalidade Primeiro:** Prioriza conversas orgânicas sobre regras complexas
-- **Liberdade Criativa:** Murphy pode adaptar suas respostas ao contexto e personalidade do usuário
-- **Inteligência Contextual:** Compreende nuances e intenções mesmo em mensagens mal formuladas
+---
 
-### 🚀 Tecnologia Inteligente:
+## Features
 
-- **Google Gemini AI 2.5 Flash Lite:** Modelo de IA mais estável e avançado para conversas naturais
-- **Prompt Engineering Enxuto:** Sistema simplificado focado em personalidade e contexto
-- **Processamento Temporal:** Awareness automático de datas e status de lançamento
-- **Validação Inteligente:** Identifica tópicos cinematográficos sem over-engineering
-- **Interface com Markdown:** Suporte a formatação rica nas respostas
+- **Streaming availability** — Find which platforms are streaming a title, with deep links directly to the content page (not just the service homepage)
+- **CineDNA recommendations** — Discover similar titles based on genres, keywords, and stylistic fingerprints of a reference work
+- **Murphy AI assistant** — Conversational AI (Google Gemini 2.5 Flash Lite) that answers questions about any movie or TV show in natural Brazilian Portuguese
+- **Authentication** — Registration, login, email-based password reset, and profile management with avatar upload
+- **Personal collections** — Favorites, watchlist, and watched history with pagination and real-time counters
+- **Trailers & details** — Synopses, cast, ratings, and embedded trailers from TMDB
 
-### 💬 Como funciona:
+---
 
-1. **Login Necessário:** Faça login para acessar a Murphy
-2. **Acesse qualquer título:** Navegue até a página de um filme ou série
-3. **Inicie a conversa:** Clique em "Conversar com a Murphy"
-4. **Converse naturalmente:** Pergunte qualquer coisa - análises, onde assistir, recomendações
-5. **Encerre quando quiser:** Botão de encerrar chat para começar conversas frescas
+## Tech Stack
 
-### ✨ O que torna a Murphy única:
+### Frontend
 
-🎬 **Conversas Reais:** Como conversar com uma amiga cinéfila, não um robô programado  
-📍 **Informações Práticas:** Sabe distinguir filmes em cartaz vs disponíveis em streaming  
-🧠 **Inteligência Adaptiva:** Se autocorrege quando recebe informações conflitantes  
-💬 **Linguagem Viva:** Usa "Eita!", "fica ligado" e outras expressões brasileiras  
-🎯 **Foco Preciso:** Cada conversa é única para o título específico que você está explorando
+| Technology | Purpose |
+|---|---|
+| Next.js 15 (App Router) | Framework |
+| React 19 | UI library |
+| TypeScript | Type safety |
+| Tailwind CSS | Styling |
+| Framer Motion | Animations |
+| Radix UI | Accessible primitives |
+| Zustand | State management |
+| Lenis | Smooth scroll |
 
-A Murphy transformou de uma IA robótica para uma companheira cinematográfica natural e inteligente!
+### Backend
 
-## 🚀 Sintonize - Curadoria Inteligente (CineDNA)
+| Technology | Purpose |
+|---|---|
+| Node.js + Express | API server |
+| MongoDB + Mongoose | Database |
+| JWT + bcrypt | Authentication |
+| Cloudinary | Image storage |
+| Helmet | HTTP security headers |
+| express-rate-limit | Rate limiting |
 
-A funcionalidade **Sintonize** é o coração da descoberta no Onde Tá Passando?. Ela permite que você encontre sua próxima obra favorita utilizando o conceito de **CineDNA**:
+### External APIs
 
-- **🎯 Busca por Referência:** Escolha um filme ou série que você ama para servir de "molde" para as recomendações.
-- **🧬 Mapeamento de DNA:** Nosso algoritmo analisa as palavras-chave (keywords), gêneros, tom e estilo da obra de referência para encontrar similares de verdade.
-- **⭐ Smart Sorting & Filtering:** Resultados filtrados automaticamente para remover obras "obscuras", sem posters ou de baixa qualidade, priorizando o que realmente importa.
-- **📄 Paginação Robusta:** Explore dezenas de páginas de resultados altamente relevantes para nunca ficar sem opções.
-- **✨ Interface Premium:** Experiência de busca fluida e dinâmica, inspirada nas melhores plataformas de curadoria do mundo.
-70: 
-71: ## 🔗 Diretórios Inteligentes - Watchmode API
-72: 
-73: Elevamos a experiência de redirecionamento para o próximo nível com a integração da **Watchmode API**:
-74: 
-75: - **🚀 Deep Linking Real:** Diferente de outros sistemas que mandam apenas para a Home do streaming, o Onde Tá Passando? te leva **diretamente para a página da obra** na Netflix, Prime Video, Disney+, etc.
-76: - **🇧🇷 Geolocalização (BR):** Priorização inteligente de links e disponibilidade para o território brasileiro.
-77: - **🧩 Fallback Inteligente:** Caso um link direto não esteja disponível, o sistema utiliza mapeamento estático e links de busca para garantir que o usuário nunca fique na mão.
-78: - **⚡ Sincronização em Tempo Real:** Verificação dinâmica de fontes a cada acesso à página de detalhes.
+| API | Usage |
+|---|---|
+| TMDB | Movie/TV metadata and trailers |
+| Watchmode | Streaming availability and deep links |
+| Google Gemini | Murphy AI assistant |
 
-## ✨ Funcionalidades
+---
 
-- **🚀 Sintonize seu Gosto (CineDNA):** Encontre obras similares baseadas em um título que você ama, com mapeamento inteligente de estilo e palavras-chave.
-- **🤖 Murphy - IA Cinematográfica:** Converse com nossa assistente inspirada no filme Interestelar (Powered by Gemini AI 2.5 Flash Lite):
-  - Conversas naturais e adaptáveis como uma amiga especialista.
-  - Contexto temporal inteligente (sabe o que lançou hoje!).
-  - Linguagem brasileira coloquial e gírias.
-  - Informações de streaming vs cinema.
-- **🔍 Curadoria Inteligente:** Sistema global de ordenação por relevância e qualidade em todas as buscas do site.
-- **🎨 Design de Elite & Legibilidade:** Interface Moderna com:
-  - **Gradients de Legibilidade:** Camadas inteligentes de degradê lateral e vertical para garantir leitura perfeita sobre qualquer cenário de fundo.
-  - **Alinhamento Premium:** Padronização cirúrgica de botões de ação e elementos visuais.
-  - **Smooth Scroll (Lenis):** Rolagem fluida e barra de rolagem personalizada.
-- **📅 Onde Assistir (Deep Links):** Redirecionamento direto para a obra via Watchmode API em tempo real.
-- **🎬 Detalhes Completos:** Sinopses, elenco, trailers, avaliações e metadados ricos do TMDB.
-- **👤 Perfil Personalizado Avançado:** 
-  - Salve favoritos e listas com **Paginação Inteligente**.
-  - Estatísticas de coleção em tempo real (Total de assistidos, favoritos e quero ver).
-  - Gestão intuitiva com remoção rápida e navegação fluida.
-- **⚡ Performance Otimizada:** Build rápido e carregamento fluido com filtragem inteligente no server-side.
-## 🧩 Arquitetura do Sistema
+## Architecture
 
-O projeto utiliza uma arquitetura moderna cliente-servidor:
+```
+client/                         # Next.js — deployed on Netlify
+  app/api/tmdb/[...path]/       # TMDB proxy route (key server-side only)
+  app/api/watchmode/[...path]/  # Watchmode proxy route (key server-side only)
+  services/                     # API service layer (tmdb, watchmode, auth)
+  components/                   # Shared UI components
+  app/                          # Pages (App Router)
 
-### Frontend (client)
+server/                         # Express — deployed on Render
+  src/routes/authRoutes.js      # POST /api/auth/login, /register, /forgotpassword
+  src/routes/userRoutes.js      # GET|POST|DELETE /api/users/* (collections, profile)
+  src/routes/aiRoutes.js        # POST /api/ai/chat (Murphy Gemini proxy)
+  src/controllers/              # Business logic
+  src/middleware/auth.js        # JWT verification
+  src/models/User.js            # Mongoose schema
+```
 
-- Interface de usuário construída com Next.js 15 e React 19
-- Design responsivo com Tailwind CSS
-- Animações com Framer Motion
-- Componentes acessíveis com Radix UI
-- Gerenciamento de estado com Zustand
+---
 
-### Backend (server)
+## Installation
 
-- API RESTful construída com Node.js e Express
-- Autenticação com JWT
-- Banco de dados MongoDB para armazenamento de usuários e preferências
-- Integração com Cloudinary para armazenamento de imagens
-- Deploy no Render
+### Prerequisites
 
-## 🛠️ Tecnologias Utilizadas
+- Node.js 18+
+- MongoDB (local or Atlas)
 
-### Frontend:
+### Frontend
 
-- **Next.js 15** - Framework React com App Router
-- **React 19** - Biblioteca para construção de interfaces
-- **TypeScript** - Linguagem tipada baseada em JavaScript
-- **Tailwind CSS** - Framework CSS utilitário
-- **Framer Motion** - Biblioteca de animações para React
-- **Radix UI** - Componentes primitivos acessíveis
-- **Lucide React** - Biblioteca de ícones
-- **Zustand** - Gerenciamento de estado
-- **Google Gemini AI** - Inteligência artificial para a assistente Murphy
-- **Watchmode API** - Redirecionamento dinâmico e Deep Links de streaming
-- **React Hot Toast** - Notificações elegantes
-- **Lenis** - Smooth scroll e experiência de rolagem premium
+```bash
+cd client
+npm install
+# Create .env.local and fill in the variables (see Environment Variables)
+npm run dev
+```
 
-### Backend:
+### Backend
 
-- **Node.js** - Ambiente de execução JavaScript
-- **Express** - Framework web para Node.js
-- **MongoDB** - Banco de dados NoSQL
-- **Mongoose** - ODM para MongoDB
-- **JWT** - Autenticação com tokens
-- **Bcrypt** - Criptografia de senhas
-- **Cloudinary** - Armazenamento de imagens
-- **Helmet** - Headers de segurança HTTP
-- **express-rate-limit** - Rate limiting por IP
+```bash
+cd server
+npm install
+# Create .env and fill in the variables (see Environment Variables)
+npm run dev
+```
 
-### Infraestrutura:
+---
 
-- **Netlify** - Hospedagem e CI/CD para o frontend
-- **Render** - Hospedagem para o backend
+## Environment Variables
 
-## 🚀 Instalação e Uso
+### Frontend (`client/.env.local`)
 
-### Pré-requisitos
+| Variable | Description |
+|---|---|
+| `NEXT_PUBLIC_API_URL` | Express backend URL (e.g. `http://localhost:3001/api`) |
+| `TMDB_API_KEY` | TMDB v4 Read Access Token |
+| `WATCHMODE_API_KEY` | Watchmode API key |
 
-- Node.js 18 ou superior
-- npm, yarn ou pnpm
-- MongoDB (local ou Atlas)
+> `TMDB_API_KEY` and `WATCHMODE_API_KEY` are intentionally **not** prefixed with `NEXT_PUBLIC_`. They are only accessed by Next.js server-side proxy routes and are never included in the client bundle.
 
-### Configuração do Frontend
+### Backend (`server/.env`)
 
-1. Clone o repositório
-2. Navegue até a pasta do cliente:
-   ```bash
-   cd client
-   ```
-3. Instale as dependências:
-   ```bash
-   npm install
-   ```
-4. Configure as variáveis de ambiente (crie um arquivo `.env.local`):
-   ```
-   NEXT_PUBLIC_API_URL=http://localhost:3001/api
+| Variable | Description |
+|---|---|
+| `PORT` | Server port (default: `3001`) |
+| `MONGODB_URI` | MongoDB connection string |
+| `JWT_SECRET` | JWT signing secret (minimum 32 random characters) |
+| `JWT_EXPIRE` | Token expiry duration (e.g. `7d`) |
+| `NODE_ENV` | `development` or `production` |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name |
+| `CLOUDINARY_API_KEY` | Cloudinary API key |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret |
+| `GEMINI_API_KEY` | Google Gemini API key (Murphy AI proxy) |
+| `SMTP_HOST` | SMTP host for password reset emails |
+| `SMTP_PORT` | SMTP port |
+| `SMTP_USER` | SMTP user |
+| `SMTP_PASS` | SMTP password |
 
-   # Chaves de API — sem prefixo NEXT_PUBLIC_ (ficam apenas no servidor Next.js)
-   TMDB_API_KEY=seu_read_access_token_v4_do_tmdb
-   WATCHMODE_API_KEY=sua_chave_api_watchmode
-   ```
-   > ⚠️ **Importante:** Nunca use `NEXT_PUBLIC_` para chaves TMDB ou Watchmode. Elas são protegidas por proxies internos do Next.js (`/api/tmdb` e `/api/watchmode`) que mantêm as chaves exclusivamente no servidor.
-5. Inicie o servidor de desenvolvimento:
-   ```bash
-   npm run dev
-   ```
+---
 
-### Configuração do Backend
+## Security
 
-1. Navegue até a pasta do servidor:
-   ```bash
-   cd server
-   ```
-2. Instale as dependências:
-   ```bash
-   npm install
-   ```
-3. Configure as variáveis de ambiente (crie um arquivo `.env`):
-   ```
-   PORT=3001
-   MONGODB_URI=sua_uri_do_mongodb
-   JWT_SECRET=seu_segredo_jwt_minimo_32_chars
-   JWT_EXPIRE=7d
-   CLOUDINARY_CLOUD_NAME=seu_cloudname
-   CLOUDINARY_API_KEY=sua_api_key
-   CLOUDINARY_API_SECRET=seu_api_secret
-   NODE_ENV=development
+### API Key Protection
 
-   # Chave Gemini AI — protegida no servidor (proxy para a Murphy)
-   GEMINI_API_KEY=sua_chave_api_gemini
-   ```
-4. Inicie o servidor de desenvolvimento:
-   ```bash
-   npm run dev
-   ```
+No external API keys are exposed to the browser. All third-party calls are proxied server-side:
 
-## 🔒 Segurança
+- **TMDB & Watchmode** — Next.js API Routes (`/api/tmdb`, `/api/watchmode`) attach the key on the server before forwarding the request
+- **Google Gemini** — Express endpoint (`/api/ai/chat`) handles all Gemini communication; the key is never sent to the client
 
-O projeto implementa as seguintes camadas de segurança:
+### Rate Limiting
 
-### Proteção de Chaves de API
-- **Proxy interno no Next.js:** As chaves do TMDB e Watchmode são acessadas exclusivamente pelo servidor Next.js via API Routes (`/api/tmdb` e `/api/watchmode`). O browser nunca recebe ou envia essas chaves diretamente.
-- **Gemini AI no backend:** O assistente Murphy se comunica com o Google Gemini exclusivamente pelo servidor Express — a chave nunca é exposta ao frontend.
-
-### Rate Limiting (Express)
-| Rota | Limite | Janela |
+| Scope | Limit | Window |
 |---|---|---|
-| Global (`/api/*`) | 200 requisições/IP | 15 minutos |
-| Autenticação (login, registro) | 10 tentativas/IP | 15 minutos |
-| Murphy IA (`/api/ai/chat`) | 15 mensagens/IP | 15 minutos |
+| All API routes (`/api/*`) | 200 req / IP | 15 min |
+| Auth routes (login, register, forgot password) | 10 req / IP | 15 min |
+| Murphy AI (`/api/ai/chat`) | 15 req / IP | 15 min |
 
-### Headers de Segurança
-- **Helmet.js** configurado no Express, adicionando automaticamente headers como `X-Frame-Options`, `X-Content-Type-Options`, `Strict-Transport-Security`, entre outros.
+### HTTP Security Headers
 
-### Autenticação
-- Senhas armazenadas com **bcrypt** (salt 10)
-- Tokens JWT com expiração de 7 dias
-- Campo `password` com `select: false` no schema — nunca retornado em queries
-- Validação de senha forte no backend (mínimo: 8 caracteres, 1 maiúscula, 1 número)
-- Token de reset de senha com hash SHA-256 e expiração de 10 minutos
+Helmet.js is applied globally on the Express server, providing `X-Frame-Options`, `X-Content-Type-Options`, `Strict-Transport-Security`, `X-DNS-Prefetch-Control`, and others out of the box.
 
-## 🌐 Deploy
+### Authentication
+
+- Passwords hashed with bcrypt (salt rounds: 10)
+- `password` field uses `select: false` in the Mongoose schema — never returned in queries
+- Password requirements enforced server-side: minimum 8 characters, 1 uppercase letter, 1 number
+- Password reset tokens are hashed with SHA-256 and expire in 10 minutes
+- JWT tokens expire in 7 days
+
+---
+
+## Deploy
 
 ### Frontend (Netlify)
 
-O frontend está configurado para deploy automático no Netlify:
+| Setting | Value |
+|---|---|
+| Build command | `next build` |
+| Publish directory | `.next` |
 
-- **Build command:** `next build`
-- **Publish directory:** `.next`
-- **Environment variables:** Configure as variáveis necessárias nas configurações do projeto no Netlify.
+Set the [frontend environment variables](#frontend-clientenvlocal) in the Netlify dashboard. Do **not** use the `NEXT_PUBLIC_` prefix for `TMDB_API_KEY` or `WATCHMODE_API_KEY`.
 
 ### Backend (Render)
 
-O backend está configurado para deploy no Render:
+| Setting | Value |
+|---|---|
+| Build command | `npm install` |
+| Start command | `npm start` |
 
-1. Crie um novo Web Service no Render
-2. Configure o build:
-   - **Build Command:** `npm install`
-   - **Start Command:** `npm start`
-3. Configure as variáveis de ambiente necessárias
+Set the [backend environment variables](#backend-serverenv) in the Render dashboard.
 
-## 📝 Licença
+---
 
-Este projeto está sob a licença MIT.
+## Author
+
+**Ivo Fernandes**
+[LinkedIn](https://linkedin.com/in/ivo-dev) · ivo.fernandes.dev@gmail.com
+
+---
+
+## License
+
+MIT

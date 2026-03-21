@@ -1,6 +1,7 @@
 {
-  "name": "my-v0-project",
+  "name": "onde-ta-passando",
   "version": "0.1.0",
+  "author": "Ivo Fernandes <ivo.fernandes.dev@gmail.com>",
   "private": true,
   "scripts": {
     "dev": "next dev",

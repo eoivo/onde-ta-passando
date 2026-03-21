@@ -54,7 +54,7 @@ export default function LoadingOverlay() {
           >
             <div className="relative w-24 h-24">
               <Image
-                src="/images/logo.png"
+                src="/images/logos/icon.png"
                 alt="Onde Tá Passando? Logo"
                 fill
                 className="object-contain animate-pulse"

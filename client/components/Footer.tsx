@@ -16,7 +16,7 @@ const Footer = () => {
             <div className="space-y-4 flex flex-col items-center">
               <div className="flex flex-col items-center gap-3">
                 <Image
-                  src="/images/logo.png"
+                  src="/images/logos/icon.png"
                   alt="Onde Tá Passando? Logo"
                   width={40}
                   height={40}
