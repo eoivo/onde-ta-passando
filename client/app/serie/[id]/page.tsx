@@ -76,6 +76,7 @@ export default async function TVShowPage({
           fill
           className="object-cover"
           priority
+          unoptimized={true}
         />
       </div>
 

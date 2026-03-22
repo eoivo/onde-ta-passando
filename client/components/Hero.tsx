@@ -53,8 +53,7 @@ export default function Hero({ movie, onTrailerStateChange, priority = false }: 
         alt={movie.title || movie.name}
         fill
         priority={priority}
-        quality={100}
-        sizes="100vw"
+        unoptimized={true}
         className="object-cover"
       />
 
