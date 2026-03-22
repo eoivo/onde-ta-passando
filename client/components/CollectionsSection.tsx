@@ -140,7 +140,7 @@ function CategoryRow({ section }: { section: CategorySection }) {
                 variant="ghost"
                 size="icon"
                 onClick={() => scroll("left")}
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-40 bg-black/50 hover:bg-black/80 text-white rounded-full opacity-0 group-hover/row:opacity-100 transition-opacity ml-2"
+                className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-40 bg-black/50 hover:bg-black/80 text-white rounded-full opacity-0 group-hover/row:opacity-100 transition-opacity ml-2"
               >
                 <ChevronLeft className="h-6 w-6" />
               </Button>
@@ -151,7 +151,7 @@ function CategoryRow({ section }: { section: CategorySection }) {
                 variant="ghost"
                 size="icon"
                 onClick={() => scroll("right")}
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-40 bg-black/50 hover:bg-black/80 text-white rounded-full opacity-0 group-hover/row:opacity-100 transition-opacity mr-2"
+                className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-40 bg-black/50 hover:bg-black/80 text-white rounded-full opacity-0 group-hover/row:opacity-100 transition-opacity mr-2"
               >
                 <ChevronRight className="h-6 w-6" />
               </Button>
