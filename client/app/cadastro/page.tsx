@@ -18,12 +18,14 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showWakingMsg, setShowWakingMsg] = useState(false);
   const { register } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setShowWakingMsg(false);
 
     if (password !== confirmPassword) {
       setError("As senhas não coincidem");
@@ -38,9 +40,14 @@ export default function RegisterPage() {
     }
 
     setIsSubmitting(true);
+    
+    // Timer para mostrar aviso de "Cold Start" após 4 segundos
+    const wakingTimer = setTimeout(() => {
+      setShowWakingMsg(true);
+    }, 4000);
 
     try {
-      const response = await register(name, email, password);
+      await register(name, email, password);
 
       toast.success(
         "Conta criada com sucesso! Faça login para continuar."
@@ -56,7 +63,9 @@ export default function RegisterPage() {
       toast.error(errorMessage);
       console.error("Erro ao registrar:", err);
     } finally {
+      clearTimeout(wakingTimer);
       setIsSubmitting(false);
+      setShowWakingMsg(false);
     }
   };
 
@@ -168,20 +177,28 @@ export default function RegisterPage() {
             />
           </div>
 
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Criando
-                conta...
-              </>
-            ) : (
-              "Criar Conta"
+          <div className="space-y-3">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white py-6"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Criando
+                  conta...
+                </>
+              ) : (
+                "Criar Conta"
+              )}
+            </Button>
+            
+            {showWakingMsg && (
+              <p className="text-[10px] text-center text-yellow-500/80 animate-pulse font-medium uppercase tracking-tight">
+                Acordando o servidor... isso acontece em períodos de inatividade (pode levar até 30s)
+              </p>
             )}
-          </Button>
+          </div>
         </form>
 
         <div className="mt-6 text-center text-sm">

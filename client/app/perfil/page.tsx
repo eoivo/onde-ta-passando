@@ -394,7 +394,7 @@ export default function ProfilePage() {
           <div className="text-center md:text-left flex-1 pb-2">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <div className="flex flex-col md:flex-row md:items-center gap-4">
+                <div className="flex items-center justify-center md:justify-start gap-3">
                   <h1 className="text-3xl md:text-4xl font-black text-white tracking-tighter uppercase drop-shadow-lg">
                     {paginatedProfile.name}
                   </h1>
