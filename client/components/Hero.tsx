@@ -70,9 +70,12 @@ export default function Hero({ movie, onTrailerStateChange, priority = false }: 
 
           <div className="flex flex-wrap items-center gap-x-2 text-[10px] md:text-xs font-semibold text-gray-500 uppercase tracking-widest">
             <span>
-              {new Date(
-                movie.release_date || movie.first_air_date
-              ).getFullYear()}
+              {(() => {
+                const dateStr = movie.release_date || movie.first_air_date;
+                if (!dateStr) return null;
+                const year = new Date(dateStr).getFullYear();
+                return isNaN(year) ? null : year;
+              })()}
             </span>
             <span>&bull;</span>
             <span>

@@ -1,6 +1,6 @@
 import HeroCarousel from "@/components/HeroCarousel";
 import MovieCarousel from "@/components/MovieCarousel";
-import CollectionsGrid from "@/components/CollectionsGrid";
+import CollectionsSection from "@/components/CollectionsSection";
 import {
   getTrending,
   getTopRated,
@@ -10,8 +10,10 @@ import {
 import { getContentFromMultipleProviders } from "@/services/streaming-sections";
 import { FEATURED_PROVIDERS } from "@/services/streaming-api";
 import {
+  FEATURED_SAGAS,
   FEATURED_UNIVERSES,
-  getMultipleUniverses
+  FEATURED_STUDIOS,
+  getMultipleCollections,
 } from "@/services/collections-api";
 
 export default async function Home() {
@@ -40,8 +42,16 @@ export default async function Home() {
   const mysteryMovies = await getMoviesByGenre(9648); // Mistério
   const adventureMovies = await getMoviesByGenre(12); // Aventura
 
-  // Buscar coleções e universos (6 coleções na ordem especificada)
-  const universes = await getMultipleUniverses(FEATURED_UNIVERSES);
+  // Buscar sagas, universos e estúdios em paralelo
+  const [sagasData, universesData, studiosData] = await Promise.all([
+    getMultipleCollections(FEATURED_SAGAS),
+    getMultipleCollections(FEATURED_UNIVERSES),
+    getMultipleCollections(FEATURED_STUDIOS),
+  ]);
+
+  const sagas = Object.values(sagasData).filter((u) => u?.movies.length > 0);
+  const universes = Object.values(universesData).filter((u) => u?.movies.length > 0);
+  const studios = Object.values(studiosData).filter((u) => u?.movies.length > 0);
 
   // Buscar conteúdo das plataformas de streaming (filmes + séries)
   const providerIds = FEATURED_PROVIDERS.map(p => p.id);
@@ -73,7 +83,7 @@ export default async function Home() {
     media_type: item.media_type || (item.first_air_date ? "tv" : "movie"),
   }));
 
-  const shuffledHeroItems = [...heroItems].sort(() => Math.random() - 0.5);
+  const shuffledHeroItems = heroItems; // Mantém estável no servidor
 
   return (
     <main className="min-h-screen pb-20">
@@ -84,13 +94,12 @@ export default async function Home() {
         <MovieCarousel title="Mais bem avaliados" movies={topRatedMovies} />
         <MovieCarousel title="Lançamentos" movies={upcomingMovies} />
 
-        {/* Seção de Coleções e Universos com Grid */}
+        {/* Seção de Sagas, Universos e Estúdios */}
         <div id="colecoes" className="scroll-mt-24">
-          <CollectionsGrid
-            collections={Object.values(universes).filter(
-              (u) => u && u.movies.length > 0
-            )}
-            configs={FEATURED_UNIVERSES}
+          <CollectionsSection
+            sagas={sagas}
+            universes={universes}
+            studios={studios}
           />
         </div>
 

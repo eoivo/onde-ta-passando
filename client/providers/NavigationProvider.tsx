@@ -69,6 +69,10 @@ export default function NavigationProvider({
     if (path.includes("/perfil")) return "perfil";
     if (path.includes("/login")) return "login";
     if (path.includes("/cadastro")) return "cadastro";
+    if (path.includes("/colecao/saga")) return "saga";
+    if (path.includes("/colecao/universo")) return "universo";
+    if (path.includes("/colecao/estudio")) return "filmografia";
+    if (path.includes("/colecao")) return "coleção";
     if (path === "/") return "início";
     return null;
   };

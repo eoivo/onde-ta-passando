@@ -13,6 +13,7 @@ export default function HeroCarousel({
   movies,
   interval = 8000,
 }: HeroCarouselProps) {
+  const [shuffledMovies, setShuffledMovies] = useState<any[]>(movies);
   const [slideA, setSlideA] = useState({ index: 0, visible: true });
   const [slideB, setSlideB] = useState({ index: 0, visible: false });
   const [showControls, setShowControls] = useState(false);
@@ -20,6 +21,12 @@ export default function HeroCarousel({
   const [trailerOpen, setTrailerOpen] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const activeSlide = slideA.visible ? "A" : "B";
+
+  useEffect(() => {
+    // Shuffle only on the client to avoid hydration mismatch
+    const shuffled = [...movies].sort(() => Math.random() - 0.5);
+    setShuffledMovies(shuffled);
+  }, [movies]);
 
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
@@ -151,7 +158,7 @@ export default function HeroCarousel({
           }}
         >
           <Hero
-            movie={movies[slideA.index]}
+            movie={shuffledMovies[slideA.index]}
             onTrailerStateChange={handleTrailerStateChange}
             priority={slideA.index === 0}
           />
@@ -166,14 +173,14 @@ export default function HeroCarousel({
           }}
         >
           <Hero
-            movie={movies[slideB.index]}
+            movie={shuffledMovies[slideB.index]}
             onTrailerStateChange={handleTrailerStateChange}
             priority={false}
           />
         </div>
 
         <div className="relative invisible">
-          <Hero movie={movies[0]} priority={false} />
+          <Hero movie={shuffledMovies[0]} priority={false} />
         </div>
       </div>
 
