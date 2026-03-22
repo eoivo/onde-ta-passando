@@ -10,6 +10,7 @@ import { Search, Menu, Film, Tv, Home, X, User, BookMarked, LogOut, UserPlus } f
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { motion } from "framer-motion";
 import { useMobile } from "@/hooks/use-mobile";
 import SearchSuggestions from "./SearchSuggestions";
 import MobileSearchOverlay from "./MobileSearchOverlay";
@@ -104,9 +105,9 @@ export default function Header() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-[40] transition-all duration-500 pb-4 ${isScrolled
-          ? "bg-gray-950/95 backdrop-blur-md pb-0 shadow-lg"
-          : "bg-gradient-to-b from-black/95 via-black/40 to-transparent"
+        className={`fixed top-0 left-0 right-0 z-[40] transition-all duration-700 pb-4 ${isScrolled
+          ? "bg-black/90 backdrop-blur-xl pb-0 shadow-2xl"
+          : "bg-gradient-to-b from-black/95 via-black/60 to-transparent"
           }`}
       >
         <div className="max-w-[1920px] mx-auto px-4 md:px-12 h-16 md:h-20 flex items-center justify-between">
@@ -243,139 +244,147 @@ export default function Header() {
                 </SheetTrigger>
                 <SheetContent
                   side="right"
-                  className="bg-gray-900 text-white border-gray-800 flex flex-col h-full overflow-y-auto"
+                  hideClose
+                  className="bg-black/95 backdrop-blur-2xl text-white border-l border-white/10 flex flex-col h-full p-0 overflow-hidden"
                   data-lenis-prevent
                 >
-                  {/* Logo */}
-                  <div className="flex flex-col items-center justify-center pt-2 pb-6 border-b border-gray-800">
-                    <div className="relative w-14 h-14 mb-2">
-                      <Image
-                        src="/images/logos/icon.png"
-                        alt="Onde Tá Passando? Logo"
-                        fill
-                        sizes="56px"
-                        className="object-contain"
-                      />
-                    </div>
-                    <h2 className="text-lg font-bold bg-gradient-to-r from-red-500 to-red-700 text-transparent bg-clip-text">
-                      Onde Tá Passando?
-                    </h2>
-                  </div>
+                  {/* Fundo com gradiente sutil */}
+                  <div className="absolute inset-0 z-0 opacity-20 pointer-events-none bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-red-600/40 via-transparent to-transparent" />
 
-                  {/* Navegação principal */}
-                  <nav className="flex flex-col gap-1 mt-4">
-                    {[
-                      { href: "/", label: "Início", icon: <Home className="h-5 w-5 text-red-500" /> },
-                      { href: "/filmes", label: "Filmes", icon: <Film className="h-5 w-5 text-red-500" /> },
-                      { href: "/series", label: "Séries", icon: <Tv className="h-5 w-5 text-red-500" /> },
-                      { href: "/sintonize", label: "Sintonize", icon: <Search className="h-5 w-5 text-red-500" />, isNew: true },
-                    ].map(({ href, label, icon, isNew }) => (
-                      <Link
-                        key={href}
-                        href={href}
-                        onClick={handleNavClick}
-                        className="flex items-center gap-4 px-3 py-3.5 rounded-xl group transition-all duration-200 hover:bg-white/5 active:bg-white/10"
+                  <div className="relative z-10 flex flex-col h-full overflow-y-auto scrollbar-hide pt-4">
+                    {/* Header do Menu */}
+                    <div className="px-6 pt-12 pb-8 flex flex-col items-center">
+                      <motion.div
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                        className="relative w-16 h-16 mb-4"
                       >
-                        <div className="p-2.5 rounded-xl bg-gradient-to-br from-red-500/10 to-red-700/10 group-hover:from-red-500/20 group-hover:to-red-700/20 transition-all duration-200">
-                          {icon}
-                        </div>
-                        <span className="text-lg font-medium text-white/90 group-hover:text-white transition-colors duration-200 flex items-center gap-2">
-                          {label}
-                          {isNew && (
-                            <span className="bg-red-500 text-[8px] font-black px-1.5 py-0.5 rounded-sm text-white animate-pulse">NEW</span>
-                          )}
-                        </span>
-                      </Link>
-                    ))}
+                        <Image
+                          src="/images/logos/icon.png"
+                          alt="Logo"
+                          fill
+                          className="object-contain"
+                        />
+                      </motion.div>
+                      <h2 className="text-2xl font-normal font-bebas tracking-widest uppercase">
+                        <span className="text-white">Onde Tá </span>
+                        <span className="text-red-600">Passando?</span>
+                      </h2>
+                    </div>
 
-                  </nav>
-
-                  {/* Zona de conta */}
-                  <div className="mt-auto border-t border-gray-800 pt-4 pb-2 flex flex-col gap-1">
-                    {isAuthenticated ? (
-                      <>
-                        {/* Info do usuário */}
-                        <div className="flex items-center gap-3 px-3 py-2 mb-1">
-                          <UserAvatar
-                            profileImageUrl={profile?.profileImage?.url}
-                            name={profile?.name}
-                            size="sm"
-                          />
-                          <div className="flex flex-col">
-                            <span className="text-sm font-medium text-white leading-tight">
-                              {user?.name?.split(" ")[0]}
-                            </span>
-                            <span className="text-xs text-white/40 leading-tight">
-                              {user?.email}
-                            </span>
-                          </div>
-                        </div>
-
-                        <button
-                          onClick={() => {
-                            refreshProfile();
-                            router.push("/perfil");
-                            handleNavClick();
-                          }}
-                          className="flex items-center gap-4 px-3 py-3 rounded-xl group transition-all duration-200 hover:bg-white/5 active:bg-white/10 w-full text-left"
+                    {/* Navegação Principal */}
+                    <nav className="flex-1 px-4 space-y-2">
+                      {[
+                        { href: "/", label: "Início", icon: <Home className="h-5 w-5" /> },
+                        { href: "/filmes", label: "Filmes", icon: <Film className="h-5 w-5" /> },
+                        { href: "/series", label: "Séries", icon: <Tv className="h-5 w-5" /> },
+                        { href: "/sintonize", label: "Sintonize", icon: <Search className="h-5 w-5" />, isNew: true },
+                      ].map(({ href, label, icon, isNew }, idx) => (
+                        <motion.div
+                          key={href}
+                          initial={{ x: 20, opacity: 0 }}
+                          animate={{ x: 0, opacity: 1 }}
+                          transition={{ delay: 0.1 + idx * 0.1 }}
                         >
-                          <div className="p-2.5 rounded-xl bg-white/5 group-hover:bg-white/10 transition-all duration-200">
-                            <User className="h-5 w-5 text-white/60" />
-                          </div>
-                          <span className="text-base font-medium text-white/80 group-hover:text-white transition-colors duration-200">
-                            Meu Perfil
-                          </span>
-                        </button>
+                          <Link
+                            href={href}
+                            onClick={handleNavClick}
+                            className={`flex items-center justify-between p-4 rounded-2xl group transition-all duration-300 ${
+                              pathname === href 
+                                ? "bg-red-600/10 border border-red-600/20" 
+                                : "hover:bg-white/5 border border-transparent"
+                            }`}
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className={`p-2 rounded-lg ${pathname === href ? "text-red-500" : "text-white/40 group-hover:text-white"}`}>
+                                {icon}
+                              </div>
+                              <span className={`text-2xl font-normal font-bebas tracking-widest uppercase transition-colors ${
+                                pathname === href ? "text-red-500" : "text-white/70 group-hover:text-white"
+                              }`}>
+                                {label}
+                              </span>
+                            </div>
+                            {isNew && (
+                              <span className="bg-red-600 text-[9px] font-black px-2 py-0.5 rounded-full text-white animate-pulse">NOVO</span>
+                            )}
+                          </Link>
+                        </motion.div>
+                      ))}
+                    </nav>
 
-                        <button
-                          onClick={() => { logout(); handleNavClick(); }}
-                          className="flex items-center gap-4 px-3 py-3 rounded-xl group transition-all duration-200 hover:bg-red-500/10 active:bg-red-500/20 w-full text-left"
+                    {/* Rodapé / Conta */}
+                    <div className="bg-white/[0.02] border-t border-white/5 p-6 space-y-4">
+                      {isAuthenticated ? (
+                        <motion.div 
+                          initial={{ y: 20, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          transition={{ delay: 0.6 }}
                         >
-                          <div className="p-2.5 rounded-xl bg-red-500/10 group-hover:bg-red-500/20 transition-all duration-200">
-                            <LogOut className="h-5 w-5 text-red-500" />
+                          <div className="flex items-center gap-4 mb-6 px-2">
+                            <div className="p-1 rounded-full border border-red-600/30">
+                              <UserAvatar
+                                profileImageUrl={profile?.profileImage?.url}
+                                name={profile?.name}
+                                size="sm"
+                              />
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-lg font-normal font-bebas tracking-wide text-white uppercase">
+                                {user?.name?.split(" ")[0]}
+                              </span>
+                              <span className="text-[10px] text-white/30 uppercase tracking-tighter">
+                                {user?.email}
+                              </span>
+                            </div>
                           </div>
-                          <span className="text-base font-medium text-red-500/80 group-hover:text-red-400 transition-colors duration-200">
-                            Sair
-                          </span>
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => { router.push("/login"); handleNavClick(); }}
-                          className="flex items-center gap-4 px-3 py-3 rounded-xl group transition-all duration-200 hover:bg-white/5 active:bg-white/10 w-full text-left"
+
+                          <div className="grid grid-cols-2 gap-3">
+                            <Button
+                              onClick={() => { refreshProfile(); router.push("/perfil"); handleNavClick(); }}
+                              variant="outline"
+                              className="bg-white/5 border-white/10 hover:bg-white/10 text-[11px] font-black uppercase tracking-widest rounded-xl h-11"
+                            >
+                              <User className="mr-2 h-3.5 w-3.5" /> Perfil
+                            </Button>
+                            <Button
+                              onClick={() => { logout(); handleNavClick(); }}
+                              variant="outline"
+                              className="bg-red-600/10 border-red-600/20 hover:bg-red-600/20 text-red-500 text-[11px] font-black uppercase tracking-widest rounded-xl h-11"
+                            >
+                              <LogOut className="mr-2 h-3.5 w-3.5" /> Sair
+                            </Button>
+                          </div>
+                        </motion.div>
+                      ) : (
+                        <motion.div 
+                          initial={{ y: 20, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          transition={{ delay: 0.6 }}
+                          className="space-y-3"
                         >
-                          <div className="p-2.5 rounded-xl bg-white/5 group-hover:bg-white/10 transition-all duration-200">
-                            <User className="h-5 w-5 text-white/60" />
-                          </div>
-                          <span className="text-base font-medium text-white/80 group-hover:text-white transition-colors duration-200">
+                          <Button
+                            onClick={() => { router.push("/login"); handleNavClick(); }}
+                            className="w-full bg-white text-black hover:bg-white/90 text-sm font-black uppercase tracking-widest h-12 rounded-xl"
+                          >
                             Entrar
-                          </span>
-                        </button>
+                          </Button>
+                          <Button
+                            onClick={() => { router.push("/cadastro"); handleNavClick(); }}
+                            variant="outline"
+                            className="w-full bg-transparent border-white/10 hover:bg-white/5 text-sm font-black uppercase tracking-widest h-12 rounded-xl"
+                          >
+                            Criar Conta
+                          </Button>
+                        </motion.div>
+                      )}
 
-                        <button
-                          onClick={() => { router.push("/cadastro"); handleNavClick(); }}
-                          className="flex items-center gap-4 px-3 py-3 rounded-xl group transition-all duration-200 hover:bg-white/5 active:bg-white/10 w-full text-left"
-                        >
-                          <div className="p-2.5 rounded-xl bg-white/5 group-hover:bg-white/10 transition-all duration-200">
-                            <UserPlus className="h-5 w-5 text-white/60" />
-                          </div>
-                          <span className="text-base font-medium text-white/80 group-hover:text-white transition-colors duration-200">
-                            Cadastrar
-                          </span>
-                        </button>
-                      </>
-                    )}
-
-                    {/* Links legais */}
-                    <div className="flex items-center gap-3 px-3 pt-3 pb-1">
-                      <Link href="/privacidade" onClick={handleNavClick} className="text-xs text-white/25 hover:text-white/50 transition-colors">
-                        Privacidade
-                      </Link>
-                      <span className="text-white/15 text-xs">·</span>
-                      <Link href="/termos" onClick={handleNavClick} className="text-xs text-white/25 hover:text-white/50 transition-colors">
-                        Termos
-                      </Link>
+                      <div className="flex items-center justify-center gap-6 pt-4 text-[10px] font-bold uppercase tracking-widest text-white/20">
+                        <Link href="/privacidade" onClick={handleNavClick}>Privacidade</Link>
+                        <span className="w-1 h-1 rounded-full bg-white/10" />
+                        <Link href="/termos" onClick={handleNavClick}>Termos</Link>
+                      </div>
                     </div>
                   </div>
                 </SheetContent>

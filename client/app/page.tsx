@@ -66,7 +66,7 @@ export default async function Home() {
     getMoviesByGenre(99, 1), getMoviesByGenre(99, 2)
   ]);
 
-  // 3. Montar o Hero (Top 15 misturado)
+  // 3. Montar o Hero (Top 15 misturado - Sorteado no servidor para evitar flicker)
   const heroItems = [
     ...trendingMoviesP1.slice(0, 4),
     ...trendingTVShowsP1.slice(0, 3),
@@ -75,7 +75,7 @@ export default async function Home() {
   ].map((item) => ({
     ...item,
     media_type: item.media_type || (item.first_air_date ? "tv" : "movie"),
-  }));
+  })).sort(() => Math.random() - 0.5);
 
   // 4. Lógica de Desduplicação Global
   const shownGlobal = new Set<string>();

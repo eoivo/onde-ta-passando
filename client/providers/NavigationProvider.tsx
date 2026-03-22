@@ -131,17 +131,9 @@ export default function NavigationProvider({
       return () => clearTimeout(timer);
     }
 
-    const handleBeforeUnload = () => {
-      setIsNavigating(true);
-      setLoading(true, null);
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
     return () => {
       document.removeEventListener("click", handleLinkClick, { capture: true });
       document.removeEventListener("submit", handleFormSubmit);
-      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [pathname, searchParamsString, isNavigating, setLoading]);
 

@@ -7,6 +7,7 @@ import Link from "next/link";
 import VideoPlayer from "./VideoPlayer";
 import { useEffect, useState } from "react";
 import { getMovieVideos, getTvVideos, getMovieDetails, getTvDetails } from "@/services/tmdb-api";
+import { motion } from "framer-motion";
 
 interface HeroProps {
   movie: any;
@@ -46,16 +47,31 @@ export default function Hero({ movie, onTrailerStateChange, priority = false }: 
   if (!movie) return null;
 
   return (
-    <div className="relative h-[85vh] w-full">
-      {/* Backdrop image */}
-      <Image
-        src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
-        alt={movie.title || movie.name}
-        fill
-        priority={priority}
-        unoptimized={true}
-        className="object-cover"
-      />
+    <div className="relative h-[85vh] w-full overflow-hidden">
+      {/* Backdrop image with Ken Burns effect */}
+      <motion.div
+        animate={{
+          scale: [1, 1.15],
+          x: [0, -20],
+          y: [0, -10],
+        }}
+        transition={{
+          duration: 25,
+          repeat: Infinity,
+          repeatType: "reverse",
+          ease: "linear",
+        }}
+        className="absolute inset-0 z-0"
+      >
+        <Image
+          src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
+          alt={movie.title || movie.name}
+          fill
+          priority={priority}
+          unoptimized={true}
+          className="object-cover"
+        />
+      </motion.div>
 
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent z-10" />

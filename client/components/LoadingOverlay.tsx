@@ -57,6 +57,7 @@ export default function LoadingOverlay() {
                 src="/images/logos/icon.png"
                 alt="Onde Tá Passando? Logo"
                 fill
+                priority={true}
                 className="object-contain animate-pulse"
               />
             </div>
