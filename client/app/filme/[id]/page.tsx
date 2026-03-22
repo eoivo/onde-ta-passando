@@ -68,6 +68,7 @@ export default async function MoviePage({
           fill
           className="object-cover"
           priority
+          quality={100}
         />
       </div>
 

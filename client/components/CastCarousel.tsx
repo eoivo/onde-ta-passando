@@ -66,10 +66,11 @@ export default function CastCarousel({ cast }: CastCarouselProps) {
                     {person.profile_path ? (
                       <div className="relative">
                         <Image
-                          src={`https://image.tmdb.org/t/p/w185${person.profile_path}`}
+                          src={`https://image.tmdb.org/t/p/h632${person.profile_path}`}
                           alt={person.name}
                           width={140}
                           height={210}
+                          quality={90}
                           className="object-cover aspect-[2/3]"
                         />
                         {/* Overlay com ícone de busca */}
@@ -111,7 +112,7 @@ export default function CastCarousel({ cast }: CastCarouselProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="absolute left-0 top-1/3 -translate-y-1/2 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute left-0 top-1/3 -translate-y-1/2 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hidden lg:flex"
           onClick={() => scroll("left")}
         >
           <ChevronLeft className="h-6 w-6" />
@@ -120,7 +121,7 @@ export default function CastCarousel({ cast }: CastCarouselProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="absolute right-0 top-1/3 -translate-y-1/2 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute right-0 top-1/3 -translate-y-1/2 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hidden lg:flex"
           onClick={() => scroll("right")}
         >
           <ChevronRight className="h-6 w-6" />

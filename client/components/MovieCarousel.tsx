@@ -51,7 +51,7 @@ export default function MovieCarousel({ title, movies }: MovieCarouselProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="absolute left-0 top-1/2 -translate-y-1/2 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute left-0 top-1/2 -translate-y-1/2 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hidden lg:flex"
           onClick={() => scroll("left")}
         >
           <ChevronLeft className="h-6 w-6" />
@@ -60,7 +60,7 @@ export default function MovieCarousel({ title, movies }: MovieCarouselProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="absolute right-0 top-1/2 -translate-y-1/2 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute right-0 top-1/2 -translate-y-1/2 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hidden lg:flex"
           onClick={() => scroll("right")}
         >
           <ChevronRight className="h-6 w-6" />

@@ -1,41 +1,48 @@
-/**
- * Utilitário para filtragem e ordenação inteligente de mídias (filmes e séries).
- * Prioriza qualidade: popularidade, existência de sinopse e avaliações.
- * Filtra títulos obscuros/antigos sem dados básicos.
- */
 export function sortAndFilterResults(results: any[]) {
     const currentYear = new Date().getFullYear();
 
     return results
         .filter((item: any) => {
-            // 1. Deve ter pelo menos um tipo de imagem
-            const hasImage = !!(item.poster_path || item.backdrop_path);
+            // 1. REQUISITO MÍNIMO VISUAL: Deve ter um poster
+            if (!item.poster_path) return false;
 
-            // 2. Verifica se tem sinopse decente
-            const hasOverview = !!item.overview && item.overview.length > 10;
-
-            // 3. Meta-dados de data e votos
-            const voteCount = item.vote_count || 0;
+            // 2. REQUISITO MÍNIMO DE INFORMAÇÃO: Sinopse
+            const hasOverview = !!item.overview && item.overview.trim().length > 15;
             const releaseDate = item.release_date || item.first_air_date;
             const itemYear = releaseDate ? parseInt(releaseDate.split("-")[0]) : 0;
+            const isReleased = itemYear > 0 && itemYear < currentYear;
 
-            // Critério de Obscuridade: 
-            // Ignora se for antigo (> 10 anos) E não tiver votos E não tiver sinopse
-            const isObscure = itemYear > 0 && itemYear < (currentYear - 10) && voteCount < 5 && !hasOverview;
+            // FILTRO RADICAL: Se já foi lançado e NÃO tem sinopse, remove da Home.
+            // O usuário não quer ver "caixas vazias" de informação.
+            if (isReleased && !hasOverview) return false;
 
-            return hasImage && !isObscure;
+            // Se for lançamento futuro, permitimos sem sinopse apenas se for muito popular (placeholder de marketing)
+            if (!isReleased && !hasOverview && (item.popularity || 0) < 5) return false;
+
+            return true;
         })
         .sort((a, b) => {
-            // 1. Popularidade base da API
-            const popA = a.popularity || 0;
-            const popB = b.popularity || 0;
+            const getScore = (item: any) => {
+                let score = item.popularity || 0;
+                const hasOverview = !!item.overview && item.overview.trim().length > 20;
+                const releaseDate = item.release_date || item.first_air_date;
+                const year = releaseDate ? parseInt(releaseDate.split("-")[0]) : 0;
+                const voteCount = item.vote_count || 0;
 
-            // 2. Pontuação de Qualidade (Quality Score):
-            // - Bonus por ter sinopse (+50%)
-            // - Bonus por ter relevância histórica de votos (+20%)
-            const scoreA = popA * (a.overview ? 1.5 : 1) * (a.vote_count > 100 ? 1.2 : 1);
-            const scoreB = popB * (b.overview ? 1.5 : 1) * (b.vote_count > 100 ? 1.2 : 1);
+                // --- BÔNUS DE QUALIDADE ---
+                if (hasOverview) score *= 2; 
+                if (item.backdrop_path) score *= 1.2; 
+                if (voteCount > 50) score *= 1.3;
 
-            return scoreB - scoreA;
+                // --- NOVIDADES ---
+                if (year >= currentYear) score *= 1.5;
+
+                // Garantia final: Mesmo que passe no filtro, sem sinopse vai pro rabo da fila
+                if (!hasOverview) score *= 0.01; 
+
+                return score;
+            };
+
+            return getScore(b) - getScore(a);
         });
 }

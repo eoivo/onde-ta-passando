@@ -81,29 +81,32 @@ async function fetchFromTMDB(
 
 export async function getTrending(
   mediaType: "movie" | "tv" | "all",
-  timeWindow: "day" | "week" = "week"
+  timeWindow: "day" | "week" = "week",
+  page: number = 1
 ) {
-  const data = await fetchFromTMDB(`/trending/${mediaType}/${timeWindow}`);
+  const data = await fetchFromTMDB(`/trending/${mediaType}/${timeWindow}`, { page: page.toString() });
   return sortAndFilterResults(data.results || []);
 }
 
-export async function getTopRated(mediaType: "movie" | "tv") {
-  const data = await fetchFromTMDB(`/${mediaType}/top_rated`);
+export async function getTopRated(mediaType: "movie" | "tv", page: number = 1) {
+  const data = await fetchFromTMDB(`/${mediaType}/top_rated`, { page: page.toString() });
   return sortAndFilterResults(data.results || []);
 }
 
-export async function getUpcoming() {
+export async function getUpcoming(page: number = 1) {
   const data = await fetchFromTMDB("/movie/upcoming", {
     region: "BR",
+    page: page.toString()
   });
   return sortAndFilterResults(data.results || []);
 }
 
-export async function getMoviesByGenre(genreId: number) {
+export async function getMoviesByGenre(genreId: number, page: number = 1) {
   const data = await fetchFromTMDB("/discover/movie", {
     with_genres: genreId.toString(),
     sort_by: "popularity.desc",
-    "vote_count.gte": "10"
+    "vote_count.gte": "10",
+    page: page.toString()
   });
   return sortAndFilterResults(data.results || []);
 }

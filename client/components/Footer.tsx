@@ -60,7 +60,6 @@ const Footer = () => {
               { href: "/", label: "Início" },
               { href: "/filmes", label: "Filmes" },
               { href: "/series", label: "Séries" },
-              { href: "/#collections", label: "Coleções" },
               { href: "/termos", label: "Termos" },
               { href: "/privacidade", label: "Privacidade" },
             ].map((link) => (

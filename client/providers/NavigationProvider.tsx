@@ -78,6 +78,11 @@ export default function NavigationProvider({
   };
 
   useEffect(() => {
+    // 1. Desabilita a restauração automática do scroll do navegador (essencial para F5 no topo)
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
     const handleLinkClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const link = target.closest("a");
@@ -98,7 +103,6 @@ export default function NavigationProvider({
         target.closest("[data-search-result]");
 
       if (isInternalLink || isSearchResult) {
-        // Ler o path de DESTINO do link clicado, não o pathname atual
         const destinationPath = link
           ? new URL(link.href).pathname
           : pathname;
@@ -140,6 +144,11 @@ export default function NavigationProvider({
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [pathname, searchParamsString, isNavigating, setLoading]);
+
+  // 2. Garante scroll no topo em CADA mudança de rota ou recarregamento
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' as any });
+  }, [pathname]);
 
   useEffect(() => {
     // Salvar caminho anterior no sessionStorage para uso na página 404
