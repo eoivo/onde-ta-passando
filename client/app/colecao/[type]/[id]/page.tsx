@@ -94,9 +94,9 @@ export default async function CollectionDetailPage({
     : null;
 
   const posterUrl = collection.poster_path
-    ? `https://image.tmdb.org/t/p/w500${collection.poster_path}`
+    ? `https://image.tmdb.org/t/p/w780${collection.poster_path}`
     : collection.movies[0]?.poster_path
-    ? `https://image.tmdb.org/t/p/w500${collection.movies[0].poster_path}`
+    ? `https://image.tmdb.org/t/p/w780${collection.movies[0].poster_path}`
     : null;
 
   // Para sagas: ordenar cronologicamente (antigo ao novo)
@@ -205,6 +205,7 @@ export default async function CollectionDetailPage({
             fill
             className="object-cover"
             priority
+            unoptimized={true}
           />
         </div>
       )}
@@ -511,6 +512,7 @@ function MovieGridItem({ movie }: { movie: CollectionMovie }) {
             src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
             alt={movie.title}
             fill
+            quality={90}
             className="object-cover"
             sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
           />
@@ -564,7 +566,8 @@ function FranchiseCard({
           src={backdropUrl}
           alt={franchise.name}
           fill
-          sizes="260px"
+          quality={80}
+          sizes="400px"
           className="object-cover transition-transform duration-500 group-hover:scale-110"
         />
       ) : (

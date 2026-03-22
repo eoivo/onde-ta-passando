@@ -194,9 +194,9 @@ function CollectionCard({
   const router = useRouter();
 
   const backdropUrl = collection.backdrop_path
-    ? `https://image.tmdb.org/t/p/w780${collection.backdrop_path}`
+    ? `https://image.tmdb.org/t/p/w1280${collection.backdrop_path}`
     : collection.movies[0]?.backdrop_path
-    ? `https://image.tmdb.org/t/p/w780${collection.movies[0].backdrop_path}`
+    ? `https://image.tmdb.org/t/p/w1280${collection.movies[0].backdrop_path}`
     : null;
 
   const countLabel = category === "universo" ? "títulos" : "filmes";
@@ -215,7 +215,8 @@ function CollectionCard({
           src={backdropUrl}
           alt={collection.name}
           fill
-          sizes="(max-width: 768px) 260px, 310px"
+          quality={90}
+          sizes="(max-width: 768px) 500px, 600px"
           className="object-cover transition-transform duration-1000 group-hover:scale-110"
         />
       ) : (
