@@ -33,6 +33,7 @@ export default async function TVShowPage({
   const tvShow = await getTvDetails(id);
   const credits = await getTvCredits(id);
   const watchProviders = await getWatchProviders(id, "tv");
+  const streamingServices = watchProviders.results?.BR?.flatrate?.map((p: any) => p.provider_name) || [];
   const videos = await getTvVideos(id);
 
 
@@ -52,7 +53,7 @@ export default async function TVShowPage({
   const seriesContext: MovieContext = {
     title: tvShow.name,
     overview: tvShow.overview,
-    releaseDate: tvShow.first_air_date || "",  // Data ISO, não formatada
+    releaseDate: tvShow.first_air_date || "",
     genres: tvShow.genres.map((g: any) => g.name),
     cast: credits.cast.slice(0, 10).map((actor: any) => actor.name),
     director: credits.crew.find(
@@ -60,6 +61,7 @@ export default async function TVShowPage({
     )?.name,
     mediaType: "tv",
     rating: tvShow.vote_average,
+    streamingServices: streamingServices,
   };
 
   return (

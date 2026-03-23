@@ -1,68 +1,69 @@
 // Controller para interação com Google Gemini AI no Backend
 // Mover a lógica para o servidor protege a API Key e permite rate limiting
 
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent";
+const API_V1BETA_URL = "https://generativelanguage.googleapis.com/v1beta/models";
 
 // Função para criar o prompt do sistema (Murphy)
 function createSystemPrompt(movieContext) {
-  const { title, overview, releaseDate, genres, cast, director, mediaType } = movieContext;
+  const { title, overview, releaseDate, genres, cast, director, mediaType, streamingServices } = movieContext;
   const mediaTypeName = mediaType === "movie" ? "filme" : "série";
-  const releaseDateObj = new Date(releaseDate);
+  const releaseDateObj = releaseDate ? new Date(releaseDate) : null;
   const currentDate = new Date();
-  const year = releaseDateObj.getFullYear();
-
+  
   const currentDateStr = currentDate.toLocaleDateString("pt-BR");
   const currentYear = currentDate.getFullYear();
+  const releaseDateStr = releaseDateObj ? releaseDateObj.toLocaleDateString("pt-BR") : "Não informada";
+  const year = releaseDateObj ? releaseDateObj.getFullYear() : "N/A";
 
   let releaseStatus = "";
-  if (!releaseDate || isNaN(releaseDateObj.getTime())) {
+  if (!releaseDateObj || isNaN(releaseDateObj.getTime())) {
     releaseStatus = "❓ STATUS NÃO ESPECIFICADO NOS DADOS OFICIAIS";
   } else if (releaseDateObj > currentDate) {
-    releaseStatus = `⏳ AINDA NÃO LANÇADO - Previsão: ${releaseDateObj.toLocaleDateString("pt-BR")}`;
+    releaseStatus = `⏳ AINDA NÃO LANÇADO - Previsão oficial de estreia: ${releaseDateStr}`;
   } else {
     const monthsAgo = (currentDate.getFullYear() - releaseDateObj.getFullYear()) * 12 + (currentDate.getMonth() - releaseDateObj.getMonth());
     if (monthsAgo < 3) {
-      releaseStatus = `🆕 LANÇAMENTO RECENTE - Lançado em: ${releaseDateObj.toLocaleDateString("pt-BR")}`;
+      releaseStatus = `🆕 LANÇAMENTO RECENTE - Lançado oficialmente em: ${releaseDateStr}`;
     } else if (monthsAgo < 12) {
-      releaseStatus = `🎬 DISPONÍVEL - Lançado em: ${releaseDateObj.toLocaleDateString("pt-BR")}`;
+      releaseStatus = `🎬 DISPONÍVEL - Lançado oficialmente em: ${releaseDateStr}`;
     } else {
-      releaseStatus = `📚 CATÁLOGO - Lançado em: ${releaseDateObj.toLocaleDateString("pt-BR")}`;
+      releaseStatus = `📚 CATÁLOGO - Lançado oficialmente em: ${releaseDateStr}`;
     }
   }
+
+  const availability = (streamingServices && streamingServices.length > 0) 
+    ? `✅ DISPONÍVEL EM: ${streamingServices.join(", ")}`
+    : "❌ AINDA NÃO DISPONÍVEL em serviços de streaming (apenas cinemas ou aguardando lançamento).";
 
   return `Você é Murphy, assistente de IA especializada em cinema, inspirada na Murphy Cooper de Interestelar. Você é curiosa, inteligente e apaixonada por filmes e séries.
 
 📅 DATA ATUAL: ${currentDateStr} (${currentYear})
 
-🎬 CONTEXTO ATUAL:
-Título: ${title} (${year})
-Tipo: ${mediaTypeName}
-Status: ${releaseStatus}
-Gêneros: ${genres.join(", ")}
-Elenco: ${cast.join(", ")}
-Direção: ${director || "N/A"}
-Sinopse: ${overview}
+🎬 CONTEXTO ATUAL DO SISTEMA (SUA ÚNICA FONTE DE VERDADE):
+• Título: ${title} (${year})
+• Tipo: ${mediaTypeName}
+• Status Oficial: ${releaseStatus}
+• Disponibilidade Real: ${availability}
+• Gêneros: ${genres.join(", ")}
+• Elenco: ${cast.join(", ")}
+• Direção: ${director || "N/A"}
+• Sinopse: ${overview}
 
 🎯 SUA PERSONALIDADE:
-• Seja natural e conversacional como uma amiga que ama cinema.
-• Use português brasileiro coloquial.
-• Use 1-2 emojis por resposta (não exagere).
+• Seja natural e conversacional como uma amiga que ama cinema. Use português brasileiro coloquial.
 
-⚠️ TRANSPARÊNCIA TEMPORAL E LIMITAÇÕES:
-• Seu treinamento interno de IA foi concluído em meados de 2025.
-• Para informações sobre obras ou fatos pós-Junho de 2025 que não estejam no CONTEXTO ATUAL, seja honesta: "Olha, como meu treinamento interno foi finalizado em 2025 e essa obra é super recente, eu ainda não tenho essa confirmação oficial por aqui."
-• Evite citar termos técnicos como "TMDB", "API" ou "N/A" para o usuário.
+⚠️ REGRAS CRÍTICAS DE VERACIDADE:
+1. **PRIORIDADE TOTAL AO CONTEXTO:** Use APENAS os dados do sistema para fatos específicos sobre o filme que você está conversando hoje (datas, streaming, elenco).
+2. **LIMITES DE TREINAMENTO:** Seu treinamento interno foi concluído em meados de 2025. Se o usuário perguntar fatos globais (premiações, notícias) de 2026, seja honesta que sua memória interna para ali.
+3. **NÃO ALUCINE:** Nunca invente estreias no futuro se o Status Oficial mostrar que o filme já saiu.
+4. **DISPONIBILIDADE:** Se a 'Disponibilidade Real' mostrar plataformas, ignore sua memória de que o filme ainda não saiu e confirme que ele JÁ está em streaming.
 
-❌ O QUE VOCÊ NÃO PODE FAZER:
-• Inventar fatos ou premiações.
-• Usar linguagem técnica de desenvolvedor.
-
-✅ SEJA LIVRE PARA admitir o limite de tempo e focar no que você CONHECE sobre o filme.`;
+❌ NÃO use termos técnicos como "TMDB", "API" ou "Contexto".`;
 }
 
-// @desc    Enviar mensagem para o chat do Gemini
+// @desc    Enviar mensagem para o chat do Gemini com lógica de Fallback
 // @route   POST /api/ai/chat
-// @access  Public (ou Private se quiser forçar login)
+// @access  Public
 exports.chat = async (req, res) => {
   try {
     const { message, movieContext, conversationHistory } = req.body;
@@ -82,47 +83,125 @@ exports.chat = async (req, res) => {
       });
     }
 
-    const systemPrompt = createSystemPrompt(movieContext);
-    const recentHistory = (conversationHistory || [])
-      .slice(-6)
-      .map(msg => `${msg.role === "user" ? "Usuário" : "Murphy"}: ${msg.content}`)
-      .join("\n");
-
-    const fullPrompt = `${systemPrompt}\n\n${recentHistory ? `Conversa anterior:\n${recentHistory}\n` : ""}Usuário: ${message}\n\nMurphy:`;
-
-    const requestBody = {
-      contents: [{ parts: [{ text: fullPrompt }] }],
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 800,
+    // Configuração dos modelos para tentativa (Cascata de Fallback)
+    // Desativada a Busca no Google (Grounding) para priorizar estabilidade na cota gratuita
+    const modelsToTry = [
+      { 
+        name: "gemini-3.1-flash-lite-preview", 
+        useGrounding: false, 
+        useThoughtSigs: true 
+      },
+      { 
+        name: "gemini-2.5-flash-lite", 
+        useGrounding: false, 
+        useThoughtSigs: false 
+      },
+      { 
+        name: "gemini-1.5-flash-latest", 
+        useGrounding: false, 
+        useThoughtSigs: false 
       }
-    };
+    ];
 
-    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestBody),
-    });
+    let lastError = null;
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Erro Gemini API:", errorData);
-      throw new Error(`Erro na API: ${response.status}`);
+    for (const modelConfig of modelsToTry) {
+      try {
+        const systemPrompt = createSystemPrompt(movieContext);
+        const contents = [];
+
+        // Mapear histórico (limpando thought_signatures se o modelo não suportar)
+        if (conversationHistory && conversationHistory.length > 0) {
+          conversationHistory.slice(-8).forEach(msg => {
+            const role = msg.role === "user" ? "user" : "model";
+            const parts = [{ text: msg.content }];
+            
+            if (modelConfig.useThoughtSigs && msg.thoughtSignature) {
+              parts.push({ thought_signature: msg.thoughtSignature });
+            }
+            
+            contents.push({ role, parts });
+          });
+        }
+
+        contents.push({
+          role: "user",
+          parts: [{ text: message }]
+        });
+
+        const requestBody = {
+          systemInstruction: {
+            role: "system",
+            parts: [{ text: systemPrompt }]
+          },
+          contents: contents,
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 1024,
+          }
+        };
+
+        // Ativar Busca no Google APENAS se o modelo suportar
+        if (modelConfig.useGrounding) {
+          requestBody.tools = [{ google_search_retrieval: {} }];
+        }
+
+        const modelUrl = `${API_V1BETA_URL}/${modelConfig.name}:generateContent?key=${GEMINI_API_KEY}`;
+        
+        const response = await fetch(modelUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          // Se for erro de cota (429), vamos para o próximo modelo sem disparar erro pro usuário
+          if (response.status === 429) {
+            console.warn(`Modelo ${modelConfig.name} atingiu limite de cota. Tentando fallback...`);
+            continue; 
+          }
+          throw new Error(`Erro na API (${modelConfig.name}): ${response.status}`);
+        }
+
+        const data = await response.json();
+        const candidate = data.candidates?.[0];
+        const parts = candidate?.content?.parts || [];
+        
+        let reply = "";
+        let newThoughtSignature = null;
+
+        parts.forEach(part => {
+          if (part.text) reply += part.text;
+          if (part.thought_signature) newThoughtSignature = part.thought_signature;
+        });
+
+        if (!reply) throw new Error("Resposta vazia da IA");
+
+        // Sucesso! Retornamos a resposta do modelo que funcionou
+        return res.status(200).json({
+          success: true,
+          data: reply,
+          thoughtSignature: newThoughtSignature,
+          modelUsed: modelConfig.name
+        });
+
+      } catch (err) {
+        console.error(`Falha no modelo ${modelConfig.name}:`, err.message);
+        lastError = err;
+      }
     }
 
-    const data = await response.json();
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "Desculpe, não consegui processar sua mensagem.";
-
-    res.status(200).json({
-      success: true,
-      data: reply
-    });
+    // Se saiu do loop, todas as tentativas falharam
+    throw lastError || new Error("Falha total na comunicação com a IA");
 
   } catch (error) {
-    console.error("Erro no AI Controller:", error);
+    console.error("Erro Final no AI Controller:", error);
     res.status(500).json({
       success: false,
-      message: "Erro ao processar conversa com a IA"
+      message: error.message.includes("429") 
+        ? "Murphy está um pouco sobrecarregada em todos os motores! Espere um minuto. 😅"
+        : "Erro ao processar conversa com a IA"
     });
   }
 };

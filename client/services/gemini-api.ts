@@ -8,6 +8,7 @@ export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
+  thoughtSignature?: string;
 }
 
 // Função helper para determinar status de lançamento
@@ -68,6 +69,7 @@ export interface MovieContext {
   mediaType: "movie" | "tv";
   rating?: number;
   runtime?: number;
+  streamingServices?: string[];
 }
 
 // Função simples para criar o prompt do sistema - MUITO MAIS ENXUTA
@@ -113,12 +115,18 @@ Status: ${releaseStatus}
 Gêneros: ${movieContext.genres.join(", ")}
 Elenco: ${movieContext.cast.join(", ")}
 Direção: ${movieContext.director || "N/A"}
+Disponível em: ${movieContext.streamingServices?.length ? movieContext.streamingServices.join(", ") : "Nenhum serviço de streaming detectado ou ainda não disponível no catálogo digital."}
 Sinopse: ${movieContext.overview}
 
 🎯 SUA PERSONALIDADE:
 • Seja natural e conversacional como uma amiga que ama cinema.
 • Use português brasileiro coloquial.
 • Use 1-2 emojis por resposta (não exagere).
+
+⚠️ FONTE DE VERDADE (STREAMING):
+• **Priorize os dados em 'Disponível em' no CONTEXTO ATUAL acima de tudo.**
+• Se o CONTEXTO indicar plataformas (ex: Netflix, Prime), diga ao usuário que o título JÁ ESTÁ DISPONÍVEL nessas plataformas, mesmo que seu treinamento sugira que o filme é futuro ou não saiu.
+• **Não diga que o filme não saiu se o contexto listar plataformas de streaming.**
 
 ⚠️ TRANSPARÊNCIA TEMPORAL E LIMITAÇÕES:
 • **Seu treinamento interno de IA foi concluído em meados de 2025.**
@@ -230,7 +238,7 @@ export const sendMessageToGemini = async (
   message: string,
   movieContext: MovieContext,
   conversationHistory: ChatMessage[] = []
-): Promise<string> => {
+): Promise<{ reply: string; thoughtSignature: string | null }> => {
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
     
@@ -254,7 +262,10 @@ export const sendMessageToGemini = async (
     }
 
     if (data.success && data.data) {
-      return data.data;
+      return {
+        reply: data.data,
+        thoughtSignature: data.thoughtSignature || null
+      };
     } else {
       throw new Error("Resposta inválida do servidor");
     }

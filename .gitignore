@@ -1,2 +1,7 @@
 tmp/
 LINKEDIN_POST.md
+.env*
+*.env
+node_modules/
+dist/
+.DS_Store

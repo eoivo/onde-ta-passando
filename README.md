@@ -43,7 +43,7 @@
 
 - **Streaming availability** — Find which platforms are streaming a title, with deep links directly to the content page (not just the service homepage)
 - **CineDNA recommendations** — Discover similar titles based on genres, keywords, and stylistic fingerprints of a reference work
-- **Murphy AI assistant** — Conversational AI (Google Gemini 2.5 Flash Lite) that answers questions about any movie or TV show in natural Brazilian Portuguese
+- **Murphy AI assistant** — Conversational AI (Google Gemini 3.1 & 2.5 Flash Lite with automated fallback) that answers questions about any movie or TV show in natural Brazilian Portuguese
 - **Authentication** — Registration, login, email-based password reset, and profile management with avatar upload
 - **Personal collections** — Favorites, watchlist, and watched history with pagination and real-time counters
 - **Trailers & details** — Synopses, cast, ratings, and embedded trailers from TMDB

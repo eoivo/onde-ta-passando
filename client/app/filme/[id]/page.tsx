@@ -33,6 +33,7 @@ export default async function MoviePage({
   const movie = await getMovieDetails(id);
   const credits = await getMovieCredits(id);
   const watchProviders = await getWatchProviders(id, "movie");
+  const streamingServices = watchProviders.results?.BR?.flatrate?.map((p: any) => p.provider_name) || [];
   const videos = await getMovieVideos(id);
 
   const hours = Math.floor(movie.runtime / 60);
@@ -45,13 +46,14 @@ export default async function MoviePage({
   const movieContext: MovieContext = {
     title: movie.title,
     overview: movie.overview,
-    releaseDate: releaseDate,
+    releaseDate: movie.release_date,
     genres: movie.genres.map((g: any) => g.name),
     cast: credits.cast.slice(0, 10).map((actor: any) => actor.name),
     director: credits.crew.find((person: any) => person.job === "Director")
       ?.name,
     mediaType: "movie",
     rating: movie.vote_average,
+    streamingServices: streamingServices,
   };
 
   return (

@@ -25,7 +25,7 @@ export const useMovieChat = (movieContext: MovieContext) => {
       setError(null);
 
       try {
-        const response = await sendMessageToGemini(
+        const { reply, thoughtSignature } = await sendMessageToGemini(
           content.trim(),
           movieContext,
           messages
@@ -33,8 +33,9 @@ export const useMovieChat = (movieContext: MovieContext) => {
 
         const assistantMessage: ChatMessage = {
           role: "assistant",
-          content: response,
+          content: reply,
           timestamp: new Date(),
+          thoughtSignature: thoughtSignature || undefined,
         };
 
         setMessages((prev) => [...prev, assistantMessage]);
