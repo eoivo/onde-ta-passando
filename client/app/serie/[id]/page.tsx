@@ -80,7 +80,7 @@ export default async function TVShowPage({
         />
       </div>
 
-      <div className="relative z-20 -mt-[400px] md:-mt-[62vh] px-4 md:px-12 max-w-[1600px] mx-auto pt-4">
+      <div className="relative z-20 -mt-[70vh] md:-mt-[62vh] px-4 md:px-12 max-w-[1600px] mx-auto pt-0 md:pt-4">
         <div className="flex flex-col md:flex-row gap-8">
           <div className="hidden md:block flex-shrink-0">
             <Image
@@ -93,7 +93,7 @@ export default async function TVShowPage({
             />
           </div>
 
-          <div className="flex-1 space-y-8 pt-10">
+          <div className="flex-1 space-y-8 pt-0 md:pt-10">
             <div className="space-y-4">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <h1 className="text-5xl md:text-7xl lg:text-8xl font-normal font-bebas tracking-tighter text-white drop-shadow-2xl uppercase leading-[0.8]">

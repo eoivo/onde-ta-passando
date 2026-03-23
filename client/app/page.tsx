@@ -134,7 +134,7 @@ export default async function Home() {
     <main className="min-h-screen pb-20">
       <HeroCarousel movies={heroItems} />
       
-      <div className="px-4 md:px-12 space-y-3 md:space-y-10 -mt-10 md:-mt-8 relative z-10">
+      <div className="px-4 md:px-12 space-y-3 md:space-y-10 -mt-8 md:-mt-8 relative z-10">
         <MovieCarousel title="Filmes em alta" movies={ensureUnique(trendingMovies).slice(0, 40)} />
         <MovieCarousel title="Séries em alta" movies={ensureUnique(trendingTVShows).slice(0, 40)} />
         <MovieCarousel title="Mais bem avaliados" movies={ensureUnique(topRatedMovies).slice(0, 40)} />

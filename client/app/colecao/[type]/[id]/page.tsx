@@ -210,7 +210,7 @@ export default async function CollectionDetailPage({
         </div>
       )}
 
-      <div className="relative z-20 px-4 md:px-8 max-w-7xl mx-auto -mt-56 md:-mt-[38vh] pt-12">
+      <div className="relative z-20 px-4 md:px-8 max-w-7xl mx-auto -mt-[35vh] md:-mt-[38vh] pt-0 md:pt-12">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Poster */}
           {posterUrl && (

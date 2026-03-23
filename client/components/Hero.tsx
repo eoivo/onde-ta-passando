@@ -47,7 +47,7 @@ export default function Hero({ movie, onTrailerStateChange, priority = false }: 
   if (!movie) return null;
 
   return (
-    <div className="relative h-[85vh] w-full overflow-hidden">
+    <div className="relative h-auto min-h-[70vh] md:h-[85vh] w-full overflow-hidden">
       {/* Backdrop image with Ken Burns effect */}
       <motion.div
         animate={{
@@ -78,7 +78,7 @@ export default function Hero({ movie, onTrailerStateChange, priority = false }: 
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10" />
 
       {/* Content */}
-      <div className="absolute inset-0 z-20 flex flex-col justify-center pb-8 md:pb-16 pt-24 md:pt-32">
+      <div className="relative md:absolute inset-0 z-20 flex flex-col justify-start md:justify-center md:pb-16 pt-[15vh] md:pt-32 pb-12">
         <div className="max-w-2xl w-full px-4 md:px-8 md:ml-16 space-y-4">
           <h1 className="text-4xl md:text-6xl font-black leading-tight tracking-tight uppercase">
             {movie.title || movie.name}
