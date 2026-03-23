@@ -1,7 +1,12 @@
 tmp/
 LINKEDIN_POST.md
-.env*
-*.env
 node_modules/
 dist/
 .DS_Store
+
+# Bloqueia todos os .env reais
+.env*
+*.env
+
+# LIBERA apenas os exemplos
+!.env.example
