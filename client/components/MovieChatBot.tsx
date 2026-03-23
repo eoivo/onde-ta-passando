@@ -335,8 +335,8 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
           <span className="font-semibold">Conversar com a Murphy</span>
         </Button>
 
-        <DialogContent className="h-[90vh] mx-auto my-auto w-[calc(100%-2rem)] max-w-4xl flex flex-col p-0 bg-gradient-to-br from-gray-900 to-black border-0 shadow-2xl rounded-2xl overflow-hidden">
-          <DialogHeader className="p-6 bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white relative">
+        <DialogContent className="h-[92dvh] md:h-[90vh] mx-auto w-full md:w-[calc(100%-2rem)] max-w-4xl flex flex-col p-0 bg-gradient-to-br from-gray-900 to-black border-0 shadow-2xl md:rounded-2xl overflow-hidden focus:outline-none">
+          <DialogHeader className="p-4 md:p-6 bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white relative flex-shrink-0">
             <div className="absolute inset-0 bg-gradient-to-r from-red-400/20 to-red-500/20 backdrop-blur-sm" />
             <DialogTitle className="relative z-10 flex items-center gap-3 text-xl font-bold">
               <motion.div
@@ -349,7 +349,7 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
-                className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm overflow-hidden border-2 border-white/30 flex items-center justify-center"
+                className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/20 backdrop-blur-sm overflow-hidden border-2 border-white/30 flex items-center justify-center"
               >
                 <Image
                   src="/images/murphy.png"
@@ -592,7 +592,7 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
             </div>
           </ScrollArea>
 
-          <div className="p-6 bg-gray-800/95 backdrop-blur-sm">
+          <div className="p-4 md:p-6 bg-gray-800/95 backdrop-blur-sm border-t border-gray-700/50 pb-[calc(1rem+env(safe-area-inset-bottom))] md:pb-6">
             <div className="flex gap-3">
               <div className="relative flex-1">
                 <Input
