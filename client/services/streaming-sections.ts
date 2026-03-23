@@ -1,23 +1,14 @@
 // Serviço para buscar conteúdo por plataforma de streaming
 import { Movie, TV } from './tmdb-api';
 
-const API_KEY = process.env.API_KEY || "";
+const TMDB_API_KEY = process.env.TMDB_API_KEY || "";
 const BASE_URL = "https://api.themoviedb.org/3";
-
-interface DiscoverParams {
-  with_watch_providers: string;
-  watch_region: string;
-  sort_by: string;
-  page: string;
-  include_adult: string;
-}
 
 async function fetchFromTMDB(
   endpoint: string,
   params: Record<string, string> = {}
 ) {
   const queryParams = new URLSearchParams({
-    api_key: API_KEY,
     language: "pt-BR",
     ...params,
   });
@@ -25,7 +16,13 @@ async function fetchFromTMDB(
   const url = `${BASE_URL}${endpoint}?${queryParams}`;
 
   try {
-    const response = await fetch(url, { next: { revalidate: 3600 } }); // Cache 1 hora
+    const response = await fetch(url, { 
+      next: { revalidate: 3600 },
+      headers: {
+        "Authorization": `Bearer ${TMDB_API_KEY}`,
+        "Accept": "application/json",
+      },
+    });
     if (!response.ok) {
       throw new Error(`TMDB API error: ${response.status}`);
     }
@@ -34,6 +31,14 @@ async function fetchFromTMDB(
     console.error("Error fetching from TMDB:", error);
     return { results: [] };
   }
+}
+
+interface DiscoverParams {
+  with_watch_providers: string;
+  watch_region: string;
+  sort_by: string;
+  page: string;
+  include_adult: string;
 }
 
 /**
@@ -56,7 +61,7 @@ export async function getContentByProvider(
     include_adult: 'false',
   };
 
-  const data = await fetchFromTMDB(`/discover/${mediaType}`, params);
+  const data = await fetchFromTMDB(`/discover/${mediaType}`, params as any);
   return data.results || [];
 }
 
