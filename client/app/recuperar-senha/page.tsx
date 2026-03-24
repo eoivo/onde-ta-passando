@@ -51,19 +51,19 @@ export default function ForgotPasswordPage() {
       </div>
 
       {/* Conteúdo */}
-      <div className="relative z-10 max-w-md w-full bg-gray-900/90 rounded-xl shadow-2xl p-8 backdrop-blur-md border border-gray-800/50">
+      <div className="relative z-10 max-w-md w-full bg-neutral-950/40 rounded-[32px] shadow-[0_0_50px_rgba(0,0,0,0.5)] p-8 md:p-10 backdrop-blur-3xl border border-white/10">
         {!isSuccess ? (
           <>
-            <div className="text-center mb-8">
-              <div className="flex justify-center mb-4">
-                <div className="bg-red-600/20 p-3 rounded-full">
+            <div className="text-center mb-10">
+              <div className="flex justify-center mb-6">
+                <div className="bg-red-500/10 p-4 rounded-2xl">
                   <Mail className="w-8 h-8 text-red-500" />
                 </div>
               </div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-red-500 to-red-700 text-transparent bg-clip-text">
+              <h1 className="text-3xl font-semibold text-white tracking-tight mb-3">
                 Esqueci minha senha
               </h1>
-              <p className="text-gray-400 mt-2">
+              <p className="text-neutral-500 text-[15px]">
                 Digite seu email e enviaremos um link para redefinir sua senha
               </p>
             </div>
@@ -72,7 +72,7 @@ export default function ForgotPasswordPage() {
               <div className="space-y-2">
                 <label
                   htmlFor="email"
-                  className="text-sm font-medium text-gray-300"
+                  className="text-[13px] font-medium text-neutral-400 ml-1 uppercase tracking-wider"
                 >
                   Email
                 </label>
@@ -83,32 +83,33 @@ export default function ForgotPasswordPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="seu@email.com"
                   required
-                  className="w-full bg-gray-800 border-gray-700 text-white"
+                  className="w-full bg-white/5 border-white/5 h-12 rounded-xl text-white placeholder:text-neutral-600 focus-visible:ring-1 focus-visible:ring-red-500/50 transition-all"
                 />
               </div>
 
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white"
+                className="w-full bg-red-600 hover:bg-neutral-100 hover:text-black text-white h-14 rounded-2xl text-[16px] font-semibold transition-all duration-300 shadow-xl disabled:opacity-50"
               >
                 {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Enviando...
-                  </>
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-5 w-5 animate-spin" /> 
+                    <span>Enviando...</span>
+                  </div>
                 ) : (
                   <>
                     <Mail className="mr-2 h-4 w-4" />
-                    Enviar link de redefinição
+                    Enviar link
                   </>
                 )}
               </Button>
             </form>
 
-            <div className="mt-6 text-center">
+            <div className="mt-8 text-center">
               <Link
                 href="/login"
-                className="text-sm text-gray-400 hover:text-red-500 flex items-center justify-center gap-2"
+                className="text-sm text-neutral-400 hover:text-red-400 flex items-center justify-center gap-2 font-medium transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Voltar para o login
@@ -116,48 +117,52 @@ export default function ForgotPasswordPage() {
             </div>
           </>
         ) : (
-          <div className="text-center space-y-6">
+          <div className="text-center space-y-8">
             <div className="flex justify-center">
-              <div className="bg-green-600/20 p-4 rounded-full">
+              <div className="bg-green-500/10 p-5 rounded-full">
                 <CheckCircle className="w-12 h-12 text-green-500" />
               </div>
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white mb-2">
+              <h2 className="text-2xl font-semibold text-white mb-2">
                 Email enviado!
               </h2>
-              <p className="text-gray-400">
-                Enviamos um link de redefinição de senha para{" "}
-                <strong className="text-white">{email}</strong>
+              <p className="text-neutral-500 text-[15px]">
+                Enviamos um link de redefinição para <br/>
+                <strong className="text-white font-medium">{email}</strong>
               </p>
             </div>
-            <div className="bg-gray-800/50 rounded-lg p-4 text-left">
-              <p className="text-sm text-gray-300 mb-2">
-                <strong>Próximos passos:</strong>
+            <div className="bg-white/5 border border-white/5 rounded-2xl p-5 text-left">
+              <p className="text-sm text-neutral-300 font-semibold mb-3 uppercase tracking-wider text-[11px]">
+                Próximos passos
               </p>
-              <ul className="text-sm text-gray-400 space-y-1 list-disc list-inside">
-                <li>Verifique sua caixa de entrada</li>
-                <li>Clique no link do email (válido por 10 minutos)</li>
-                <li>Crie uma nova senha</li>
+              <ul className="text-sm text-neutral-400 space-y-2 text-[13px]">
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 mt-0.5">•</span>
+                  Verifique sua caixa de entrada
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 mt-0.5">•</span>
+                  Clique no link para criar nova senha
+                </li>
               </ul>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <Button
                 onClick={() => router.push("/login")}
-                className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white"
+                className="w-full bg-red-600 hover:bg-neutral-100 hover:text-black text-white h-14 rounded-2xl text-[16px] font-semibold transition-all duration-300 shadow-xl"
               >
                 Voltar para o login
               </Button>
-              <Button
+              <button
                 onClick={() => {
                   setIsSuccess(false);
                   setEmail("");
                 }}
-                variant="outline"
-                className="w-full border-gray-600 text-gray-300 hover:bg-gray-800"
+                className="text-sm text-neutral-500 hover:text-white transition-colors underline underline-offset-4"
               >
                 Enviar outro email
-              </Button>
+              </button>
             </div>
           </div>
         )}

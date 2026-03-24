@@ -127,25 +127,25 @@ export default function ResetPasswordPage() {
       </div>
 
       {/* Conteúdo */}
-      <div className="relative z-10 max-w-md w-full bg-gray-900/90 rounded-xl shadow-2xl p-8 backdrop-blur-md border border-gray-800/50">
+      <div className="relative z-10 max-w-md w-full bg-neutral-950/40 rounded-[32px] shadow-[0_0_50px_rgba(0,0,0,0.5)] p-8 md:p-10 backdrop-blur-3xl border border-white/10">
         {!isSuccess ? (
           <>
-            <div className="text-center mb-8">
-              <div className="flex justify-center mb-4">
-                <div className="bg-red-600/20 p-3 rounded-full">
+            <div className="text-center mb-10">
+              <div className="flex justify-center mb-6">
+                <div className="bg-red-500/10 p-4 rounded-2xl">
                   <Lock className="w-8 h-8 text-red-500" />
                 </div>
               </div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-red-500 to-red-700 text-transparent bg-clip-text">
-                Redefinir Senha
+              <h1 className="text-3xl font-semibold text-white tracking-tight mb-3">
+                Nova Senha
               </h1>
-              <p className="text-gray-400 mt-2">
-                Digite sua nova senha abaixo
+              <p className="text-neutral-500 text-[15px]">
+                Crie uma senha forte para sua segurança
               </p>
             </div>
 
             {error && (
-              <div className="mb-6 p-3 bg-red-900/30 border border-red-800 text-red-200 rounded-lg text-sm">
+              <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 text-red-200 rounded-2xl text-[14px] leading-relaxed">
                 {error}
               </div>
             )}
@@ -154,33 +154,33 @@ export default function ResetPasswordPage() {
               <div className="space-y-2">
                 <label
                   htmlFor="password"
-                  className="text-sm font-medium text-gray-300"
+                  className="text-[13px] font-medium text-neutral-400 ml-1 uppercase tracking-wider"
                 >
                   Nova Senha
                 </label>
-                <div className="relative">
+                <div className="relative group/pass">
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="********"
+                    placeholder="••••••••"
                     required
-                    className="w-full bg-gray-800 border-gray-700 text-white pr-10"
+                    className="w-full bg-white/5 border-white/5 h-12 rounded-xl text-white placeholder:text-neutral-600 focus-visible:ring-1 focus-visible:ring-red-500/50 transition-all pr-12"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white transition-colors p-1"
                   >
                     {showPassword ? (
-                      <EyeOff className="w-4 h-4" />
+                      <EyeOff className="h-4 w-4" />
                     ) : (
-                      <Eye className="w-4 h-4" />
+                      <Eye className="h-4 w-4" />
                     )}
                   </button>
                 </div>
-                <p className="text-xs text-gray-500">
+                <p className="text-[11px] text-neutral-500 ml-1">
                   Mínimo de 8 caracteres, 1 maiúscula e 1 número
                 </p>
               </div>
@@ -188,79 +188,83 @@ export default function ResetPasswordPage() {
               <div className="space-y-2">
                 <label
                   htmlFor="confirmPassword"
-                  className="text-sm font-medium text-gray-300"
+                  className="text-[13px] font-medium text-neutral-400 ml-1 uppercase tracking-wider"
                 >
                   Confirmar Nova Senha
                 </label>
-                <div className="relative">
+                <div className="relative group/pass">
                   <Input
                     id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="********"
+                    placeholder="••••••••"
                     required
-                    className="w-full bg-gray-800 border-gray-700 text-white pr-10"
+                    className="w-full bg-white/5 border-white/5 h-12 rounded-xl text-white placeholder:text-neutral-600 focus-visible:ring-1 focus-visible:ring-red-500/50 transition-all pr-12"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white transition-colors p-1"
                   >
                     {showConfirmPassword ? (
-                      <EyeOff className="w-4 h-4" />
+                      <EyeOff className="h-4 w-4" />
                     ) : (
-                      <Eye className="w-4 h-4" />
+                      <Eye className="h-4 w-4" />
                     )}
                   </button>
                 </div>
               </div>
 
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Redefinindo...
-                  </>
-                ) : (
-                  <>
-                    <Lock className="mr-2 h-4 w-4" />
-                    Redefinir Senha
-                  </>
-                )}
-              </Button>
+              <div className="space-y-4 pt-2">
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white h-14 rounded-2xl text-[16px] font-semibold transition-all duration-300 disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-5 w-5 animate-spin" /> 
+                      <span>Redefinindo...</span>
+                    </div>
+                  ) : (
+                    <>
+                      <Lock className="mr-2 h-4 w-4" />
+                      Alterar Senha
+                    </>
+                  )}
+                </Button>
+              </div>
             </form>
 
-            <div className="mt-6 text-center">
+            <div className="mt-8 text-center">
               <Link
                 href="/login"
-                className="text-sm text-gray-400 hover:text-red-500"
+                className="text-sm text-neutral-400 hover:text-red-400 font-medium transition-colors underline underline-offset-4"
               >
-                Voltar para o login
+                Cancelar e voltar ao login
               </Link>
             </div>
           </>
         ) : (
-          <div className="text-center space-y-6">
+          <div className="text-center space-y-8">
             <div className="flex justify-center">
-              <div className="bg-green-600/20 p-4 rounded-full">
+              <div className="bg-green-500/10 p-5 rounded-full">
                 <CheckCircle className="w-12 h-12 text-green-500" />
               </div>
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white mb-2">
+              <h2 className="text-2xl font-semibold text-white mb-2">
                 Senha redefinida!
               </h2>
-              <p className="text-gray-400">
-                Sua senha foi alterada com sucesso. Você será redirecionado em instantes...
+              <p className="text-neutral-500 text-[15px]">
+                Sua segurança foi atualizada com sucesso. <br/>
+                Você será redirecionado para o login.
               </p>
             </div>
             <Button
               onClick={() => router.push("/login")}
-              className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white"
+              className="w-full bg-red-600 hover:bg-red-700 text-white h-14 rounded-2xl text-[16px] font-semibold transition-all duration-300"
             >
               Ir para o login
             </Button>

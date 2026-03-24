@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { validatePassword } from "@/lib/password-validation";
 
@@ -19,6 +19,8 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showWakingMsg, setShowWakingMsg] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { register } = useAuth();
   const router = useRouter();
 
@@ -88,25 +90,25 @@ export default function RegisterPage() {
       </div>
 
       {/* Conteúdo */}
-      <div className="relative z-10 max-w-md w-full bg-gray-900/90 rounded-xl shadow-2xl p-8 backdrop-blur-md border border-gray-800/50">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-normal font-bebas tracking-wide bg-gradient-to-r from-red-500 to-red-700 text-transparent bg-clip-text uppercase">
+      <div className="relative z-10 max-w-md w-full bg-neutral-950/40 rounded-[32px] shadow-[0_0_50px_rgba(0,0,0,0.5)] p-8 md:p-10 backdrop-blur-3xl border border-white/10">
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-semibold text-white tracking-tight mb-3">
             Criar Conta
           </h1>
-          <p className="text-gray-400 mt-2">
-            Cadastre-se para salvar seus favoritos
+          <p className="text-neutral-500 text-[15px]">
+            Junte-se ao <span className="text-neutral-300 font-medium">Onde Tá Passando?</span>
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 p-3 bg-red-900/30 border border-red-800 text-red-200 rounded-lg text-sm">
+          <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 text-red-200 rounded-2xl text-[14px] leading-relaxed">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <label htmlFor="name" className="text-sm font-medium text-gray-300">
+            <label htmlFor="name" className="text-[13px] font-medium text-neutral-400 ml-1 uppercase tracking-wider">
               Nome completo
             </label>
             <Input
@@ -116,14 +118,14 @@ export default function RegisterPage() {
               onChange={(e) => setName(e.target.value)}
               placeholder="João Silva"
               required
-              className="w-full bg-gray-800 border-gray-700 text-white"
+              className="w-full bg-white/5 border-white/5 h-12 rounded-xl text-white placeholder:text-neutral-600 focus-visible:ring-1 focus-visible:ring-red-500/50 transition-all"
             />
           </div>
 
           <div className="space-y-2">
             <label
               htmlFor="email"
-              className="text-sm font-medium text-gray-300"
+              className="text-[13px] font-medium text-neutral-400 ml-1 uppercase tracking-wider"
             >
               Email
             </label>
@@ -134,27 +136,40 @@ export default function RegisterPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="seu@email.com"
               required
-              className="w-full bg-gray-800 border-gray-700 text-white"
+              className="w-full bg-white/5 border-white/5 h-12 rounded-xl text-white placeholder:text-neutral-600 focus-visible:ring-1 focus-visible:ring-red-500/50 transition-all"
             />
           </div>
 
           <div className="space-y-2">
             <label
               htmlFor="password"
-              className="text-sm font-medium text-gray-300"
+              className="text-[13px] font-medium text-neutral-400 ml-1 uppercase tracking-wider"
             >
               Senha
             </label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="********"
-              required
-              className="w-full bg-gray-800 border-gray-700 text-white"
-            />
-            <p className="text-xs text-gray-500">
+            <div className="relative group/pass">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                className="w-full bg-white/5 border-white/5 h-12 rounded-xl text-white placeholder:text-neutral-600 focus-visible:ring-1 focus-visible:ring-red-500/50 transition-all pr-12"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white transition-colors p-1"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+            <p className="text-[11px] text-neutral-500 ml-1">
               Mínimo de 8 caracteres, 1 maiúscula e 1 número
             </p>
           </div>
@@ -162,53 +177,66 @@ export default function RegisterPage() {
           <div className="space-y-2">
             <label
               htmlFor="confirmPassword"
-              className="text-sm font-medium text-gray-300"
+              className="text-[13px] font-medium text-neutral-400 ml-1 uppercase tracking-wider"
             >
               Confirmar Senha
             </label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="********"
-              required
-              className="w-full bg-gray-800 border-gray-700 text-white"
-            />
+            <div className="relative group/pass">
+              <Input
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                className="w-full bg-white/5 border-white/5 h-12 rounded-xl text-white placeholder:text-neutral-600 focus-visible:ring-1 focus-visible:ring-red-500/50 transition-all pr-12"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white transition-colors p-1"
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+            </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4 pt-2">
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white py-6"
+              className="w-full bg-red-600 hover:bg-red-700 text-white h-14 rounded-2xl text-[16px] font-semibold transition-all duration-300 disabled:opacity-50"
             >
               {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Criando
-                  conta...
-                </>
+                <div className="flex items-center gap-2">
+                  <Loader2 className="h-5 w-5 animate-spin" /> 
+                  <span>Criando conta...</span>
+                </div>
               ) : (
-                "Criar Conta"
+                "Cadastrar"
               )}
             </Button>
             
             {showWakingMsg && (
-              <p className="text-[10px] text-center text-yellow-500/80 animate-pulse font-medium uppercase tracking-tight">
-                Acordando o servidor... isso acontece em períodos de inatividade (pode levar até 30s)
+              <p className="text-[10px] text-center text-red-400 animate-pulse font-medium uppercase tracking-widest pt-2">
+                Aguardando servidor... (Cold Start pode levar 30s)
               </p>
             )}
           </div>
         </form>
 
-        <div className="mt-6 text-center text-sm">
-          <p className="text-gray-400">
+        <div className="mt-10 text-center">
+          <p className="text-neutral-500 text-[14px]">
             Já tem uma conta?{" "}
             <Link
               href="/login"
-              className="text-red-500 hover:text-red-400 font-medium"
+              className="text-white hover:text-red-400 font-semibold underline underline-offset-4 transition-colors"
             >
-              Faça login
+              Fazer Login
             </Link>
           </p>
         </div>

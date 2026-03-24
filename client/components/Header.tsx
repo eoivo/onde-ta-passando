@@ -414,28 +414,29 @@ export default function Header() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
-                  className="bg-gray-900 border-gray-800 text-white"
+                  className="bg-neutral-950/80 backdrop-blur-2xl border-white/10 text-white rounded-2xl w-52 p-2 shadow-2xl overflow-hidden"
                 >
-                  <div className="px-2 py-2 text-xs text-gray-400">
-                    Olá, {user?.name?.split(" ")[0]}
+                  <div className="px-3 py-3 text-[13px] font-medium text-neutral-400">
+                    Olá, <span className="text-white font-semibold">{user?.name?.split(" ")[0]}</span>
                   </div>
-                  <DropdownMenuSeparator className="bg-gray-800" />
+                  <DropdownMenuSeparator className="bg-white/5 mx-1" />
                   <DropdownMenuItem
-                    className="hover:bg-gray-800 cursor-pointer"
+                    className="focus:bg-white/10 hover:bg-white/10 cursor-pointer rounded-xl py-2.5 px-3 transition-all duration-200 mt-1"
                     onClick={() => {
                       refreshProfile();
                       router.push("/perfil");
                     }}
                   >
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Meu Perfil</span>
+                    <User className="mr-3 h-4 w-4 text-neutral-400" />
+                    <span className="text-sm">Meu Perfil</span>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-gray-800" />
+                  <DropdownMenuSeparator className="bg-white/5 mx-1 mt-1" />
                   <DropdownMenuItem
-                    className="hover:bg-gray-800 cursor-pointer text-red-500 hover:text-red-400"
+                    className="focus:bg-red-500/10 hover:bg-red-500/10 cursor-pointer text-red-500 hover:text-red-400 rounded-xl py-2.5 px-3 transition-all duration-200 mt-1"
                     onClick={logout}
                   >
-                    Sair
+                    <LogOut className="mr-3 h-4 w-4" />
+                    <span className="text-sm font-medium">Sair da conta</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

@@ -20,18 +20,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
 import {
   MessageCircle,
   Send,
-  Bot,
   User,
-  Loader2,
-  Sparkles,
-  Zap,
-  Brain,
-  Star,
-  MessageSquare,
   Copy,
   Check,
   LogIn,
@@ -54,50 +46,29 @@ interface MovieChatBotProps {
   movieContext: MovieContext;
 }
 
-// Componente para renderizar mensagens com Markdown
 const MessageContent: React.FC<{ content: string; isAssistant: boolean }> = ({
   content,
   isAssistant,
 }) => {
   if (!isAssistant) {
-    return (
-      <p className="text-sm leading-relaxed whitespace-pre-wrap">{content}</p>
-    );
+    return <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{content}</p>;
   }
 
   return (
-    <div className="text-sm leading-relaxed">
+    <div className="text-[15px] leading-relaxed">
       <ReactMarkdown
         components={{
-          // Customiza a renderização de parágrafos
-          p: ({ children }) => (
-            <p className="text-sm leading-relaxed mb-2 last:mb-0">{children}</p>
-          ),
-          // Customiza a renderização de listas
-          ul: ({ children }) => (
-            <ul className="text-sm leading-relaxed ml-4 mb-2 space-y-1">
-              {children}
-            </ul>
-          ),
-          li: ({ children }) => (
-            <li className="text-sm leading-relaxed list-disc marker:text-red-400">
-              {children}
-            </li>
-          ),
-          // Customiza a renderização de texto em negrito
-          strong: ({ children }) => (
-            <strong className="font-semibold text-red-300">{children}</strong>
-          ),
-          // Customiza a renderização de texto em itálico
-          em: ({ children }) => (
-            <em className="italic text-gray-200">{children}</em>
-          ),
-          // Customiza a renderização de código inline
+          p: ({ children }) => <p className="mb-3 last:mb-0 text-neutral-200">{children}</p>,
+          ul: ({ children }) => <ul className="ml-5 mb-3 space-y-2 text-neutral-200">{children}</ul>,
+          li: ({ children }) => <li className="list-disc marker:text-neutral-500">{children}</li>,
+          strong: ({ children }) => <strong className="font-semibold text-red-200">{children}</strong>,
+          em: ({ children }) => <em className="italic text-neutral-400">{children}</em>,
           code: ({ children }) => (
-            <code className="bg-gray-700 text-red-300 px-1 py-0.5 rounded text-xs">
+            <code className="bg-red-500/10 text-red-100 px-1.5 py-0.5 rounded-md text-sm font-mono border border-red-500/20">
               {children}
             </code>
           ),
+          h3: ({ children }) => <h3 className="text-[17px] font-medium text-white mt-5 mb-2">{children}</h3>,
         }}
       >
         {content}
@@ -114,6 +85,7 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
   const [isTyping, setIsTyping] = useState(false);
   const [copiedMessage, setCopiedMessage] = useState<number | null>(null);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -123,9 +95,7 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
   const {
     messages,
     isLoading,
-    error,
     sendMessage,
-    clearMessages,
     addWelcomeMessage,
   } = useMovieChat(movieContext);
 
@@ -153,16 +123,16 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isTyping]);
 
   useEffect(() => {
     if (isOpen && !hasInitialized && isAuthenticated) {
       const initializeChat = async () => {
         try {
           setIsTyping(true);
-          await new Promise((resolve) => setTimeout(resolve, 1000)); // Simula digitação
+          await new Promise((resolve) => setTimeout(resolve, 800));
 
-          const userName = user?.name?.split(" ")[0] || "amigo";
+          const userName = user?.name?.split(" ")[0] || "agora";
           const welcomeMessage = await generateWelcomeMessage(
             movieContext,
             userName
@@ -173,28 +143,19 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
           setSuggestedTopics(topics);
           setHasInitialized(true);
           setIsTyping(false);
-          toast.success(`Chat iniciado sobre "${movieContext.title}"! 🎬`);
         } catch (error) {
           console.error("Erro ao inicializar chat:", error);
-          const userName = user?.name?.split(" ")[0] || "amigo";
+          const userName = user?.name?.split(" ")[0] || "agora";
           addWelcomeMessage(
-            `Olá! ${userName} ✨ Murphy aqui! Vamos conversar sobre "${movieContext.title}"? 🎬`
+            `Olá, ${userName}. Sou a Murphy. Como posso te ajudar a descobrir mais sobre "${movieContext.title}"?`
           );
           setIsTyping(false);
-          toast.error("Erro ao inicializar chat");
         }
       };
 
       initializeChat();
     }
-  }, [
-    isOpen,
-    hasInitialized,
-    movieContext,
-    addWelcomeMessage,
-    isAuthenticated,
-    user,
-  ]);
+  }, [isOpen, hasInitialized, movieContext, addWelcomeMessage, isAuthenticated, user]);
 
   const handleSendMessage = async (messageToSend?: string) => {
     const message = messageToSend || inputValue.trim();
@@ -203,6 +164,8 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
     setInputValue("");
     setSuggestedTopics([]);
 
+    // Mostra o feedback visual antes de enviar de fato
+    scrollToBottom();
     await sendMessage(message);
   };
 
@@ -215,7 +178,6 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
 
   const handleSuggestedTopicClick = async (topic: string) => {
     setSuggestedTopics([]);
-    toast.success("Enviando sugestão...");
     await handleSendMessage(topic);
   };
 
@@ -223,7 +185,6 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
     try {
       await navigator.clipboard.writeText(text);
       setCopiedMessage(index);
-      toast.success("Mensagem copiada!");
       setTimeout(() => setCopiedMessage(null), 2000);
     } catch (err) {
       toast.error("Erro ao copiar mensagem");
@@ -238,70 +199,30 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
   };
 
   const messageVariants = {
-    hidden: { opacity: 0, y: 30, scale: 0.8 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: {
-        type: "spring",
-        stiffness: 300,
-        damping: 25,
-      },
-    },
-    exit: {
-      opacity: 0,
-      y: -20,
-      scale: 0.8,
-      transition: { duration: 0.2 },
-    },
-  };
-
-  const buttonVariants = {
-    hover: { scale: 1.05, y: -2 },
-    tap: { scale: 0.95 },
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+    exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
   };
 
   return (
     <>
-      {/* Dialog de Autenticação */}
       <AlertDialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
-        <AlertDialogContent className="bg-gray-900 border-gray-800 text-white">
+        <AlertDialogContent className="bg-neutral-900 border-neutral-800 text-white shadow-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2 text-xl">
-              <motion.div
-                animate={{
-                  scale: [1, 1.1, 1],
-                  rotate: [0, 5, -5, 0],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                className="w-10 h-10 rounded-full bg-gradient-to-r from-red-500 to-red-600 flex items-center justify-center"
-              >
-                <Brain className="h-5 w-5 text-white" />
-              </motion.div>
+            <AlertDialogTitle className="text-xl font-medium tracking-tight">
               Login Necessário
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-300 text-base leading-relaxed">
-              Para conversar com a Murphy sobre "{movieContext.title}", você
-              precisa estar logado no sistema.
+            <AlertDialogDescription className="text-neutral-400 text-[15px] leading-relaxed pt-2">
+              Para conversar com a inteligência artificial sobre <span className="text-white font-medium">"{movieContext.title}"</span>, você
+              precisa estar conectado à sua conta.
               <br />
               <br />
-              🎬 <strong>Com uma conta você pode:</strong>
-              <br />• Conversar com a Murphy sobre qualquer filme ou série
-              <br />• Receber recomendações personalizadas
-              <br />• Salvar suas conversas e favoritos
-              <br />
-              <br />
-              Não tem uma conta ainda? É rápido e gratuito criar uma!
+              Crie uma conta gratuita em poucos segundos para receber recomendações e análises profundas.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="gap-3">
+          <AlertDialogFooter className="gap-2 mt-4">
             <AlertDialogCancel
-              className="bg-gray-800 border-gray-700 text-white hover:bg-gray-700"
+              className="bg-transparent border-neutral-700 text-white hover:bg-neutral-800"
               onClick={() => setShowAuthDialog(false)}
             >
               Cancelar
@@ -309,14 +230,14 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
             <Button
               variant="outline"
               onClick={handleRegisterRedirect}
-              className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white"
+              className="border-neutral-700 text-neutral-300 hover:bg-neutral-800 hover:text-white"
             >
               <UserPlus className="mr-2 h-4 w-4" />
               Criar Conta
             </Button>
             <AlertDialogAction
               onClick={handleLoginRedirect}
-              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800"
+              className="bg-white text-black hover:bg-neutral-200 font-medium"
             >
               <LogIn className="mr-2 h-4 w-4" />
               Entrar
@@ -326,74 +247,66 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
       </AlertDialog>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <Button
-          onClick={handleChatButtonClick}
-          size="lg"
-          className="relative gap-3 bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white border-0 hover:from-red-700 hover:via-red-800 hover:to-red-900 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden w-full md:w-[280px] justify-center"
+        <div 
+          className="relative w-full md:w-[280px]"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
         >
-          <MessageCircle className="h-5 w-5" />
-          <span className="font-semibold">Conversar com a Murphy</span>
-        </Button>
+          <Button
+            onClick={handleChatButtonClick}
+            size="lg"
+            className="relative gap-3 bg-black/40 backdrop-blur-xl border border-white/10 text-white hover:bg-white/15 shadow-2xl transition-all duration-300 w-full justify-center md:rounded-2xl rounded-xl h-14 overflow-hidden group"
+          >
+            {/* Efeito Shimmer Animado */}
+            <motion.div
+              initial={{ x: "-100%" }}
+              animate={{ x: "200%" }}
+              transition={{ repeat: Infinity, duration: 3, ease: "linear", repeatDelay: 4 }}
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent pointer-events-none"
+            />
 
-        <DialogContent className="h-[92dvh] md:h-[90vh] mx-auto w-full md:w-[calc(100%-2rem)] max-w-4xl flex flex-col p-0 bg-gradient-to-br from-gray-900 to-black border-0 shadow-2xl md:rounded-2xl overflow-hidden focus:outline-none">
-          <DialogHeader className="p-4 md:p-6 bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white relative flex-shrink-0">
-            <div className="absolute inset-0 bg-gradient-to-r from-red-400/20 to-red-500/20 backdrop-blur-sm" />
-            <DialogTitle className="relative z-10 flex items-center gap-3 text-xl font-bold">
-              <motion.div
-                animate={{
-                  scale: [1, 1.1, 1],
-                  rotate: [0, 5, -5, 0],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/20 backdrop-blur-sm overflow-hidden border-2 border-white/30 flex items-center justify-center"
-              >
-                <Image
-                  src="/images/murphy.png"
-                  alt="Murphy"
-                  className="w-full h-full object-cover"
-                  width={48}
-                  height={48}
-                  onError={(e) => {
-                    const target = e.currentTarget;
-                    const brainIcon = target.nextElementSibling as HTMLElement;
-                    target.style.display = "none";
-                    if (brainIcon) {
-                      brainIcon.style.display = "block";
-                    }
-                  }}
-                />
-                <Brain className="h-6 w-6 text-white hidden" />
-              </motion.div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span>Murphy</span>
-                  <motion.div
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                  >
-                    <Star className="h-4 w-4 text-yellow-300" />
-                  </motion.div>
-                </div>
-                <div className="text-sm font-normal text-red-100">
-                  Especialista em "{movieContext.title}"
-                </div>
+            <motion.div
+              animate={isHovered ? { y: -2, rotate: [-5, 5, 0] } : {}}
+            >
+              <MessageCircle className="h-[18px] w-[18px] opacity-70" strokeWidth={2.5} />
+            </motion.div>
+
+            <span className="font-medium tracking-wide flex items-center gap-2">
+              Conversar com a Murphy
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+              </span>
+            </span>
+          </Button>
+        </div>
+
+        <DialogContent className="h-[92dvh] md:h-[85vh] mx-auto w-full md:w-[calc(100%-2rem)] max-w-3xl flex flex-col p-0 bg-neutral-950/80 backdrop-blur-2xl border-x-0 border-b-0 border-t border-white/10 md:border md:border-white/10 shadow-[0_0_80px_rgba(0,0,0,0.8)] rounded-t-[32px] md:rounded-3xl overflow-hidden focus:outline-none focus-visible:outline-none outline-none">
+          {/* Header Minimalista Responsivo */}
+          <DialogHeader className="px-5 py-4 bg-transparent border-b border-white/5 flex-shrink-0 flex flex-row items-center gap-4 space-y-0 text-left">
+            <DialogTitle className="sr-only">Chat com Murphy</DialogTitle>
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-neutral-900 border border-white/5 flex-shrink-0 flex items-center justify-center">
+              <Image
+                src="/images/murphy.png"
+                alt="Murphy"
+                className="w-full h-full object-cover"
+                width={40}
+                height={40}
+              />
+            </div>
+            <div className="flex flex-col leading-none">
+              <span className="text-[15px] font-semibold text-white tracking-tight mb-1">Murphy AI</span>
+              <div className="flex items-center gap-2 text-[11px] text-neutral-500 font-medium uppercase tracking-wider">
+                <span>{movieContext.mediaType === "movie" ? "Filme" : "Série"}</span>
+                <span className="w-1 h-1 rounded-full bg-red-600/60" />
+                <span className="text-neutral-400 line-clamp-1 max-w-[180px] normal-case tracking-normal">"{movieContext.title}"</span>
               </div>
-              <Badge
-                variant="secondary"
-                className="ml-auto bg-white/20 text-white border-white/30 backdrop-blur-sm"
-              >
-                <MessageSquare className="mr-1 h-3 w-3" />
-                {movieContext.mediaType === "movie" ? "Filme" : "Série"}
-              </Badge>
-            </DialogTitle>
+            </div>
           </DialogHeader>
 
-          <ScrollArea className="flex-1 bg-gray-900" data-lenis-prevent>
-            <div className="p-6 pt-8 space-y-6">
+          {/* Área de Mensagens */}
+          <ScrollArea className="flex-1 px-2" data-lenis-prevent>
+            <div className="p-3 md:p-5 space-y-7 pt-6">
               <AnimatePresence mode="popLayout">
                 {messages.map((message, index) => (
                   <motion.div
@@ -403,235 +316,138 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
                     animate="visible"
                     exit="exit"
                     layout
-                    className={`flex gap-4 items-start ${message.role === "user" ? "justify-end" : "justify-start"
-                      }`}
+                    className={`flex gap-3 items-start ${message.role === "user" ? "justify-end" : "justify-start"}`}
                   >
                     {message.role === "assistant" && (
-                      <div className="flex-shrink-0 mt-1">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-red-500 to-red-600 flex items-center justify-center shadow-lg overflow-hidden border-2 border-red-400/30">
-                          <Image
-                            src="/images/murphy.png"
-                            alt="Murphy"
-                            className="w-full h-full object-cover"
-                            width={40}
-                            height={40}
-                            onError={(e) => {
-                              const target = e.currentTarget;
-                              const botIcon =
-                                target.nextElementSibling as HTMLElement;
-                              target.style.display = "none";
-                              if (botIcon) {
-                                botIcon.style.display = "block";
-                              }
-                            }}
-                          />
-                          <Bot className="h-5 w-5 text-white hidden" />
-                        </div>
+                      <div className="w-8 h-8 rounded-full overflow-hidden bg-neutral-900 border border-white/5 flex items-center justify-center flex-shrink-0 mt-1">
+                        <Image
+                          src="/images/murphy.png"
+                          alt="Murphy"
+                          className="w-full h-full object-cover opacity-90"
+                          width={32}
+                          height={32}
+                        />
                       </div>
                     )}
 
-                    <div
-                      className={`max-w-[75%] ${message.role === "user" ? "order-2" : ""
-                        }`}
-                    >
+                    <div className={`flex flex-col gap-1.5 max-w-[88%] md:max-w-[80%] ${message.role === "user" ? "items-end" : "items-start"}`}>
                       <div
-                        className={`relative p-4 rounded-2xl shadow-lg ${message.role === "user"
-                          ? "bg-gradient-to-r from-red-600 to-red-700 text-white ml-auto"
-                          : "bg-gray-800 text-gray-100 border border-gray-700"
+                        className={`shadow-sm ${message.role === "user"
+                          ? "px-5 py-3 bg-white/10 backdrop-blur-md text-white rounded-[20px] rounded-br-[4px] border border-white/5"
+                          : "px-2 py-1 bg-transparent text-neutral-200"
                           }`}
                       >
-                        {message.role === "assistant" && (
-                          <div className="absolute -top-1 -left-1 w-3 h-3 bg-gradient-to-r from-red-500 to-red-600 rounded-full shadow-sm" />
-                        )}
-
                         <MessageContent
                           content={message.content}
                           isAssistant={message.role === "assistant"}
                         />
+                      </div>
 
-                        <div
-                          className={`flex items-center justify-between mt-2 pt-2 border-t ${message.role === "user"
-                            ? "border-white/20"
-                            : "border-gray-600"
-                            }`}
-                        >
-                          <p
-                            className={`text-xs ${message.role === "user"
-                              ? "text-white/70"
-                              : "text-gray-400"
-                              }`}
+                      {/* Metadados da Mensagem (Hora e Cópia) */}
+                      <div className={`flex items-center gap-3 px-2 ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+                        <span className="text-[10px] uppercase text-neutral-500 font-semibold tracking-wider">
+                          {formatTime(message.timestamp)}
+                        </span>
+                        {message.role === "assistant" && (
+                          <button
+                            onClick={() => copyToClipboard(message.content, index)}
+                            className="text-neutral-500 hover:text-white transition-colors"
+                            title="Copiar mensagem"
                           >
-                            {formatTime(message.timestamp)}
-                          </p>
-
-                          {message.role === "assistant" && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() =>
-                                copyToClipboard(message.content, index)
-                              }
-                              className={`h-6 w-6 p-0 hover:bg-gray-700 ${copiedMessage === index
-                                ? "text-green-400"
-                                : "text-gray-400"
-                                }`}
-                            >
-                              {copiedMessage === index ? (
-                                <Check className="h-3 w-3" />
-                              ) : (
-                                <Copy className="h-3 w-3" />
-                              )}
-                            </Button>
-                          )}
-                        </div>
+                            {copiedMessage === index ? (
+                              <Check className="h-3 w-3 text-green-500" />
+                            ) : (
+                              <Copy className="h-3 w-3" />
+                            )}
+                          </button>
+                        )}
                       </div>
                     </div>
-
-                    {message.role === "user" && (
-                      <div className="flex-shrink-0 order-3 mt-1">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-red-600 to-red-700 flex items-center justify-center shadow-lg">
-                          <User className="h-5 w-5 text-white" />
-                        </div>
-                      </div>
-                    )}
                   </motion.div>
                 ))}
               </AnimatePresence>
 
+              {/* Loader Minimalista (Bouncing Dots) */}
               {(isLoading || isTyping) && (
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="flex gap-4 justify-start items-start"
+                  className="flex gap-3 justify-start items-end"
                 >
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-red-500 to-red-600 flex items-center justify-center shadow-lg mt-1 overflow-hidden border-2 border-red-400/30">
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-neutral-900 border border-white/5 flex items-center justify-center flex-shrink-0 mb-1">
                     <Image
                       src="/images/murphy.png"
                       alt="Murphy"
-                      className="w-full h-full object-cover"
-                      width={40}
-                      height={40}
-                      onError={(e) => {
-                        const target = e.currentTarget;
-                        const botIcon =
-                          target.nextElementSibling as HTMLElement;
-                        target.style.display = "none";
-                        if (botIcon) {
-                          botIcon.style.display = "block";
-                        }
-                      }}
+                      className="w-full h-full object-cover opacity-50 grayscale"
+                      width={32}
+                      height={32}
                     />
-                    <Bot className="h-5 w-5 text-white hidden" />
                   </div>
-                  <div className="bg-gray-800 p-4 rounded-2xl shadow-lg border border-gray-700 relative">
-                    <div className="absolute -top-1 -left-1 w-3 h-3 bg-gradient-to-r from-red-500 to-red-600 rounded-full shadow-sm" />
-                    <div className="flex items-center gap-3">
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{
-                          duration: 1,
-                          repeat: Infinity,
-                          ease: "linear",
-                        }}
-                      >
-                        <Loader2 className="h-4 w-4 text-red-500" />
-                      </motion.div>
-                      <span className="text-sm text-gray-300">
-                        {isTyping ? "Iniciando conversa..." : "Pensando..."}
-                      </span>
-                      <motion.div
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{ duration: 1, repeat: Infinity }}
-                      >
-                        <Sparkles className="h-3 w-3 text-red-400" />
-                      </motion.div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {suggestedTopics.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="space-y-3"
-                >
-                  <div className="flex items-center gap-2 text-sm text-gray-300">
+                  <div className="flex items-center gap-1.5 h-10 px-4">
                     <motion.div
-                      animate={{ rotate: [0, 10, -10, 0] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    >
-                      <Zap className="h-4 w-4 text-red-500" />
-                    </motion.div>
-                    <span className="font-medium">Sugestões para começar:</span>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    {suggestedTopics.map((topic, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: index * 0.1 }}
-                      >
-                        <Badge
-                          variant="outline"
-                          className="cursor-pointer px-3 py-2 bg-gray-800 border-red-600 hover:border-red-500 hover:bg-gray-700 text-red-300 transition-all duration-200 shadow-sm"
-                          onClick={() => handleSuggestedTopicClick(topic)}
-                        >
-                          <Sparkles className="mr-1 h-3 w-3" />
-                          {topic}
-                        </Badge>
-                      </motion.div>
-                    ))}
+                      className="w-1.5 h-1.5 bg-red-600/40 rounded-full"
+                      animate={{ y: [0, -4, 0] }}
+                      transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
+                    />
+                    <motion.div
+                      className="w-1.5 h-1.5 bg-red-600/40 rounded-full"
+                      animate={{ y: [0, -4, 0] }}
+                      transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
+                    />
+                    <motion.div
+                      className="w-1.5 h-1.5 bg-red-600/40 rounded-full"
+                      animate={{ y: [0, -4, 0] }}
+                      transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
+                    />
                   </div>
                 </motion.div>
               )}
 
-              <div ref={messagesEndRef} />
+              {/* Tópicos Sugeridos Clean */}
+              {!isLoading && !isTyping && suggestedTopics.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="flex flex-wrap gap-2 pt-2 ml-10"
+                >
+                  {suggestedTopics.map((topic, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleSuggestedTopicClick(topic)}
+                      className="px-4 py-2 bg-white/5 hover:bg-white/10 active:scale-95 border border-white/5 text-[13px] text-neutral-300 font-medium rounded-2xl transition-all duration-200 text-left"
+                    >
+                      {topic}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+              <div ref={messagesEndRef} className="h-6" />
             </div>
           </ScrollArea>
 
-          <div className="p-4 md:p-6 bg-gray-800/95 backdrop-blur-sm border-t border-gray-700/50 pb-[calc(1rem+env(safe-area-inset-bottom))] md:pb-6">
-            <div className="flex gap-3">
-              <div className="relative flex-1">
-                <Input
-                  ref={inputRef}
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder={`Pergunte algo sobre "${movieContext.title}"...`}
-                  disabled={isLoading}
-                  className="h-12 pr-12 bg-gray-700/80 border-0 focus:ring-2 focus:ring-red-500/50 focus:ring-offset-0 rounded-xl shadow-sm text-sm placeholder:text-gray-400 text-white backdrop-blur-sm"
-                />
-              </div>
-
+          {/* Área de Input "Inner Pill Glass" com Safe Area */}
+          <div className="p-3 md:p-5 bg-transparent border-t border-white/5 pb-[calc(12px+env(safe-area-inset-bottom))] md:pb-5">
+            <div className="relative flex items-center gap-2 bg-white/5 border border-white/10 rounded-[24px] p-1.5 backdrop-blur-md focus-within:border-white/20 focus-within:bg-white/10 transition-all duration-300">
+              <Input
+                ref={inputRef}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Envie uma mensagem..."
+                disabled={isLoading}
+                className="flex-1 bg-transparent border-0 h-10 text-[15px] focus-visible:ring-0 focus-visible:ring-offset-0 text-white placeholder:text-neutral-500 shadow-none px-4"
+              />
               <Button
                 onClick={() => handleSendMessage()}
                 disabled={!inputValue.trim() || isLoading}
-                className="h-12 px-6 rounded-xl shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{
-                  background: isLoading
-                    ? "linear-gradient(to right, #dc2626, #b91c1c)"
-                    : "linear-gradient(to right, #ef4444, #dc2626)",
-                  border: "none",
-                  color: "white",
-                }}
+                size="icon"
+                className={`h-10 w-10 shrink-0 rounded-full transition-all duration-300 focus:ring-0 focus:outline-none focus:ring-offset-0 focus-visible:ring-0 focus-visible:outline-none focus-visible:ring-offset-0 ${inputValue.trim() && !isLoading
+                  ? "bg-red-600 text-white hover:bg-red-700 scale-100 shadow-none"
+                  : "bg-white/10 text-neutral-500 scale-95 opacity-50"
+                  }`}
               >
-                {isLoading ? (
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{
-                      duration: 1,
-                      repeat: Infinity,
-                      ease: "linear",
-                    }}
-                  >
-                    <Loader2 className="h-4 w-4" />
-                  </motion.div>
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
+                <Send className="h-4 w-4" />
               </Button>
             </div>
           </div>

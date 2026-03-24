@@ -97,11 +97,11 @@ export default async function TVShowPage({
 
           <div className="flex-1 space-y-8 pt-0 md:pt-10">
             <div className="space-y-4">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                <h1 className="text-5xl md:text-7xl lg:text-8xl font-normal font-bebas tracking-tighter text-white drop-shadow-2xl uppercase leading-[0.8]">
+              <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
+                <h1 className="text-5xl md:text-7xl lg:text-8xl font-normal font-bebas tracking-tighter text-white drop-shadow-2xl uppercase leading-[0.8] max-w-4xl">
                   {tvShow.name}
                 </h1>
-                <div className="flex flex-wrap items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3 lg:mt-2">
                   <DynamicMediaActions
                     mediaId={id}
                     mediaType="tv"

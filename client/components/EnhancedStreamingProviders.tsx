@@ -11,7 +11,14 @@ import {
   ExternalLink,
   AlertCircle,
   TrendingUp,
+  ShoppingCart,
 } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { PROVIDER_QUALITY_MAPPING } from "@/services/streaming-api";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +35,7 @@ interface EnhancedStreamingProvidersProps {
   tmdbId?: string;
   imdbId?: string;
   mediaType?: "movie" | "tv";
+  hideHeader?: boolean;
 }
 
 interface Provider {
@@ -190,8 +198,8 @@ export default function EnhancedStreamingProviders({
   tmdbId = "",
   imdbId = "",
   mediaType = "movie",
+  hideHeader = false,
 }: EnhancedStreamingProvidersProps) {
-  const [detailsOpen, setDetailsOpen] = useState(false);
   const [watchmodeLinks, setWatchmodeLinks] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -229,14 +237,15 @@ export default function EnhancedStreamingProviders({
 
   if (!brProviders) {
     return (
-      <div className="text-center p-8 bg-gray-800/50 rounded-xl">
-        <AlertCircle className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-        <h3 className="text-lg font-medium text-white mb-2">
+      <div className="flex flex-col items-center justify-center p-12 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[32px] text-center group">
+        <div className="bg-red-500/10 p-5 rounded-2xl mb-5 group-hover:scale-110 transition-transform duration-500">
+          <AlertCircle className="h-10 w-10 text-red-500" />
+        </div>
+        <h3 className="text-2xl font-normal font-bebas tracking-wider text-white mb-2 uppercase">
           Conteúdo não disponível
         </h3>
-        <p className="text-gray-400">
-          Este título não está disponível em nenhuma plataforma de streaming no
-          Brasil.
+        <p className="text-neutral-500 text-[15px] max-w-sm leading-relaxed">
+          Este título ainda não está disponível em nenhuma plataforma de streaming no Brasil.
         </p>
       </div>
     );
@@ -279,12 +288,12 @@ export default function EnhancedStreamingProviders({
     return (
       <div
         key={uniqueKey}
-        className="bg-gray-800 rounded-xl p-5 hover:bg-gray-700 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl group cursor-pointer"
+        className="bg-white/5 backdrop-blur-2xl border border-white/5 rounded-[24px] p-6 hover:bg-white/[0.08] transition-all duration-500 group cursor-pointer"
         onClick={() => handleProviderClick(provider.provider_id, provider.provider_name)}
       >
         {/* Header do provedor */}
-        <div className="flex items-center mb-4">
-          <div className="relative h-12 w-14 mr-3 rounded-lg overflow-hidden">
+        <div className="flex items-center mb-6">
+          <div className="relative h-14 w-14 mr-4 rounded-2xl overflow-hidden bg-white/5 p-1 border border-white/5">
             <Image
               src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
               alt={provider.provider_name}
@@ -293,51 +302,52 @@ export default function EnhancedStreamingProviders({
             />
           </div>
           <div className="flex-1">
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-[17px] font-semibold text-white tracking-tight">
               {provider.provider_name}
             </h3>
-            <Badge variant="secondary" className="text-xs mt-1">
-              {quality}
-            </Badge>
+            <div className="flex gap-2 mt-1">
+              <span className="text-[10px] font-black uppercase tracking-widest text-neutral-500">
+                {quality}
+              </span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-red-500/80">• BR</span>
+            </div>
           </div>
         </div>
 
         {/* Tipo de acesso */}
-        <div className="mb-4">
-          <Badge
-            variant={type === "flatrate" ? "default" : "outline"}
-            className="text-sm"
-          >
-            {type === "flatrate"
-              ? "📺 Incluído na assinatura"
-              : type === "rent"
-              ? "💸 Disponível para aluguel"
-              : "💰 Disponível para compra"}
-          </Badge>
+        <div className="mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 text-[9px] font-black uppercase tracking-[0.15em] text-neutral-400">
+            {type === "flatrate" ? (
+              <>
+                <PlayCircle className="h-3 w-3 text-red-500" />
+                <span>Assinatura</span>
+              </>
+            ) : type === "rent" ? (
+              <>
+                <RefreshCw className="h-3 w-3 text-red-500" />
+                <span>Aluguel</span>
+              </>
+            ) : (
+              <>
+                <ShoppingCart className="h-3 w-3 text-red-500" />
+                <span>Compra</span>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Botão de acesso */}
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                className="w-full bg-primary hover:bg-primary/80 text-white group-hover:scale-105 transition-transform"
-                size="sm"
-              >
-                <ExternalLink className="mr-2 h-4 w-4" />
-                Ir para {provider.provider_name}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Abrir {provider.provider_name} em nova aba</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Button
+          className="w-full bg-red-600 hover:bg-red-700 text-white h-11 rounded-xl text-[12px] font-bold uppercase tracking-wider transition-all duration-300"
+          size="sm"
+        >
+          Assistir No Streaming
+        </Button>
 
         {/* Indicador */}
-        <div className="mt-3 flex items-center text-xs text-gray-400">
-          <TrendingUp className="mr-1 h-3 w-3" />
-          Disponível no Brasil
+        <div className="mt-4 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+          <TrendingUp className="mr-1.5 h-3 w-3 text-red-500" />
+          <span className="text-[10px] font-black uppercase tracking-tighter text-neutral-500">Tendência no Brasil</span>
         </div>
       </div>
     );
@@ -347,23 +357,26 @@ export default function EnhancedStreamingProviders({
     filteredFlatrate.length + filteredRent.length + filteredBuy.length;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold flex items-center">
-          <PlayCircle className="mr-3 text-primary" />
-          Onde Assistir
-        </h2>
+    <div className="space-y-8">
+      {!hideHeader && (
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl font-normal font-bebas tracking-wider uppercase flex items-center gap-3">
+            <PlayCircle className="text-red-600 h-8 w-8" />
+            Onde Assistir
+          </h2>
 
-        <Badge variant="outline" className="text-sm">
-          {totalProviders} {totalProviders === 1 ? "plataforma" : "plataformas"}
-        </Badge>
-      </div>
+          <div className="bg-white/5 border border-white/10 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-neutral-400">
+            {totalProviders} {totalProviders === 1 ? "opção" : "opções"}
+          </div>
+        </div>
+      )}
 
       {/* Provedores de assinatura */}
       {filteredFlatrate.length > 0 && (
         <div>
-          <h3 className="text-xl font-semibold mb-4 text-green-400">
-            📺 Incluído na Assinatura
+          <h3 className="text-xl font-normal font-bebas mb-6 text-white/50 tracking-widest flex items-center gap-3 uppercase">
+            <div className="w-1.5 h-6 bg-red-600 rounded-full" />
+            Planos de Assinatura
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredFlatrate.map((provider: Provider, index: number) =>
@@ -375,9 +388,10 @@ export default function EnhancedStreamingProviders({
 
       {/* Provedores de aluguel/compra */}
       {(filteredRent.length > 0 || filteredBuy.length > 0) && (
-        <div>
-          <h3 className="text-xl font-semibold mb-4 text-yellow-400">
-            💰 Aluguel ou Compra
+        <div className="pt-4">
+          <h3 className="text-xl font-normal font-bebas mb-6 text-white/50 tracking-widest flex items-center gap-3 uppercase">
+            <div className="w-1.5 h-6 bg-red-600 rounded-full" />
+            Aluguel ou Compra Avulsa
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredRent.map((provider: Provider, index: number) =>
@@ -390,75 +404,63 @@ export default function EnhancedStreamingProviders({
         </div>
       )}
 
-      {/* Informações adicionais */}
-      <details
-        className="group bg-primary/10 rounded-xl cursor-pointer"
-        open={detailsOpen}
-        onClick={() => setDetailsOpen(!detailsOpen)}
-      >
-        <summary className="p-4 flex justify-between items-center font-medium list-none">
-          <span className="flex items-center text-primary">
-            <Info className="mr-2 h-5 w-5" />
-            Informações sobre disponibilidade
-          </span>
-          <ChevronDown
-            className={`transition-transform duration-300 text-primary ${
-              detailsOpen ? "rotate-180" : ""
-            }`}
-          />
-        </summary>
-        <div className="p-4 pt-0 text-sm space-y-3">
-          <div className="bg-gray-800/50 p-3 rounded-lg">
-            <h4 className="font-medium text-white mb-2 flex items-center">
-              <PlayCircle className="mr-2 h-4 w-4 text-green-400" />
-              Como funciona?
-            </h4>
-            <p className="text-gray-300">
-              Mostramos em quais plataformas de streaming este título está
-              disponível no Brasil. Clique no botão para ir diretamente para a
-              plataforma.
-            </p>
-          </div>
+      {/* Seção de Informações Adicionais */}
+      <div className="pt-6 border-t border-white/5">
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="info" className="border-none transform-gpu translate-z-0">
+            <AccordionTrigger className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/5 p-5 hover:no-underline group transition-colors duration-300 hover:bg-white/10 hover:border-red-600/30">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-red-600/10 rounded-xl group-hover:scale-110 transition-transform duration-500">
+                  <Info className="h-4 w-4 text-red-500" />
+                </div>
+                <div className="text-left">
+                  <span className="block text-[15px] font-normal font-bebas text-white uppercase tracking-widest pt-1">
+                    Informações sobre disponibilidade
+                  </span>
+                  <span className="text-[10px] text-neutral-500 font-black uppercase tracking-[0.1em]">
+                    Clique para entender como o catálogo funciona
+                  </span>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="pt-4 px-1">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
+                <div className="bg-white/5 p-5 rounded-2xl border border-white/5 backdrop-blur-xl">
+                  <h4 className="font-bebas text-lg text-white mb-2 flex items-center gap-2 tracking-wide uppercase">
+                    <PlayCircle className="h-4 w-4 text-red-600" />
+                    Como funciona?
+                  </h4>
+                  <p className="text-neutral-500 text-[13px] leading-relaxed">
+                    Monitoramos em tempo real em quais plataformas de streaming este título está disponível no Brasil.
+                  </p>
+                </div>
 
-          <div className="bg-gray-800/50 p-3 rounded-lg">
-            <h4 className="font-medium text-white mb-2 flex items-center">
-              <TrendingUp className="mr-2 h-4 w-4 text-blue-400" />
-              Tipos de Acesso
-            </h4>
-            <p className="text-gray-300">
-              <strong>Assinatura:</strong> Incluído em planos mensais.
-              <br />
-              <strong>Aluguel:</strong> Pagamento único por período limitado.
-              <br />
-              <strong>Compra:</strong> Propriedade permanente do título.
-            </p>
-          </div>
+                <div className="bg-white/5 p-5 rounded-2xl border border-white/5 backdrop-blur-xl">
+                  <h4 className="font-bebas text-lg text-white mb-2 flex items-center gap-2 tracking-wide uppercase">
+                    <TrendingUp className="h-4 w-4 text-red-500" />
+                    Tipos de Acesso
+                  </h4>
+                  <p className="text-neutral-500 text-[13px] leading-relaxed">
+                    <strong className="text-neutral-300 font-bold uppercase text-[10px] tracking-widest mr-1">Streaming:</strong> Catálogo mensal.<br/>
+                    <strong className="text-neutral-300 font-bold uppercase text-[10px] tracking-widest mr-1">Avulso:</strong> Aluguel ou Compra.
+                  </p>
+                </div>
 
-          <div className="bg-gray-800/50 p-3 rounded-lg">
-            <h4 className="font-medium text-white mb-2 flex items-center">
-              <AlertCircle className="mr-2 h-4 w-4 text-yellow-400" />
-              Importante
-            </h4>
-            <p className="text-gray-300">
-              As informações são atualizadas regularmente, mas podem variar.
-              Verifique diretamente na plataforma para confirmação de
-              disponibilidade e preços.
-            </p>
-          </div>
-        </div>
-      </details>
-
-      {/* Botão de atualização */}
-      <div className="flex justify-center">
-        <Button
-          variant="ghost"
-          onClick={() => window.location.reload()}
-          className="text-primary hover:text-primary/80"
-        >
-          <RefreshCw className="mr-2 h-4 w-4" />
-          Atualizar disponibilidade
-        </Button>
+                <div className="bg-white/5 p-5 rounded-2xl border border-white/5 backdrop-blur-xl">
+                  <h4 className="font-bebas text-lg text-white mb-2 flex items-center gap-2 tracking-wide uppercase">
+                    <AlertCircle className="h-4 w-4 text-red-600" />
+                    Observação
+                  </h4>
+                  <p className="text-neutral-500 text-[13px] leading-relaxed">
+                    As informações podem variar. Verifique na plataforma oficial antes de assinar.
+                  </p>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
+
     </div>
   );
 }

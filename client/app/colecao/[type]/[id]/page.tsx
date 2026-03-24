@@ -249,26 +249,36 @@ export default async function CollectionDetailPage({
               </p>
             )}
 
-            <div className="flex flex-wrap items-center gap-6 text-gray-400">
-              <div className="flex items-center gap-2">
-                <Film className="w-5 h-5" />
-                <span className="font-medium text-white">
-                  {totalVisibleResults} filme
-                  {totalVisibleResults !== 1 ? "s" : ""}
+            <div className="flex flex-wrap items-center gap-3 text-gray-400">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 backdrop-blur-md border border-white/10 rounded-full">
+                <Film className="w-4 h-4 text-red-500" />
+                <span className="font-bold text-white text-[11px] uppercase tracking-widest leading-none">
+                  {totalVisibleResults} {totalVisibleResults !== 1 ? "filmes" : "filme"}
                 </span>
               </div>
               {averageRating > 0 && (
-                <div className="flex items-center gap-2">
-                  <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-                  <span className="font-medium text-white">
-                    {averageRating.toFixed(1)}
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 backdrop-blur-md border border-white/10 rounded-full">
+                  <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                  <span className="font-bold text-white text-[11px] uppercase tracking-widest leading-none">
+                    {averageRating.toFixed(1)} CF
                   </span>
                 </div>
               )}
-              <div className="flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
-                <span className="font-medium text-white">{yearsSpan}</span>
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 backdrop-blur-md border border-white/10 rounded-full">
+                <Calendar className="w-4 h-4 text-neutral-400" />
+                <span className="font-bold text-white text-[11px] uppercase tracking-widest leading-none">{yearsSpan}</span>
               </div>
+              
+              {firstRelease && lastRelease && category === "saga" && (
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-red-600/10 backdrop-blur-md border border-red-600/20 rounded-full">
+                  <Clock className="w-4 h-4 text-red-500" />
+                  <span className="font-bold text-red-500 text-[11px] uppercase tracking-widest leading-none">
+                    {lastRelease.getFullYear() - firstRelease.getFullYear() > 0
+                      ? `${lastRelease.getFullYear() - firstRelease.getFullYear()} ANOS DE SAGA`
+                      : "1 ANO DE SAGA"}
+                  </span>
+                </div>
+              )}
             </div>
 
             {firstRelease && lastRelease && category === "saga" && (
@@ -285,22 +295,22 @@ export default async function CollectionDetailPage({
         </div>
 
         {/* Acordeões */}
-        <div className="mt-8">
-          <Accordion type="single" collapsible className="w-full space-y-4">
+        <div className="mt-12">
+          <Accordion type="single" collapsible className="w-full space-y-6">
             {/* Linha do Tempo — apenas para Sagas */}
             {category === "saga" && (
               <AccordionItem
                 value="timeline"
-                className="bg-gray-900/50 rounded-xl px-6 border-none"
+                className="bg-white/5 backdrop-blur-xl rounded-[32px] px-8 border border-white/10 overflow-hidden transition-colors duration-500 data-[state=open]:border-red-600/30 transform-gpu translate-z-0"
               >
-                <AccordionTrigger className="text-xl font-bold hover:no-underline">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-red-500" />
-                    Linha do Tempo
+                <AccordionTrigger className="py-6 text-xl font-normal font-bebas tracking-wider hover:no-underline group uppercase">
+                  <div className="flex items-center gap-3">
+                    <Clock className="w-6 h-6 text-red-600 group-hover:scale-110 transition-transform" />
+                    <span className="text-2xl">Linha do Tempo</span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <div className="space-y-3 pt-2">
+                  <div className="space-y-3 pb-8 pt-2">
                     {allMovies.map((movie, index) => {
                       const releaseYear = movie.release_date
                         ? new Date(movie.release_date).getFullYear()
@@ -309,29 +319,29 @@ export default async function CollectionDetailPage({
                         <Link
                           key={movie.id}
                           href={`/filme/${movie.id}`}
-                          className="flex items-center gap-4 p-3 bg-gray-800/50 rounded-lg hover:bg-gray-800 transition-colors group"
+                          className="flex items-center gap-6 p-4 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 hover:border-red-500/30 transition-all duration-500 group"
                         >
-                          <div className="flex-shrink-0 w-12 text-center">
-                            <div className="text-xl font-bold text-red-500">
-                              {index + 1}
+                          <div className="flex-shrink-0 w-16 text-center border-r border-white/10">
+                            <div className="text-3xl font-normal font-bebas text-red-600 group-hover:scale-110 transition-transform leading-none">
+                              {String(index + 1).padStart(2, '0')}
                             </div>
-                            <div className="text-xs text-gray-400">
+                            <div className="text-[10px] font-black uppercase text-neutral-500 tracking-tighter mt-1">
                               {releaseYear}
                             </div>
                           </div>
                           <div className="flex-1">
-                            <h3 className="font-semibold text-white group-hover:text-red-500 transition-colors text-sm md:text-base">
+                            <h3 className="font-semibold text-white group-hover:text-red-500 transition-colors text-[16px] tracking-tight">
                               {movie.title}
                             </h3>
                             {movie.overview && (
-                              <p className="text-xs text-gray-400 line-clamp-1 mt-1">
+                              <p className="text-[13px] text-neutral-500 line-clamp-1 mt-1 font-light italic">
                                 {movie.overview}
                               </p>
                             )}
                           </div>
-                          <div className="flex items-center gap-1 flex-shrink-0">
-                            <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                            <span className="text-xs font-medium">
+                          <div className="flex items-center gap-1.5 flex-shrink-0 bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
+                            <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
+                            <span className="text-[13px] font-bold text-white">
                               {movie.vote_average?.toFixed(1) || "N/A"}
                             </span>
                           </div>
@@ -347,25 +357,25 @@ export default async function CollectionDetailPage({
             {category === "saga" && streamingProviders && (
               <AccordionItem
                 value="streaming"
-                className="bg-gray-900/50 rounded-xl px-6 border-none"
+                className="bg-white/5 backdrop-blur-xl rounded-[32px] px-8 border border-white/10 overflow-hidden transition-colors duration-500 data-[state=open]:border-red-600/30 transform-gpu translate-z-0"
               >
-                <AccordionTrigger className="text-xl font-bold hover:no-underline">
-                  <div className="flex items-center gap-2">
-                    <PlayCircle className="w-5 h-5 text-red-500" />
-                    Onde Assistir
+                <AccordionTrigger className="py-6 text-xl font-normal font-bebas tracking-wider hover:no-underline group uppercase">
+                  <div className="flex items-center gap-3">
+                    <PlayCircle className="w-6 h-6 text-red-600 group-hover:scale-110 transition-transform" />
+                    <span className="text-2xl">Onde Assistir</span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <div className="pt-2">
-                    <p className="text-gray-400 mb-4 text-sm">
-                      Plataformas onde você pode assistir os filmes desta saga
-                      (baseado em disponibilidade no Brasil)
+                  <div className="pb-8 pt-2">
+                    <p className="text-neutral-500 mb-8 text-[15px] font-light leading-relaxed max-w-2xl italic">
+                      Monitoramos as principais plataformas do Brasil para você maratonar esta saga com o máximo de conforto.
                     </p>
                     <EnhancedStreamingProviders
                       providers={streamingProviders}
                       title={collectionName}
                       tmdbId={sortedMovies[0]?.id}
                       mediaType="movie"
+                      hideHeader={true}
                     />
                   </div>
                 </AccordionContent>
