@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { useDragScroll } from "@/hooks/useDragScroll";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,15 +19,21 @@ interface CastCarouselProps {
 
 export default function CastCarousel({ cast }: CastCarouselProps) {
   const carouselRef = useRef<HTMLDivElement>(null);
+  useDragScroll(carouselRef);
 
   const scroll = (direction: "left" | "right") => {
     if (carouselRef.current) {
-      const { scrollLeft, clientWidth } = carouselRef.current;
+      const { scrollLeft, clientWidth, scrollWidth } = carouselRef.current;
+      const maxScroll = scrollWidth - clientWidth;
 
-      const scrollTo =
+      let scrollTo =
         direction === "left"
           ? scrollLeft - clientWidth * 0.75
           : scrollLeft + clientWidth * 0.75;
+
+      // Loop infinito
+      if (direction === "right" && scrollLeft >= maxScroll - 10) scrollTo = 0;
+      else if (direction === "left" && scrollLeft <= 10) scrollTo = maxScroll;
 
       carouselRef.current.scrollTo({
         left: scrollTo,
@@ -47,12 +54,12 @@ export default function CastCarousel({ cast }: CastCarouselProps) {
       <div className="relative group">
         <div
           ref={carouselRef}
-          className="flex gap-4 overflow-x-auto scrollbar-hide snap-x pb-4"
+          className="flex gap-4 overflow-x-auto scrollbar-hide pb-4"
         >
           {cast.map((person, index) => (
             <motion.div
               key={person.id}
-              className="flex-shrink-0 w-[140px] snap-start"
+              className="flex-shrink-0 w-[140px]"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}

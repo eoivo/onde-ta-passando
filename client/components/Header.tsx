@@ -141,7 +141,7 @@ export default function Header() {
                   { href: "/", label: "Início" },
                   { href: "/filmes", label: "Filmes" },
                   { href: "/series", label: "Séries" },
-                  { href: "/sintonize", label: "Sintonize", isNew: true },
+                  { href: "/sintonia", label: "Sintonia", isNew: true },
                 ].map(({ href, label, isNew }) => (
                   <Link
                     key={href}
@@ -279,7 +279,7 @@ export default function Header() {
                         { href: "/", label: "Início", icon: <Home className="h-5 w-5" /> },
                         { href: "/filmes", label: "Filmes", icon: <Film className="h-5 w-5" /> },
                         { href: "/series", label: "Séries", icon: <Tv className="h-5 w-5" /> },
-                        { href: "/sintonize", label: "Sintonize", icon: <Search className="h-5 w-5" />, isNew: true },
+                        { href: "/sintonia", label: "Sintonia", icon: <Search className="h-5 w-5" />, isNew: true },
                       ].map(({ href, label, icon, isNew }, idx) => (
                         <motion.div
                           key={href}

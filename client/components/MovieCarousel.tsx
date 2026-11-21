@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useDragScroll } from "@/hooks/useDragScroll";
 import MovieCard from "./MovieCard";
 
 interface MovieCarouselProps {
@@ -12,14 +13,20 @@ interface MovieCarouselProps {
 
 export default function MovieCarousel({ title, movies }: MovieCarouselProps) {
   const carouselRef = useRef<HTMLDivElement>(null);
+  useDragScroll(carouselRef);
 
   const scroll = (direction: "left" | "right") => {
     if (carouselRef.current) {
-      const { scrollLeft, clientWidth } = carouselRef.current;
-      const scrollTo =
+      const { scrollLeft, clientWidth, scrollWidth } = carouselRef.current;
+      const maxScroll = scrollWidth - clientWidth;
+      let scrollTo =
         direction === "left"
           ? scrollLeft - clientWidth * 0.75
           : scrollLeft + clientWidth * 0.75;
+
+      // Loop infinito: volta ao início/fim ao chegar na extremidade
+      if (direction === "right" && scrollLeft >= maxScroll - 10) scrollTo = 0;
+      else if (direction === "left" && scrollLeft <= 10) scrollTo = maxScroll;
 
       carouselRef.current.scrollTo({
         left: scrollTo,
@@ -35,12 +42,12 @@ export default function MovieCarousel({ title, movies }: MovieCarouselProps) {
       <div className="relative group">
         <div
           ref={carouselRef}
-          className="flex gap-2 overflow-x-auto scrollbar-hide snap-x pb-4"
+          className="flex gap-2 overflow-x-auto scrollbar-hide pb-4"
         >
           {movies.map((movie, index) => (
             <div
               key={movie.id}
-              className="flex-shrink-0 w-[150px] md:w-[180px] snap-start"
+              className="flex-shrink-0 w-[150px] md:w-[180px]"
             >
               <MovieCard movie={movie} index={index} />
             </div>

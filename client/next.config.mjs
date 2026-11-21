@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async redirects() {
+    return [
+      { source: "/sintonize", destination: "/sintonia", permanent: true },
+    ];
+  },
   typescript: {
     ignoreBuildErrors: true,
   },

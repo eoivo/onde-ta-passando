@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Film, Globe, Clapperboard, ChevronRight, ChevronLeft } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
+import { useDragScroll } from "@/hooks/useDragScroll";
 import { Button } from "@/components/ui/button";
 import {
   UnifiedCollection,
@@ -84,6 +85,7 @@ export default function CollectionsSection({
 
 function CategoryRow({ section }: { section: CategorySection }) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  useDragScroll(scrollRef);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
 
@@ -98,11 +100,16 @@ function CategoryRow({ section }: { section: CategorySection }) {
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
-      const { scrollLeft, clientWidth } = scrollRef.current;
-      const scrollTo =
+      const { scrollLeft, clientWidth, scrollWidth } = scrollRef.current;
+      const maxScroll = scrollWidth - clientWidth;
+      let scrollTo =
         direction === "left"
           ? scrollLeft - clientWidth * 0.75
           : scrollLeft + clientWidth * 0.75;
+
+      // Loop infinito
+      if (direction === "right" && scrollLeft >= maxScroll - 10) scrollTo = 0;
+      else if (direction === "left" && scrollLeft <= 10) scrollTo = maxScroll;
 
       scrollRef.current.scrollTo({
         left: scrollTo,
@@ -135,7 +142,7 @@ function CategoryRow({ section }: { section: CategorySection }) {
         ) : (
           <>
             {/* Setas Flutuantes (Hover Desktop) - Estilo Padronizado */}
-            {showLeftArrow && (
+            {(showLeftArrow || true) && (
               <Button
                 variant="ghost"
                 size="icon"
@@ -146,7 +153,7 @@ function CategoryRow({ section }: { section: CategorySection }) {
               </Button>
             )}
 
-            {showRightArrow && (
+            {(showRightArrow || true) && (
               <Button
                 variant="ghost"
                 size="icon"

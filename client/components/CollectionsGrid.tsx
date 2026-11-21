@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import { useDragScroll } from "@/hooks/useDragScroll";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { UnifiedCollection } from "@/services/collections-api";
@@ -151,14 +152,20 @@ function FeaturedCollectionCard({
   getCollectionName: () => string;
 }) {
   const carouselRef = useRef<HTMLDivElement>(null);
+  useDragScroll(carouselRef);
 
   const scroll = (direction: "left" | "right") => {
     if (carouselRef.current) {
-      const { scrollLeft, clientWidth } = carouselRef.current;
-      const scrollTo =
+      const { scrollLeft, clientWidth, scrollWidth } = carouselRef.current;
+      const maxScroll = scrollWidth - clientWidth;
+      let scrollTo =
         direction === "left"
           ? scrollLeft - clientWidth * 0.75
           : scrollLeft + clientWidth * 0.75;
+
+      // Loop infinito
+      if (direction === "right" && scrollLeft >= maxScroll - 10) scrollTo = 0;
+      else if (direction === "left" && scrollLeft <= 10) scrollTo = maxScroll;
 
       carouselRef.current.scrollTo({
         left: scrollTo,
@@ -216,13 +223,13 @@ function FeaturedCollectionCard({
           <div className="relative group">
             <div
               ref={carouselRef}
-              className="flex gap-3 overflow-x-auto scrollbar-hide snap-x pb-2"
+              className="flex gap-3 overflow-x-auto scrollbar-hide pb-2"
               onClick={(e) => e.stopPropagation()}
             >
               {collection.movies.slice(0, 20).map((movie, index) => (
                 <div
                   key={movie.id}
-                  className="flex-shrink-0 w-[120px] md:w-[140px] snap-start"
+                  className="flex-shrink-0 w-[120px] md:w-[140px]"
                 >
                   <MovieCard movie={movie} index={index} />
                 </div>

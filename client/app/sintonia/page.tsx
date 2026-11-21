@@ -3,7 +3,7 @@ import SintonizeContent from "./SintonizeContent";
 import LoadingReset from "@/components/LoadingReset";
 
 export const metadata = {
-    title: "Sintonize seu Gosto | Onde Tá Passando?",
+    title: "Sintonia: obras parecidas com as que você ama | Onde Tá Passando?",
     description: "Encontre filmes e séries com a mesma vibe e DNA das suas obras favoritas.",
 };
 

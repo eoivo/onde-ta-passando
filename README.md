@@ -42,11 +42,12 @@
 ## Features
 
 - **Streaming availability** — Find which platforms are streaming a title, with deep links directly to the content page (not just the service homepage)
-- **CineDNA recommendations** — Discover similar titles based on genres, keywords, and stylistic fingerprints of a reference work
+- **Sintonia** (`/sintonia`) — Tell the app a title you've already watched and find similar ones, based on genres, keywords, and stylistic fingerprints of the reference work
 - **Murphy AI assistant** — Conversational AI (Google Gemini 3.1 & 2.5 Flash Lite with automated fallback) that answers questions about any movie or TV show in natural Brazilian Portuguese
 - **Authentication** — Registration, login, email-based password reset, and profile management with avatar upload
 - **Personal collections** — Favorites, watchlist, and watched history with pagination and real-time counters
 - **Trailers & details** — Synopses, cast, ratings, and embedded trailers from TMDB
+- **Carousels** — Infinite-loop arrows (wraps from the end back to the start and vice versa), free mouse drag on desktop, and a swipe-enabled hero banner
 
 ---
 
@@ -94,6 +95,7 @@ client/                         # Next.js — deployed on Netlify
   app/api/watchmode/[...path]/  # Watchmode proxy route (key server-side only)
   services/                     # API service layer (tmdb, watchmode, auth)
   components/                   # Shared UI components
+  hooks/                        # Custom hooks (e.g. useDragScroll)
   app/                          # Pages (App Router)
 
 server/                         # Express — deployed on Render

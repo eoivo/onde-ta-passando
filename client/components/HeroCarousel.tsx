@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, TouchEvent } from "react";
+import { useState, useEffect, useRef, TouchEvent, MouseEvent } from "react";
 import Hero from "./Hero";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -115,6 +115,23 @@ export default function HeroCarousel({
     touchEndX.current = e.touches[0].clientX;
   };
 
+  const mouseStartX = useRef<number | null>(null);
+
+  const handleMouseDown = (e: MouseEvent<HTMLDivElement>) => {
+    if (e.button !== 0) return;
+    mouseStartX.current = e.clientX;
+  };
+
+  const handleMouseUp = (e: MouseEvent<HTMLDivElement>) => {
+    if (mouseStartX.current === null) return;
+    const distance = mouseStartX.current - e.clientX;
+    mouseStartX.current = null;
+    if (Math.abs(distance) > 80) {
+      if (distance > 0) goToNext();
+      else goToPrevious();
+    }
+  };
+
   const handleTouchEnd = () => {
     if (!touchStartX.current || !touchEndX.current) return;
 
@@ -136,7 +153,12 @@ export default function HeroCarousel({
     <div
       className="relative z-0"
       onMouseEnter={() => setShowControls(true)}
-      onMouseLeave={() => setShowControls(false)}
+      onMouseLeave={() => {
+        setShowControls(false);
+        mouseStartX.current = null;
+      }}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}

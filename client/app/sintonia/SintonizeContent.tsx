@@ -169,7 +169,7 @@ export default function SintonizeContent() {
         const params = new URLSearchParams();
         params.set("id", media.id.toString());
         params.set("type", media.media_type);
-        router.push(`/sintonize?${params.toString()}`, { scroll: false });
+        router.push(`/sintonia?${params.toString()}`, { scroll: false });
     };
 
     const clearSearch = () => {
@@ -214,10 +214,10 @@ export default function SintonizeContent() {
                 >
 
                     <h1 className="text-5xl md:text-7xl font-black text-white mb-3 tracking-tighter uppercase font-bebas drop-shadow-2xl">
-                        Qual obra você <span className="text-red-600 italic">amou?</span>
+                        Qual obra você <span className="text-red-600 italic">já viu e amou?</span>
                     </h1>
                     <p className="text-white/60 mb-5 text-lg md:text-xl font-light drop-shadow-lg">
-                        Digite o nome de uma obra e selecione como sua referência de estilo.
+                        Conte o que você já viu e encontre obras parecidas ou com o mesmo clima.
                     </p>
 
                     <div className="relative group mb-2 max-w-3xl mx-auto shadow-2xl transition-all duration-300">
@@ -410,7 +410,7 @@ export default function SintonizeContent() {
                                 <div className="space-y-4">
                                     <p className="text-white/30 text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-2">
                                         <Filter className="w-3 h-3 text-red-500" />
-                                        Sintonizado pelo Estilo:
+                                        Sintonia de estilo:
                                     </p>
                                     <div className="flex flex-wrap gap-2">
                                         {keywords.map((kw) => (
@@ -453,7 +453,7 @@ export default function SintonizeContent() {
                                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center shadow-lg shadow-red-600/20">
                                     <Sparkles className="w-6 h-6 text-white" />
                                 </div>
-                                Obras na <span className="text-red-600 italic">mesma sintonize:</span>
+                                Na mesma <span className="text-red-600 italic">sintonia de {targetMedia?.title || targetMedia?.name}:</span>
                             </h2>
                         </div>
 

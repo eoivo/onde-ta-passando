@@ -65,7 +65,7 @@ export default function NavigationProvider({
     if (path.includes("/filmes")) return "filmes";
     if (path.includes("/series")) return "séries";
     if (path.includes("/busca")) return "resultados";
-    if (path.includes("/sintonize")) return "recomendações";
+    if (path.includes("/sintonia")) return "recomendações";
     if (path.includes("/perfil")) return "perfil";
     if (path.includes("/login")) return "login";
     if (path.includes("/cadastro")) return "cadastro";
