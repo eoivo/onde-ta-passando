@@ -370,6 +370,12 @@ export default function SintonizeContent() {
     }
 
     // Página de Resultados do DNA
+    const goToTargetDetails = () => {
+        if (!targetMedia) return;
+        const id = targetMedia.id || targetId;
+        setGlobalLoading(true, targetMedia.title || targetMedia.name);
+        router.push(`/${targetType === "tv" ? "serie" : "filme"}/${id}`);
+    };
     return (
         <div className="max-w-7xl mx-auto px-4 py-32">
             {loading ? (
@@ -383,7 +389,14 @@ export default function SintonizeContent() {
                         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-red-600/5 blur-[120px] -mr-64 -mt-64 rounded-full"></div>
 
                         <div className="flex flex-col md:flex-row gap-10 relative z-10">
-                            <div className="w-48 h-72 md:w-64 md:h-96 rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 flex-shrink-0">
+                            <div
+                                onClick={goToTargetDetails}
+                                role="link"
+                                tabIndex={0}
+                                onKeyDown={(e) => { if (e.key === "Enter") goToTargetDetails(); }}
+                                aria-label={`Ver detalhes de ${targetMedia?.title || targetMedia?.name}`}
+                                className="relative w-48 h-72 md:w-64 md:h-96 rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 flex-shrink-0 cursor-pointer transition-all duration-300 hover:border-white/30"
+                            >
                                 <img
                                     src={`https://image.tmdb.org/t/p/w500${targetMedia?.poster_path}`}
                                     alt={targetMedia?.title || targetMedia?.name}
@@ -448,12 +461,12 @@ export default function SintonizeContent() {
                     </section>
 
                     <section className="space-y-12">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-3xl md:text-4xl font-black text-white flex items-center gap-4 tracking-tighter">
-                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center shadow-lg shadow-red-600/20">
-                                    <Sparkles className="w-6 h-6 text-white" />
-                                </div>
-                                Na mesma <span className="text-red-600 italic">sintonia de {targetMedia?.title || targetMedia?.name}:</span>
+                        <div className="space-y-2">
+                            <p className="text-red-500 text-xs font-black uppercase tracking-[0.3em]">
+                                Na mesma sintonia de
+                            </p>
+                            <h2 className="text-3xl md:text-5xl font-black text-white tracking-tighter leading-none">
+                                {targetMedia?.title || targetMedia?.name}
                             </h2>
                         </div>
 
