@@ -116,7 +116,21 @@ server/                         # Express — deployed on Render
 - Node.js 18+
 - MongoDB (local or Atlas)
 
-### Frontend
+### Quick Start (from Root)
+
+```bash
+# Install dependencies for both client and server
+npm run install:all
+
+# Start both client (http://localhost:3000) and server (http://localhost:3001) together
+npm run dev
+
+# Or run them individually from the root:
+npm run dev:client
+npm run dev:server
+```
+
+### Frontend (Manual)
 
 ```bash
 cd client
