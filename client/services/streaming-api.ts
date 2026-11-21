@@ -24,7 +24,8 @@ export const PROVIDER_QUALITY_MAPPING: Record<number, string> = {
   100: "HD", // YouTube
   2: "HD", // Google Play Movies & TV
   3: "4K HDR", // Apple TV
-  167: "HD", // Pluto TV
+  300: "HD", // Pluto TV
+  167: "HD", // Claro Video
   613: "Full HD", // Telecine
   47: "HD", // Claro Video
   546: "Full HD", // Discovery+
@@ -112,14 +113,14 @@ export const BRAZILIAN_PROVIDERS: StreamingProvider[] = [
     quality: "Full HD"
   },
   {
-    id: 167,
+    id: 300,
     name: "Pluto TV",
     color: "#FF6600",
     display_priority: 11,
     quality: "HD"
   },
   {
-    id: 47,
+    id: 167,
     name: "Claro Video",
     color: "#DC2626",
     display_priority: 12,

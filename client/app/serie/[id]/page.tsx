@@ -97,11 +97,109 @@ export default async function TVShowPage({
 
           <div className="flex-1 space-y-8 pt-0 md:pt-10">
             <div className="space-y-4">
+              {(() => {
+                const originalMapping = [
+                  {
+                    brand: "Netflix",
+                    color: "text-red-500",
+                    logo: "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+                    networkNames: ["Netflix"],
+                    companyNames: ["Netflix"],
+                    providerIds: [8, 1796],
+                  },
+                  {
+                    brand: "Prime Video",
+                    color: "text-sky-400",
+                    logo: "https://image.tmdb.org/t/p/original/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+                    networkNames: ["Prime Video", "Amazon Prime Video", "Amazon"],
+                    companyNames: ["Amazon Studios", "Amazon MGM Studios"],
+                    providerIds: [119, 9],
+                  },
+                  {
+                    brand: "Disney+",
+                    color: "text-blue-500",
+                    logo: "https://image.tmdb.org/t/p/original/97yvRBw1GzX7fXprcF80er19ot.jpg",
+                    networkNames: ["Disney+", "Disney Plus", "Disney+ Hotstar"],
+                    companyNames: ["Disney+"],
+                    providerIds: [337],
+                  },
+                  {
+                    brand: "HBO",
+                    color: "text-purple-400",
+                    logo: "https://image.tmdb.org/t/p/original/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+                    networkNames: ["HBO", "HBO Max", "MAX", "Max"],
+                    companyNames: ["HBO", "HBO Max", "HBO Entertainment"],
+                    providerIds: [384, 1899],
+                  },
+                  {
+                    brand: "Apple TV+",
+                    color: "text-gray-200",
+                    logo: "https://image.tmdb.org/t/p/original/mcbz1LgtErU9p4UdbZ0rG6RTWHX.jpg",
+                    networkNames: ["Apple TV+", "Apple TV"],
+                    companyNames: ["Apple Studios", "Apple Original Films"],
+                    providerIds: [350],
+                  },
+                  {
+                    brand: "Globoplay",
+                    color: "text-pink-500",
+                    logo: "https://image.tmdb.org/t/p/original/7Cg8esVVXOijXAm1f1vrS7jVjcN.jpg",
+                    networkNames: ["Globoplay"],
+                    companyNames: ["Globoplay", "Estúdios Globo"],
+                    providerIds: [307],
+                  },
+                  {
+                    brand: "Paramount+",
+                    color: "text-blue-500",
+                    logo: "https://image.tmdb.org/t/p/original/h5DcR0J2EESLitnhR8xLG1QymTE.jpg",
+                    networkNames: ["Paramount+", "Paramount Plus", "Paramount+ with Showtime", "Paramount Network"],
+                    companyNames: ["Paramount+", "Paramount Television Studios", "MTV Entertainment Studios"],
+                    providerIds: [531],
+                  },
+                ];
+
+                const networks: any[] = tvShow.networks || [];
+                const companies: any[] = tvShow.production_companies || [];
+                const brFlatrate: any[] = watchProviders?.results?.BR?.flatrate || [];
+
+                // 1) Prioridade máxima: a emissora original (network) é diretamente uma das plataformas de streaming
+                let info = originalMapping.find((m) =>
+                  networks.some((n) => m.networkNames.includes(n.name))
+                );
+
+                // 2) Fallback seguro: só considera a produtora (ex: Paramount Television Studios em séries da CBS)
+                // se a série não for de outra plataforma concorrente E estiver disponível no streaming dessa mesma marca no Brasil
+                if (!info) {
+                  info = originalMapping.find(
+                    (m) =>
+                      companies.some((c) => m.companyNames.includes(c.name)) &&
+                      brFlatrate.some((p) => m.providerIds.includes(p.provider_id))
+                  );
+                }
+
+                if (!info) return null;
+
+                return (
+                  <div className="inline-flex items-center gap-2">
+                    <div className="relative w-4 h-4 rounded-[3px] overflow-hidden flex-shrink-0">
+                      <Image
+                        src={info.logo}
+                        alt={`Original ${info.brand}`}
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                    <span className="text-neutral-300 font-bold text-[11px] tracking-[0.24em] uppercase leading-none">
+                      Original <strong className={`${info.color} font-extrabold`}>{info.brand}</strong>
+                    </span>
+                  </div>
+                );
+              })()}
+
               <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
                 <h1 className="text-5xl md:text-7xl lg:text-8xl font-normal font-bebas tracking-tighter text-white drop-shadow-2xl uppercase leading-[0.8] max-w-4xl">
                   {tvShow.name}
                 </h1>
-                <div className="flex flex-wrap items-center gap-3 lg:mt-2">
+                <div className="flex flex-wrap items-center gap-2 lg:mt-2">
                   <DynamicMediaActions
                     mediaId={id}
                     mediaType="tv"
@@ -113,92 +211,61 @@ export default async function TVShowPage({
                 </div>
               </div>
 
-              {(() => {
-                const originalMapping = [
-                  { names: ["Netflix"], label: "Original da Netflix", color: "text-red-600", logo: "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg" },
-                  { names: ["Amazon Studios", "Amazon MGM Studios", "Amazon"], label: "Original da Amazon", color: "text-blue-400", logo: "https://image.tmdb.org/t/p/original/pvske1MyAoymrs5bguRfVqYiM9a.jpg" },
-                  { names: ["Disney+", "Disney Plus"], label: "Original Disney+", color: "text-blue-600", logo: "https://image.tmdb.org/t/p/original/97yvRBw1GzX7fXprcF80er19ot.jpg" },
-                  { names: ["HBO", "MAX", "Max"], label: "Original HBO", color: "text-purple-400", logo: "https://image.tmdb.org/t/p/original/jbe4gVSfRlbPTdESXhEKpornsfu.jpg" },
-                  { names: ["Apple TV+", "Apple TV"], label: "Original Apple TV+", color: "text-gray-200", logo: "https://image.tmdb.org/t/p/original/mcbz1LgtErU9p4UdbZ0rG6RTWHX.jpg" },
-                  { names: ["Globoplay"], label: "Original Globoplay", color: "text-pink-500", logo: "https://image.tmdb.org/t/p/original/7Cg8esVVXOijXAm1f1vrS7jVjcN.jpg" },
-                  { names: ["Paramount+"], label: "Original Paramount+", color: "text-blue-500", logo: "https://image.tmdb.org/t/p/original/h5DcR0J2EESLitnhR8xLG1QymTE.jpg" },
-                ];
-
-                const network = tvShow.networks?.find((n: any) =>
-                  originalMapping.some(m => m.names.includes(n.name))
-                );
-
-                if (!network) return null;
-
-                const info = originalMapping.find(m => m.names.includes(network.name));
-                if (!info) return null;
-
-                return (
-                  <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 mb-6 group hover:bg-black/60 transition-colors duration-300">
-                    <div className="relative w-5 h-5 flex-shrink-0">
-                      <Image
-                        src={info.logo}
-                        alt={info.label}
-                        fill
-                        className="object-contain"
-                      />
-                    </div>
-                    <span className={`${info.color} font-bold text-[10px] tracking-[0.2em] uppercase`}>
-                      {info.label}
-                    </span>
-                  </div>
-                );
-              })()}
-
               <div className="flex flex-wrap gap-2 items-center">
                 {tvShow.genres.map((genre: any) => (
-                  <Badge key={genre.id} variant="outline" className="text-sm">
+                  <Badge
+                    key={genre.id}
+                    variant="outline"
+                    className="h-7 px-3 py-0 bg-white/5 border-white/15 text-white/90 text-xs font-medium leading-none inline-flex items-center justify-center"
+                  >
                     {genre.name}
                   </Badge>
                 ))}
 
-                <div className="flex items-center gap-1 ml-2">
-                  <StarIcon className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-                  <span className="font-medium">
+                <div className="flex items-center gap-1.5 ml-2 text-sm text-neutral-200">
+                  <StarIcon className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                  <span className="font-semibold text-white">
                     {tvShow.vote_average.toFixed(1)}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-1 ml-2">
-                  <Calendar className="w-4 h-4" />
+                <div className="flex items-center gap-1.5 ml-2 text-sm text-neutral-200">
+                  <Calendar className="w-4 h-4 text-neutral-400" />
                   <span>{firstAirDate}</span>
                 </div>
-
-                <Badge variant="secondary" className="ml-2">
-                  {status}
-                </Badge>
               </div>
 
-              <div className="flex flex-wrap gap-x-6 gap-y-2 text-base text-gray-300">
+              <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-neutral-400">
                 <div>
-                  <span className="font-medium text-white">Temporadas:</span>{" "}
+                  <span className="font-semibold text-white">Temporadas:</span>{" "}
                   {tvShow.number_of_seasons}
                 </div>
                 <div>
-                  <span className="font-medium text-white">Episódios:</span>{" "}
+                  <span className="font-semibold text-white">Episódios:</span>{" "}
                   {tvShow.number_of_episodes}
                 </div>
                 {tvShow.networks && tvShow.networks.length > 0 && (
                   <div>
-                    <span className="font-medium text-white">Rede:</span>{" "}
+                    <span className="font-semibold text-white">Rede:</span>{" "}
                     {tvShow.networks.map((n: any) => n.name).join(", ")}
+                  </div>
+                )}
+                {status && (
+                  <div>
+                    <span className="font-semibold text-white">Status:</span>{" "}
+                    {status}
                   </div>
                 )}
               </div>
             </div>
 
-            <p className="text-xl text-gray-200 leading-relaxed max-w-4xl font-light italic">
+            <p className="text-base md:text-[17px] text-neutral-100/90 leading-[1.65] max-w-3xl font-normal">
               {tvShow.overview}
             </p>
 
-            <div className="flex flex-col gap-3 items-stretch md:items-start">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-stretch sm:items-center">
               {videos.length > 0 && (
-                <VideoPlayer videos={videos} btnWidth="md:w-[280px]" />
+                <VideoPlayer videos={videos} btnWidth="sm:w-auto" />
               )}
 
               {/* Chat Bot */}

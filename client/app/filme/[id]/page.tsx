@@ -89,11 +89,49 @@ export default async function MoviePage({
 
           <div className="flex-1 space-y-8 pt-0 md:pt-10">
             <div className="space-y-4">
+              {(() => {
+                const originalMapping = [
+                  { names: ["Netflix"], brand: "Netflix", color: "text-red-500", logo: "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg", providerIds: [8, 1796] },
+                  { names: ["Prime Video", "Amazon Prime Video", "Amazon Studios", "Amazon MGM Studios", "Amazon"], brand: "Prime Video", color: "text-sky-400", logo: "https://image.tmdb.org/t/p/original/pvske1MyAoymrs5bguRfVqYiM9a.jpg", providerIds: [119, 9] },
+                  { names: ["Disney+", "Disney Plus"], brand: "Disney+", color: "text-blue-500", logo: "https://image.tmdb.org/t/p/original/97yvRBw1GzX7fXprcF80er19ot.jpg", providerIds: [337] },
+                  { names: ["HBO", "HBO Max", "HBO Films", "MAX", "Max"], brand: "HBO", color: "text-purple-400", logo: "https://image.tmdb.org/t/p/original/jbe4gVSfRlbPTdESXhEKpornsfu.jpg", providerIds: [384, 1899] },
+                  { names: ["Apple TV+", "Apple TV", "Apple Original Films", "Apple Studios"], brand: "Apple TV+", color: "text-gray-200", logo: "https://image.tmdb.org/t/p/original/mcbz1LgtErU9p4UdbZ0rG6RTWHX.jpg", providerIds: [350] },
+                  { names: ["Globoplay", "Estúdios Globo"], brand: "Globoplay", color: "text-pink-500", logo: "https://image.tmdb.org/t/p/original/7Cg8esVVXOijXAm1f1vrS7jVjcN.jpg", providerIds: [307] },
+                  { names: ["Paramount+", "Paramount Plus", "Paramount Players"], brand: "Paramount+", color: "text-blue-500", logo: "https://image.tmdb.org/t/p/original/h5DcR0J2EESLitnhR8xLG1QymTE.jpg", providerIds: [531] },
+                ];
+
+                const companies: any[] = movie.production_companies || [];
+                const brFlatrate: any[] = watchProviders?.results?.BR?.flatrate || [];
+
+                const info = originalMapping.find(
+                  (m) =>
+                    companies.some((pc) => m.names.includes(pc.name)) &&
+                    (brFlatrate.length === 0 || brFlatrate.some((p) => m.providerIds.includes(p.provider_id)))
+                );
+                if (!info) return null;
+
+                return (
+                  <div className="inline-flex items-center gap-2">
+                    <div className="relative w-4 h-4 rounded-[3px] overflow-hidden flex-shrink-0">
+                      <Image
+                        src={info.logo}
+                        alt={`Original ${info.brand}`}
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                    <span className="text-neutral-300 font-bold text-[11px] tracking-[0.24em] uppercase leading-none">
+                      Original <strong className={`${info.color} font-extrabold`}>{info.brand}</strong>
+                    </span>
+                  </div>
+                );
+              })()}
+
               <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
                 <h1 className="text-5xl md:text-7xl lg:text-8xl font-normal font-bebas tracking-tighter text-white drop-shadow-2xl uppercase leading-[0.8] max-w-4xl">
                   {movie.title}
                 </h1>
-                <div className="flex flex-wrap items-center gap-3 lg:mt-2">
+                <div className="flex flex-wrap items-center gap-2 lg:mt-2">
                   <DynamicMediaActions
                     mediaId={id}
                     mediaType="movie"
@@ -105,76 +143,43 @@ export default async function MoviePage({
                 </div>
               </div>
 
-              {(() => {
-                const originalMapping = [
-                  { names: ["Netflix"], label: "Original da Netflix", color: "text-red-600", logo: "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg" },
-                  { names: ["Amazon Studios", "Amazon MGM Studios"], label: "Original da Amazon", color: "text-blue-400", logo: "https://image.tmdb.org/t/p/original/pvske1MyAoymrs5bguRfVqYiM9a.jpg" },
-                  { names: ["Disney+", "Disney Plus"], label: "Original Disney+", color: "text-blue-600", logo: "https://image.tmdb.org/t/p/original/97yvRBw1GzX7fXprcF80er19ot.jpg" },
-                  { names: ["HBO", "MAX", "Max"], label: "Original HBO", color: "text-purple-400", logo: "https://image.tmdb.org/t/p/original/jbe4gVSfRlbPTdESXhEKpornsfu.jpg" },
-                  { names: ["Apple TV+", "Apple TV"], label: "Original Apple TV+", color: "text-gray-200", logo: "https://image.tmdb.org/t/p/original/mcbz1LgtErU9p4UdbZ0rG6RTWHX.jpg" },
-                  { names: ["Globoplay"], label: "Original Globoplay", color: "text-pink-500", logo: "https://image.tmdb.org/t/p/original/7Cg8esVVXOijXAm1f1vrS7jVjcN.jpg" },
-                  { names: ["Paramount+"], label: "Original Paramount+", color: "text-blue-500", logo: "https://image.tmdb.org/t/p/original/h5DcR0J2EESLitnhR8xLG1QymTE.jpg" },
-                ];
-
-                const producer = movie.production_companies?.find((pc: any) =>
-                  originalMapping.some(m => m.names.includes(pc.name))
-                );
-
-                if (!producer) return null;
-
-                const info = originalMapping.find(m => m.names.includes(producer.name));
-                if (!info) return null;
-
-                return (
-                  <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 mb-6 group hover:bg-black/60 transition-colors duration-300">
-                    <div className="relative w-5 h-5 flex-shrink-0">
-                      <Image
-                        src={info.logo}
-                        alt={info.label}
-                        fill
-                        className="object-contain"
-                      />
-                    </div>
-                    <span className={`${info.color} font-bold text-[10px] tracking-[0.2em] uppercase`}>
-                      {info.label}
-                    </span>
-                  </div>
-                );
-              })()}
-
               <div className="flex flex-wrap gap-2 items-center">
                 {movie.genres.map((genre: any) => (
-                  <Badge key={genre.id} variant="outline" className="text-sm">
+                  <Badge
+                    key={genre.id}
+                    variant="outline"
+                    className="h-7 px-3 py-0 bg-white/5 border-white/15 text-white/90 text-xs font-medium leading-none inline-flex items-center justify-center"
+                  >
                     {genre.name}
                   </Badge>
                 ))}
 
-                <div className="flex items-center gap-1 ml-2">
-                  <StarIcon className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-                  <span className="font-medium">
+                <div className="flex items-center gap-1.5 ml-2 text-sm text-neutral-200">
+                  <StarIcon className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                  <span className="font-semibold text-white">
                     {movie.vote_average.toFixed(1)}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-1 ml-2">
-                  <Clock className="w-4 h-4" />
+                <div className="flex items-center gap-1.5 ml-2 text-sm text-neutral-200">
+                  <Clock className="w-4 h-4 text-neutral-400" />
                   <span>{formattedRuntime}</span>
                 </div>
 
-                <div className="flex items-center gap-1 ml-2">
-                  <Calendar className="w-4 h-4" />
+                <div className="flex items-center gap-1.5 ml-2 text-sm text-neutral-200">
+                  <Calendar className="w-4 h-4 text-neutral-400" />
                   <span>{releaseDate}</span>
                 </div>
               </div>
             </div>
 
-            <p className="text-xl text-gray-200 leading-relaxed max-w-4xl font-light italic">
+            <p className="text-base md:text-[17px] text-neutral-100/90 leading-[1.65] max-w-3xl font-normal">
               {movie.overview}
             </p>
 
-            <div className="flex flex-col gap-3 items-stretch md:items-start">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-stretch sm:items-center">
               {videos.length > 0 && (
-                <VideoPlayer videos={videos} btnWidth="md:w-[280px]" />
+                <VideoPlayer videos={videos} btnWidth="sm:w-auto" />
               )}
 
               {/* Chat Bot */}

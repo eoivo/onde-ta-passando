@@ -76,14 +76,14 @@ export default function ShareButton({ title, className }: ShareButtonProps) {
     <Popover>
       <PopoverTrigger asChild>
         <Button
-          variant="ghost"
+          variant="outline"
           size="icon"
           className={cn(
-            "rounded-full hover:bg-red-600/10 hover:text-red-600 transition-colors",
+            "h-10 w-10 rounded-full bg-black/45 backdrop-blur-md border-white/15 text-white/85 hover:bg-white/10 hover:border-white/30 hover:text-white transition-all duration-200",
             className
           )}
         >
-          <Share2 className="h-5 w-5" />
+          <Share2 className="h-[18px] w-[18px]" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-56 p-2">

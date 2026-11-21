@@ -231,12 +231,18 @@ export const sendMessageToGemini = async (
 ): Promise<{ reply: string; thoughtSignature: string | null }> => {
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
-    
+    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${API_URL}/ai/chat`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({
         message,
         movieContext,
@@ -247,7 +253,7 @@ export const sendMessageToGemini = async (
     const data = await response.json();
 
     if (!response.ok) {
-      // Se caiu no rate limit ou outro erro do servidor
+      // Se caiu no rate limit, validação ou autenticação, preserva a mensagem do servidor
       throw new Error(data.message || `Erro no servidor: ${response.status}`);
     }
 
@@ -261,14 +267,13 @@ export const sendMessageToGemini = async (
     }
   } catch (error: any) {
     console.error("Erro na comunicação com a IA:", error);
-    
-    // Fallback amigável se for erro de rate limit (429)
-    if (error.message && error.message.includes("Murphy está um pouco sobrecarregada")) {
-        throw error;
+
+    if (error instanceof Error && error.message && !error.message.includes("Failed to fetch")) {
+      throw error;
     }
 
     throw new Error(
-      "Não consegui processar sua mensagem no momento. Tente novamente!"
+      "Não consegui processar sua mensagem no momento. Tente novamente em instantes."
     );
   }
 };
@@ -278,7 +283,7 @@ export async function generateWelcomeMessage(
   movieContext: MovieContext,
   userName?: string
 ): Promise<string> {
-  const greeting = userName ? `Oi, ${userName}!` : "Oi!";
+  const greeting = userName ? `Oi, ${userName}.` : "Oi.";
 
   // Extrair ano com validação para evitar NaN
   let year = "";
@@ -289,25 +294,28 @@ export async function generateWelcomeMessage(
     }
   }
 
-  const mediaType = movieContext.mediaType === "movie" ? "filme" : "série";
+  const mediaType = movieContext.mediaType === "movie" ? "esse filme" : "essa série";
 
-  return `${greeting} 🎬 Murphy aqui! Vejo que você escolheu "${movieContext.title}"${year} - ótima escolha! Estou aqui para conversar sobre qualquer coisa desse ${mediaType}. O que você gostaria de saber?`;
+  return `${greeting} Sou a Murphy. Vi que você está olhando "${movieContext.title}"${year} — o que você quer saber ou discutir sobre ${mediaType}?`;
 }
 
 // Tópicos sugeridos mais simples e diretos
 export function generateSuggestedTopics(movieContext: MovieContext): string[] {
+  const mediaLabel = movieContext.mediaType === "movie" ? "o filme" : "a série";
+  const similarLabel = movieContext.mediaType === "movie" ? "Filmes similares" : "Séries similares";
+
   const topics = [
-    "💭 Sua opinião sobre o filme",
-    "🎭 Personagens favoritos",
-    "🎬 Cenas marcantes",
-    "📍 Onde assistir",
-    "🎯 Filmes similares",
-    "⭐ Sua nota para o filme",
+    `Sua opinião sobre ${mediaLabel}`,
+    "Personagens favoritos",
+    "Cenas marcantes",
+    "Onde assistir",
+    similarLabel,
+    `Sua nota para ${mediaLabel}`,
   ];
 
   if (movieContext.mediaType === "tv") {
-    topics.push("📺 Temporadas favoritas");
-    topics.push("🔮 Teorias e especulações");
+    topics.push("Temporadas favoritas");
+    topics.push("Teorias e especulações");
   }
 
   return topics.slice(0, 6);

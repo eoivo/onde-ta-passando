@@ -80,10 +80,10 @@ export default function VideoPlayer({
     <>
       <Button
         onClick={handlePlay}
-        className={`bg-white text-black hover:bg-white/90 flex items-center justify-center gap-2 w-full ${btnWidth}`}
+        className={`h-12 px-7 rounded-full bg-white text-black hover:bg-neutral-200 font-semibold flex items-center justify-center gap-2.5 w-full transition-all duration-200 hover:-translate-y-0.5 ${btnWidth}`}
         size="lg"
       >
-        <Play className="h-5 w-5 fill-black" />
+        <Play className="h-4 w-4 fill-black" />
         Assistir trailer
       </Button>
 

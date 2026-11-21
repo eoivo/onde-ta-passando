@@ -1,14 +1,47 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   ChatMessage,
   MovieContext,
   sendMessageToGemini,
 } from "@/services/gemini-api";
 
+const getStorageKey = (movieContext: MovieContext) =>
+  `murphy_chat_${movieContext.mediaType}_${movieContext.title.trim().toLowerCase()}`;
+
 export const useMovieChat = (movieContext: MovieContext) => {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const storageKey = getStorageKey(movieContext);
+
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const saved = sessionStorage.getItem(storageKey);
+      if (!saved) return [];
+      const parsed = JSON.parse(saved);
+      if (!Array.isArray(parsed)) return [];
+      return parsed.map((m: any) => ({
+        ...m,
+        timestamp: new Date(m.timestamp),
+      }));
+    } catch {
+      return [];
+    }
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Sincroniza mensagens com sessionStorage para persistir durante a sessão/navegação
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      if (messages.length > 0) {
+        sessionStorage.setItem(storageKey, JSON.stringify(messages));
+      } else {
+        sessionStorage.removeItem(storageKey);
+      }
+    } catch {
+      // Ignora erro de quota do sessionStorage
+    }
+  }, [messages, storageKey]);
 
   const sendMessage = useCallback(
     async (content: string) => {
@@ -40,11 +73,15 @@ export const useMovieChat = (movieContext: MovieContext) => {
 
         setMessages((prev) => [...prev, assistantMessage]);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Erro desconhecido");
+        const errorText =
+          err instanceof Error && err.message
+            ? err.message
+            : "Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente em instantes.";
+        setError(errorText);
 
         const errorMessage: ChatMessage = {
           role: "assistant",
-          content: "Desculpe, ocorreu um erro. Tente novamente! 😅",
+          content: errorText,
           timestamp: new Date(),
         };
 
@@ -59,7 +96,12 @@ export const useMovieChat = (movieContext: MovieContext) => {
   const clearMessages = useCallback(() => {
     setMessages([]);
     setError(null);
-  }, []);
+    if (typeof window !== "undefined") {
+      try {
+        sessionStorage.removeItem(storageKey);
+      } catch {}
+    }
+  }, [storageKey]);
 
   const addWelcomeMessage = useCallback((welcomeContent: string) => {
     const welcomeMessage: ChatMessage = {

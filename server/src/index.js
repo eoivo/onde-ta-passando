@@ -20,13 +20,16 @@ if (!fs.existsSync(tmpDir)) {
 
 const app = express();
 
+//Necessário em produção (Render/Cloudflare) para o express-rate-limit identificar o IP real do cliente
+app.set("trust proxy", 1);
+
 // [FIX A-01] Helmet — adiciona ~12 headers de segurança automaticamente
 app.use(helmet());
 
 // CORS configurado de forma segura (apenas domínios autorizados)
 app.use(cors(corsConfig));
 
-app.use(express.json());
+app.use(express.json({ limit: "32kb" }));
 app.use(
   fileUpload({
     useTempFiles: true,

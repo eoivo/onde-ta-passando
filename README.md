@@ -43,7 +43,7 @@
 
 - **Streaming availability** — Find which platforms are streaming a title, with deep links directly to the content page (not just the service homepage)
 - **Sintonia** (`/sintonia`) — Tell the app a title you've already watched and find similar ones, based on genres, keywords, and stylistic fingerprints of the reference work
-- **Murphy AI assistant** — Conversational AI (Google Gemini 3.1 & 2.5 Flash Lite with automated fallback) that answers questions about any movie or TV show in natural Brazilian Portuguese
+- **Murphy AI assistant** — Conversational AI (Google Gemini 3.5 Flash-Lite, 3 Flash & 3.1/2.5 Flash-Lite with automated fallback) that answers questions about any movie or TV show in natural Brazilian Portuguese
 - **Authentication** — Registration, login, email-based password reset, and profile management with avatar upload
 - **Personal collections** — Favorites, watchlist, and watched history with pagination and real-time counters
 - **Trailers & details** — Synopses, cast, ratings, and embedded trailers from TMDB
@@ -183,7 +183,7 @@ No external API keys are exposed to the browser. All third-party calls are proxi
 |---|---|---|
 | All API routes (`/api/*`) | 200 req / IP | 15 min |
 | Auth routes (login, register, forgot password) | 10 req / IP | 15 min |
-| Murphy AI (`/api/ai/chat`) | 15 req / IP | 15 min |
+| Murphy AI (`/api/ai/chat`, JWT-protected) | 12 req / 15 min & 40 req / day (per user/IP) | 15 min / 24 h |
 
 ### HTTP Security Headers
 

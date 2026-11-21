@@ -39,7 +39,8 @@ const PROVIDER_URLS: Record<number, string> = {
   2: "https://play.google.com/store/movies",
   3: "https://tv.apple.com/br",
   // Novos provedores brasileiros
-  167: "https://www.plutoTV.com/br", // Pluto TV
+  300: "https://pluto.tv/br", // Pluto TV
+  167: "https://www.clarovideo.com/brasil", // Claro Video
   613: "https://www.telecineplay.com.br", // Telecine
   47: "https://www.clarovideo.com/brasil", // Claro Video
   546: "https://www.discoveryplus.com/br", // Discovery+

@@ -193,10 +193,10 @@ export default function MediaActions({
             <Button
               variant="outline"
               size="icon"
-              className={`rounded-full ${
+              className={`h-10 w-10 rounded-full backdrop-blur-md transition-all duration-200 ${
                 isFavorite
-                  ? "bg-red-900/30 text-red-500 border-red-800 hover:bg-red-900/50 hover:text-red-400"
-                  : "hover:bg-gray-800 hover:text-red-400"
+                  ? "bg-red-950/60 text-red-500 border-red-500/50 hover:bg-red-900/60 hover:text-red-400"
+                  : "bg-black/45 border-white/15 text-white/85 hover:bg-white/10 hover:border-white/30 hover:text-white"
               }`}
               onClick={handleFavorite}
               disabled={isLoadingFavorite}
@@ -224,10 +224,10 @@ export default function MediaActions({
             <Button
               variant="outline"
               size="icon"
-              className={`rounded-full ${
+              className={`h-10 w-10 rounded-full backdrop-blur-md transition-all duration-200 ${
                 isInWatchlist
-                  ? "bg-blue-900/30 text-blue-500 border-blue-800 hover:bg-blue-900/50 hover:text-blue-400"
-                  : "hover:bg-gray-800 hover:text-blue-400"
+                  ? "bg-blue-950/60 text-blue-400 border-blue-500/50 hover:bg-blue-900/60 hover:text-blue-300"
+                  : "bg-black/45 border-white/15 text-white/85 hover:bg-white/10 hover:border-white/30 hover:text-white"
               }`}
               onClick={handleWatchlist}
               disabled={isLoadingWatchlist}
@@ -257,10 +257,10 @@ export default function MediaActions({
             <Button
               variant="outline"
               size="icon"
-              className={`rounded-full ${
+              className={`h-10 w-10 rounded-full backdrop-blur-md transition-all duration-200 ${
                 isWatched
-                  ? "bg-green-900/30 text-green-500 border-green-800 hover:bg-green-900/50 hover:text-green-400"
-                  : "hover:bg-gray-800 hover:text-green-400"
+                  ? "bg-green-950/60 text-green-400 border-green-500/50 hover:bg-green-900/60 hover:text-green-300"
+                  : "bg-black/45 border-white/15 text-white/85 hover:bg-white/10 hover:border-white/30 hover:text-white"
               }`}
               onClick={handleWatched}
               disabled={isLoadingWatched}

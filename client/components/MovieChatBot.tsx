@@ -28,6 +28,9 @@ import {
   Check,
   LogIn,
   UserPlus,
+  ArrowUpRight,
+  RotateCcw,
+  X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -38,6 +41,8 @@ import {
   generateWelcomeMessage,
   generateSuggestedTopics,
 } from "@/services/gemini-api";
+import { searchMulti } from "@/services/tmdb-api";
+import { useLoadingStore } from "@/store/loading-store";
 import { useMovieChat } from "@/hooks/useMovieChat";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
@@ -46,13 +51,24 @@ interface MovieChatBotProps {
   movieContext: MovieContext;
 }
 
-const MessageContent: React.FC<{ content: string; isAssistant: boolean }> = ({
-  content,
-  isAssistant,
-}) => {
+const preprocessMediaLinks = (text: string) =>
+  text.replace(
+    /\[([^\]]+)\]\((#obra:[^)]+)\)/g,
+    (_, label, target) => `[${label}](${target.replace(/ /g, "%20")})`
+  );
+
+const MessageContent: React.FC<{
+  content: string;
+  isAssistant: boolean;
+  currentTitle: string;
+  onMediaClick?: (rawRef: string, fallbackText: string) => void;
+}> = ({ content, isAssistant, currentTitle, onMediaClick }) => {
   if (!isAssistant) {
     return <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{content}</p>;
   }
+
+  const processedContent = preprocessMediaLinks(content);
+  const normalizedCurrent = currentTitle.trim().toLowerCase();
 
   return (
     <div className="text-[15px] leading-relaxed">
@@ -62,7 +78,37 @@ const MessageContent: React.FC<{ content: string; isAssistant: boolean }> = ({
           ul: ({ children }) => <ul className="ml-5 mb-3 space-y-2 text-neutral-200">{children}</ul>,
           li: ({ children }) => <li className="list-disc marker:text-neutral-500">{children}</li>,
           strong: ({ children }) => <strong className="font-semibold text-red-200">{children}</strong>,
-          em: ({ children }) => <em className="italic text-neutral-400">{children}</em>,
+          em: ({ children }) => <em className="italic text-neutral-300">{children}</em>,
+          a: ({ href, children }) => {
+            const label = String(children ?? "");
+            if (href && href.startsWith("#obra:") && onMediaClick) {
+              // Se a IA por acaso linkar a própria obra da página atual, renderiza apenas como texto normal
+              if (label.trim().toLowerCase() === normalizedCurrent) {
+                return <span>{children}</span>;
+              }
+              return (
+                <button
+                  type="button"
+                  onClick={() => onMediaClick(href, label)}
+                  className="inline-flex items-baseline gap-0.5 font-semibold text-white underline decoration-red-500/70 decoration-dotted underline-offset-4 hover:text-red-400 hover:decoration-red-400 transition-colors cursor-pointer"
+                  title={`Abrir página de "${label}"`}
+                >
+                  <span>{children}</span>
+                  <ArrowUpRight className="w-3.5 h-3.5 text-red-500 inline self-center shrink-0" />
+                </button>
+              );
+            }
+            return (
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-red-400 underline underline-offset-4 hover:text-red-300"
+              >
+                {children}
+              </a>
+            );
+          },
           code: ({ children }) => (
             <code className="bg-red-500/10 text-red-100 px-1.5 py-0.5 rounded-md text-sm font-mono border border-red-500/20">
               {children}
@@ -71,7 +117,7 @@ const MessageContent: React.FC<{ content: string; isAssistant: boolean }> = ({
           h3: ({ children }) => <h3 className="text-[17px] font-medium text-white mt-5 mb-2">{children}</h3>,
         }}
       >
-        {content}
+        {processedContent}
       </ReactMarkdown>
     </div>
   );
@@ -90,12 +136,56 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const { setLoading: setGlobalLoading } = useLoadingStore();
+
+  const handleMediaReferenceClick = async (rawRef: string, fallbackText: string) => {
+    try {
+      // Formato esperado: #obra:movie:Título:2022 ou #obra:tv:Título
+      const clean = decodeURIComponent(rawRef.replace(/^#obra:/, ""));
+      const parts = clean.split(":");
+      const rawType = parts[0] === "tv" ? "tv" : parts[0] === "movie" ? "movie" : undefined;
+      const maybeYear = parts.length >= 3 && /^\d{4}$/.test(parts[parts.length - 1]) ? parts.pop() : undefined;
+      const parsedTitle = (parts.slice(1).join(":") || fallbackText).trim();
+
+      // Se clicou na própria obra da página atual, apenas fecha o modal
+      if (parsedTitle.toLowerCase() === movieContext.title.toLowerCase()) {
+        setIsOpen(false);
+        return;
+      }
+
+      setGlobalLoading(true, parsedTitle);
+      setIsOpen(false);
+
+      const searchType = rawType === "movie" ? "movies" : rawType === "tv" ? "tv" : "all";
+      const data = await searchMulti(parsedTitle, searchType, undefined, maybeYear);
+      let results: any[] = data?.results || [];
+
+      // Se filtrando por ano não veio nada, tenta sem ano
+      if (results.length === 0 && maybeYear) {
+        const retry = await searchMulti(parsedTitle, searchType);
+        results = retry?.results || [];
+      }
+
+      const best = results.find((r) => r.media_type !== "person") || results[0];
+      if (best && best.id) {
+        const isTv = rawType === "tv" || best.media_type === "tv" || (!best.title && best.name);
+        router.push(`/${isTv ? "serie" : "filme"}/${best.id}`);
+      } else {
+        router.push(`/busca?q=${encodeURIComponent(parsedTitle)}`);
+      }
+    } catch (err) {
+      console.error("Erro ao navegar para obra citada:", err);
+      setGlobalLoading(false);
+      router.push(`/busca?q=${encodeURIComponent(fallbackText)}`);
+    }
+  };
 
   const { isAuthenticated, user } = useAuth();
   const {
     messages,
     isLoading,
     sendMessage,
+    clearMessages,
     addWelcomeMessage,
   } = useMovieChat(movieContext);
 
@@ -126,36 +216,54 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
   }, [messages, isTyping]);
 
   useEffect(() => {
-    if (isOpen && !hasInitialized && isAuthenticated) {
-      const initializeChat = async () => {
-        try {
-          setIsTyping(true);
-          await new Promise((resolve) => setTimeout(resolve, 800));
+    if (!isOpen || hasInitialized || !isAuthenticated) return;
 
-          const userName = user?.name?.split(" ")[0] || "agora";
-          const welcomeMessage = await generateWelcomeMessage(
-            movieContext,
-            userName
-          );
-          const topics = generateSuggestedTopics(movieContext);
-
-          addWelcomeMessage(welcomeMessage);
-          setSuggestedTopics(topics);
-          setHasInitialized(true);
-          setIsTyping(false);
-        } catch (error) {
-          console.error("Erro ao inicializar chat:", error);
-          const userName = user?.name?.split(" ")[0] || "agora";
-          addWelcomeMessage(
-            `Olá, ${userName}. Sou a Murphy. Como posso te ajudar a descobrir mais sobre "${movieContext.title}"?`
-          );
-          setIsTyping(false);
-        }
-      };
-
-      initializeChat();
+    // Se já existe conversa salva na sessão para esta obra, restaura sem gerar nova boas-vindas
+    if (messages.length > 0) {
+      setHasInitialized(true);
+      if (messages.length === 1 && messages[0].role === "assistant") {
+        setSuggestedTopics(generateSuggestedTopics(movieContext));
+      }
+      return;
     }
-  }, [isOpen, hasInitialized, movieContext, addWelcomeMessage, isAuthenticated, user]);
+
+    const initializeChat = async () => {
+      try {
+        setIsTyping(true);
+        await new Promise((resolve) => setTimeout(resolve, 800));
+
+        const userName = user?.name?.split(" ")[0] || "agora";
+        const welcomeMessage = await generateWelcomeMessage(
+          movieContext,
+          userName
+        );
+        const topics = generateSuggestedTopics(movieContext);
+
+        addWelcomeMessage(welcomeMessage);
+        setSuggestedTopics(topics);
+        setHasInitialized(true);
+        setIsTyping(false);
+      } catch (error) {
+        console.error("Erro ao inicializar chat:", error);
+        const userName = user?.name?.split(" ")[0] || "agora";
+        addWelcomeMessage(
+          `Olá, ${userName}. Sou a Murphy. Como posso te ajudar a descobrir mais sobre "${movieContext.title}"?`
+        );
+        setIsTyping(false);
+      }
+    };
+
+    initializeChat();
+  }, [isOpen, hasInitialized, movieContext, addWelcomeMessage, isAuthenticated, user, messages]);
+
+  const handleResetChat = async () => {
+    if (isLoading || isTyping) return;
+    clearMessages();
+    const userName = user?.name?.split(" ")[0] || "agora";
+    const welcomeMessage = await generateWelcomeMessage(movieContext, userName);
+    addWelcomeMessage(welcomeMessage);
+    setSuggestedTopics(generateSuggestedTopics(movieContext));
+  };
 
   const handleSendMessage = async (messageToSend?: string) => {
     const message = messageToSend || inputValue.trim();
@@ -248,14 +356,14 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <div 
-          className="relative w-full md:w-[280px]"
+          className="relative w-full md:w-auto"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
           <Button
             onClick={handleChatButtonClick}
             size="lg"
-            className="relative gap-3 bg-black/40 backdrop-blur-xl border border-white/10 text-white hover:bg-white/15 shadow-2xl transition-all duration-300 w-full justify-center md:rounded-2xl rounded-xl h-14 overflow-hidden group"
+            className="relative gap-2.5 bg-black/55 backdrop-blur-xl border border-white/15 text-white hover:bg-white/10 hover:border-white/30 shadow-2xl transition-all duration-200 hover:-translate-y-0.5 w-full md:w-auto justify-center rounded-full h-12 pl-2.5 pr-5 overflow-hidden group"
           >
             {/* Efeito Shimmer Animado */}
             <motion.div
@@ -266,12 +374,19 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
             />
 
             <motion.div
-              animate={isHovered ? { y: -2, rotate: [-5, 5, 0] } : {}}
+              animate={isHovered ? { scale: 1.06 } : { scale: 1 }}
+              className="w-7 h-7 rounded-full overflow-hidden border border-white/20 bg-neutral-900 flex-shrink-0"
             >
-              <MessageCircle className="h-[18px] w-[18px] opacity-70" strokeWidth={2.5} />
+              <Image
+                src="/images/murphy.png"
+                alt="Murphy"
+                width={28}
+                height={28}
+                className="w-full h-full object-cover"
+              />
             </motion.div>
 
-            <span className="font-medium tracking-wide flex items-center gap-2">
+            <span className="font-medium tracking-wide flex items-center gap-2.5 text-sm">
               Conversar com a Murphy
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -281,26 +396,58 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
           </Button>
         </div>
 
-        <DialogContent className="h-[92dvh] md:h-[85vh] mx-auto w-full md:w-[calc(100%-2rem)] max-w-3xl flex flex-col p-0 bg-neutral-950/80 backdrop-blur-2xl border-x-0 border-b-0 border-t border-white/10 md:border md:border-white/10 shadow-[0_0_80px_rgba(0,0,0,0.8)] rounded-t-[32px] md:rounded-3xl overflow-hidden focus:outline-none focus-visible:outline-none outline-none">
+        <DialogContent className="[&>button]:hidden h-[92dvh] md:h-[85vh] mx-auto w-full md:w-[calc(100%-2rem)] max-w-3xl flex flex-col p-0 bg-neutral-950/80 backdrop-blur-2xl border-x-0 border-b-0 border-t border-white/10 md:border md:border-white/10 shadow-[0_0_80px_rgba(0,0,0,0.8)] rounded-t-[32px] md:rounded-3xl overflow-hidden focus:outline-none focus-visible:outline-none outline-none">
           {/* Header Minimalista Responsivo */}
-          <DialogHeader className="px-5 py-4 bg-transparent border-b border-white/5 flex-shrink-0 flex flex-row items-center gap-4 space-y-0 text-left">
+          <DialogHeader className="px-5 py-4 bg-transparent border-b border-white/5 flex-shrink-0 flex flex-row items-center justify-between gap-4 space-y-0 text-left">
             <DialogTitle className="sr-only">Chat com Murphy</DialogTitle>
-            <div className="w-10 h-10 rounded-full overflow-hidden bg-neutral-900 border border-white/5 flex-shrink-0 flex items-center justify-center">
-              <Image
-                src="/images/murphy.png"
-                alt="Murphy"
-                className="w-full h-full object-cover"
-                width={40}
-                height={40}
-              />
-            </div>
-            <div className="flex flex-col leading-none">
-              <span className="text-[15px] font-semibold text-white tracking-tight mb-1">Murphy AI</span>
-              <div className="flex items-center gap-2 text-[11px] text-neutral-500 font-medium uppercase tracking-wider">
-                <span>{movieContext.mediaType === "movie" ? "Filme" : "Série"}</span>
-                <span className="w-1 h-1 rounded-full bg-red-600/60" />
-                <span className="text-neutral-400 line-clamp-1 max-w-[180px] normal-case tracking-normal">"{movieContext.title}"</span>
+            <div className="flex items-center gap-3.5 min-w-0">
+              <div className="w-10 h-10 rounded-full overflow-hidden bg-neutral-900 border border-white/10 flex-shrink-0 flex items-center justify-center">
+                <Image
+                  src="/images/murphy.png"
+                  alt="Murphy"
+                  className="w-full h-full object-cover"
+                  width={40}
+                  height={40}
+                />
               </div>
+              <div className="flex flex-col leading-none min-w-0">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="text-[15px] font-semibold text-white tracking-tight">Murphy</span>
+                  <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-red-500 bg-red-600/10 border border-red-500/25 px-1.5 py-0.5 rounded-full">
+                    Assistente
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-[11px] text-neutral-400 truncate">
+                  <span className="text-neutral-500">Conversando sobre</span>
+                  <strong className="text-neutral-200 font-medium truncate max-w-[200px] sm:max-w-[380px]">
+                    {movieContext.title}
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5 shrink-0">
+              {messages.length > 1 && (
+                <button
+                  type="button"
+                  onClick={handleResetChat}
+                  disabled={isLoading || isTyping}
+                  title="Limpar conversa"
+                  className="flex items-center gap-1.5 h-8 px-2.5 rounded-lg text-xs font-medium text-neutral-400 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-40"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Limpar</span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                title="Fechar"
+                aria-label="Fechar"
+                className="flex items-center justify-center w-8 h-8 rounded-lg text-neutral-400 hover:text-white hover:bg-white/10 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
           </DialogHeader>
 
@@ -340,6 +487,8 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
                         <MessageContent
                           content={message.content}
                           isAssistant={message.role === "assistant"}
+                          currentTitle={movieContext.title}
+                          onMediaClick={handleMediaReferenceClick}
                         />
                       </div>
 
@@ -415,7 +564,7 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
                     <button
                       key={index}
                       onClick={() => handleSuggestedTopicClick(topic)}
-                      className="px-4 py-2 bg-white/5 hover:bg-white/10 active:scale-95 border border-white/5 text-[13px] text-neutral-300 font-medium rounded-2xl transition-all duration-200 text-left"
+                      className="px-4 py-2 bg-white/5 hover:bg-white/10 hover:border-white/20 active:scale-95 border border-white/10 text-[13px] text-neutral-300 hover:text-white font-medium rounded-2xl transition-all duration-200 text-left"
                     >
                       {topic}
                     </button>
@@ -435,6 +584,7 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Envie uma mensagem..."
+                maxLength={500}
                 disabled={isLoading}
                 className="flex-1 bg-transparent border-0 h-10 text-[15px] focus-visible:ring-0 focus-visible:ring-offset-0 text-white placeholder:text-neutral-500 shadow-none px-4"
               />

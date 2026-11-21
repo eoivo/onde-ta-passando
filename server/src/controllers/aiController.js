@@ -17,48 +17,52 @@ function createSystemPrompt(movieContext) {
 
   let releaseStatus = "";
   if (!releaseDateObj || isNaN(releaseDateObj.getTime())) {
-    releaseStatus = "❓ STATUS NÃO ESPECIFICADO NOS DADOS OFICIAIS";
+    releaseStatus = "STATUS NÃO ESPECIFICADO NOS DADOS OFICIAIS";
   } else if (releaseDateObj > currentDate) {
-    releaseStatus = `⏳ AINDA NÃO LANÇADO - Previsão oficial de estreia: ${releaseDateStr}`;
+    releaseStatus = `AINDA NÃO LANÇADO - Previsão oficial de estreia: ${releaseDateStr}`;
   } else {
     const monthsAgo = (currentDate.getFullYear() - releaseDateObj.getFullYear()) * 12 + (currentDate.getMonth() - releaseDateObj.getMonth());
     if (monthsAgo < 3) {
-      releaseStatus = `🆕 LANÇAMENTO RECENTE - Lançado oficialmente em: ${releaseDateStr}`;
+      releaseStatus = `LANÇAMENTO RECENTE - Lançado oficialmente em: ${releaseDateStr}`;
     } else if (monthsAgo < 12) {
-      releaseStatus = `🎬 DISPONÍVEL - Lançado oficialmente em: ${releaseDateStr}`;
+      releaseStatus = `DISPONÍVEL - Lançado oficialmente em: ${releaseDateStr}`;
     } else {
-      releaseStatus = `📚 CATÁLOGO - Lançado oficialmente em: ${releaseDateStr}`;
+      releaseStatus = `CATÁLOGO - Lançado oficialmente em: ${releaseDateStr}`;
     }
   }
 
   const availability = (streamingServices && streamingServices.length > 0) 
-    ? `✅ DISPONÍVEL EM: ${streamingServices.join(", ")}`
-    : "❌ AINDA NÃO DISPONÍVEL em serviços de streaming (apenas cinemas ou aguardando lançamento).";
+    ? `DISPONÍVEL EM: ${streamingServices.join(", ")}`
+    : "AINDA NÃO DISPONÍVEL em serviços de streaming (apenas cinemas ou aguardando lançamento).";
 
-  return `Você é Murphy, assistente de IA especializada em cinema, inspirada na Murphy Cooper de Interestelar. Você é curiosa, inteligente e apaixonada por filmes e séries.
+  return `Você é Murphy, assistente de IA especializada em cinema, inspirada na Murphy Cooper de Interestelar. Você é inteligente, perspicaz e valoriza o tempo do usuário.
 
-📅 DATA ATUAL: ${currentDateStr} (${currentYear})
+DATA ATUAL: ${currentDateStr} (${currentYear})
 
-🎬 CONTEXTO ATUAL DO SISTEMA (SUA ÚNICA FONTE DE VERDADE):
-• Título: ${title} (${year})
-• Tipo: ${mediaTypeName}
-• Status Oficial: ${releaseStatus}
-• Disponibilidade Real: ${availability}
-• Gêneros: ${genres.join(", ")}
-• Elenco: ${cast.join(", ")}
-• Direção: ${director || "N/A"}
-• Sinopse: ${overview}
+CONTEXTO ATUAL DO SISTEMA (SUA ÚNICA FONTE DE VERDADE):
+- Título: ${title} (${year})
+- Tipo: ${mediaTypeName}
+- Status Oficial: ${releaseStatus}
+- Disponibilidade Real: ${availability}
+- Gêneros: ${genres.join(", ")}
+- Elenco: ${cast.join(", ")}
+- Direção: ${director || "N/A"}
+- Sinopse: ${overview}
 
-🎯 SUA PERSONALIDADE:
-• Seja natural e conversacional como uma amiga que ama cinema. Use português brasileiro coloquial.
+PERSONALIDADE E TOM DE VOZ:
+- CONCISÃO É PRIORIDADE: Vá direto ao ponto. Evite introduções longas.
+- RESPOSTA PROPORCIONAL: Se a pergunta for simples, responda em 1-2 frases. Só se estenda se o usuário pedir uma análise profunda.
+- Seja natural, inteligente e direta, usando português brasileiro coloquial.
+- NÃO use emojis nas respostas. Mantenha um tom editorial, sóbrio e cinematográfico.
+- FORMATAÇÃO DE OBRAS CITADAS (OBRIGATÓRIO): Sempre que mencionar o título de OUTROS filmes ou séries (recomendações, comparações ou referências externas), formate-o como um link Markdown no padrão [Título da Obra](#obra:movie:Título da Obra:ANO) para filmes ou [Título da Obra](#obra:tv:Título da Obra:ANO) para séries (use espaços normais no título, nunca use %20; se não souber o ano exato, omita o :ANO final). Exemplo: recomendo [Batman](#obra:movie:Batman:2022) (2022) e [Breaking Bad](#obra:tv:Breaking Bad:2008). NUNCA aplique esse link à obra principal atual (${title}) e nem a nomes de atores, diretores ou personagens.
 
-⚠️ REGRAS CRÍTICAS DE VERACIDADE:
-1. **PRIORIDADE TOTAL AO CONTEXTO:** Use APENAS os dados do sistema para fatos específicos sobre o filme que você está conversando hoje (datas, streaming, elenco).
-2. **LIMITES DE TREINAMENTO:** Seu treinamento interno foi concluído em meados de 2025. Se o usuário perguntar fatos globais (premiações, notícias) de 2026, seja honesta que sua memória interna para ali.
-3. **NÃO ALUCINE:** Nunca invente estreias no futuro se o Status Oficial mostrar que o filme já saiu.
-4. **DISPONIBILIDADE:** Se a 'Disponibilidade Real' mostrar plataformas, ignore sua memória de que o filme ainda não saiu e confirme que ele JÁ está em streaming.
+REGRAS CRÍTICAS DE VERACIDADE:
+1. PRIORIDADE TOTAL AO CONTEXTO: Use APENAS os dados do sistema para fatos específicos sobre a obra (datas, streaming, elenco).
+2. LIMITES DE TREINAMENTO: Seu treinamento interno foi concluído em meados de 2025. Se o usuário perguntar fatos globais (premiações, notícias) de 2026, seja honesta de forma breve.
+3. NÃO ALUCINE: Nunca invente estreias no futuro se o Status Oficial mostrar que a obra já saiu.
+4. DISPONIBILIDADE: Se a 'Disponibilidade Real' mostrar plataformas, confirme que o título JÁ está disponível nelas.
 
-❌ NÃO use termos técnicos como "TMDB", "API" ou "Contexto".`;
+NÃO use termos técnicos como "TMDB", "API" ou "Contexto".`;
 }
 
 // @desc    Enviar mensagem para o chat do Gemini com lógica de Fallback
@@ -68,12 +72,42 @@ exports.chat = async (req, res) => {
   try {
     const { message, movieContext, conversationHistory } = req.body;
 
-    if (!message || !movieContext) {
+    if (!message || !movieContext || typeof message !== "string") {
       return res.status(400).json({
         success: false,
         message: "Forneça a mensagem e o contexto do filme"
       });
     }
+
+    const trimmedMessage = message.trim();
+    if (!trimmedMessage) {
+      return res.status(400).json({
+        success: false,
+        message: "A mensagem não pode estar vazia"
+      });
+    }
+
+    // Limite de 500 caracteres por mensagem para evitar abuso de tokens
+    if (trimmedMessage.length > 500) {
+      return res.status(400).json({
+        success: false,
+        message: "Sua mensagem é muito longa (máximo de 500 caracteres)."
+      });
+    }
+
+    // Sanitiza os campos do movieContext para evitar payloads gigantes
+    const safeMovieContext = {
+      title: String(movieContext.title || "").slice(0, 150),
+      overview: String(movieContext.overview || "").slice(0, 1200),
+      releaseDate: String(movieContext.releaseDate || "").slice(0, 30),
+      genres: Array.isArray(movieContext.genres) ? movieContext.genres.slice(0, 8).map(g => String(g).slice(0, 40)) : [],
+      cast: Array.isArray(movieContext.cast) ? movieContext.cast.slice(0, 10).map(c => String(c).slice(0, 60)) : [],
+      director: movieContext.director ? String(movieContext.director).slice(0, 80) : "N/A",
+      mediaType: movieContext.mediaType === "tv" ? "tv" : "movie",
+      streamingServices: Array.isArray(movieContext.streamingServices)
+        ? movieContext.streamingServices.slice(0, 10).map(s => String(s).slice(0, 40))
+        : []
+    };
 
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
     if (!GEMINI_API_KEY) {
@@ -84,20 +118,25 @@ exports.chat = async (req, res) => {
     }
 
     // Configuração dos modelos para tentativa (Cascata de Fallback)
-    // Desativada a Busca no Google (Grounding) para priorizar estabilidade na cota gratuita
+    // Priorizando modelos estáveis (GA), rápidos (<1.5s) e com cota ativa no Free Tier
     const modelsToTry = [
       { 
-        name: "gemini-3.1-flash-lite-preview", 
+        name: "gemini-3.5-flash-lite", 
+        useGrounding: false, 
+        useThoughtSigs: false 
+      },
+      { 
+        name: "gemini-3-flash-preview", 
+        useGrounding: false, 
+        useThoughtSigs: true 
+      },
+      { 
+        name: "gemini-3.1-flash-lite", 
         useGrounding: false, 
         useThoughtSigs: true 
       },
       { 
         name: "gemini-2.5-flash-lite", 
-        useGrounding: false, 
-        useThoughtSigs: false 
-      },
-      { 
-        name: "gemini-1.5-flash-latest", 
         useGrounding: false, 
         useThoughtSigs: false 
       }
@@ -107,14 +146,15 @@ exports.chat = async (req, res) => {
 
     for (const modelConfig of modelsToTry) {
       try {
-        const systemPrompt = createSystemPrompt(movieContext);
+        const systemPrompt = createSystemPrompt(safeMovieContext);
         const contents = [];
 
-        // Mapear histórico (limpando thought_signatures se o modelo não suportar)
-        if (conversationHistory && conversationHistory.length > 0) {
-          conversationHistory.slice(-8).forEach(msg => {
+        // Mapear histórico (máx 6 mensagens recentes e 1500 caracteres por item para economizar tokens)
+        if (Array.isArray(conversationHistory) && conversationHistory.length > 0) {
+          conversationHistory.slice(-6).forEach(msg => {
+            if (!msg || typeof msg.content !== "string") return;
             const role = msg.role === "user" ? "user" : "model";
-            const parts = [{ text: msg.content }];
+            const parts = [{ text: msg.content.slice(0, 1500) }];
             
             if (modelConfig.useThoughtSigs && msg.thoughtSignature) {
               parts.push({ thought_signature: msg.thoughtSignature });
@@ -126,7 +166,7 @@ exports.chat = async (req, res) => {
 
         contents.push({
           role: "user",
-          parts: [{ text: message }]
+          parts: [{ text: trimmedMessage }]
         });
 
         const requestBody = {
@@ -137,7 +177,7 @@ exports.chat = async (req, res) => {
           contents: contents,
           generationConfig: {
             temperature: 0.7,
-            maxOutputTokens: 1024,
+            maxOutputTokens: 512,
           }
         };
 
@@ -152,6 +192,7 @@ exports.chat = async (req, res) => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(requestBody),
+          signal: AbortSignal.timeout(12000),
         });
 
         if (!response.ok) {
@@ -200,7 +241,7 @@ exports.chat = async (req, res) => {
     res.status(500).json({
       success: false,
       message: error.message.includes("429") 
-        ? "Murphy está um pouco sobrecarregada em todos os motores! Espere um minuto. 😅"
+        ? "Murphy está um pouco sobrecarregada em todos os motores. Espere um minuto."
         : "Erro ao processar conversa com a IA"
     });
   }
