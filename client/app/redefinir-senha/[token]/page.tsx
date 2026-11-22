@@ -21,6 +21,7 @@ export default function ResetPasswordPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showWakingMsg, setShowWakingMsg] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState("");
 
@@ -52,6 +53,11 @@ export default function ResetPasswordPage() {
     }
 
     setIsSubmitting(true);
+    setShowWakingMsg(false);
+
+    const wakingTimer = setTimeout(() => {
+      setShowWakingMsg(true);
+    }, 4000);
 
     try {
       await resetPassword(token, password);
@@ -67,7 +73,9 @@ export default function ResetPasswordPage() {
       toast.error(err.message || "Erro ao redefinir senha");
       console.error("Erro ao redefinir senha:", err);
     } finally {
+      clearTimeout(wakingTimer);
       setIsSubmitting(false);
+      setShowWakingMsg(false);
     }
   };
 
@@ -87,19 +95,19 @@ export default function ResetPasswordPage() {
           <div className="absolute inset-0 backdrop-blur-[2px]" />
         </div>
 
-        <div className="relative z-10 max-w-md w-full bg-gray-900/90 rounded-xl shadow-2xl p-8 backdrop-blur-md border border-gray-800/50 text-center">
-          <div className="flex justify-center mb-4">
-            <div className="bg-red-600/20 p-4 rounded-full">
-              <XCircle className="w-12 h-12 text-red-500" />
+        <div className="relative z-10 max-w-md w-full bg-neutral-950/40 rounded-[32px] shadow-[0_0_50px_rgba(0,0,0,0.5)] p-8 md:p-10 backdrop-blur-3xl border border-white/10 text-center">
+          <div className="flex justify-center mb-5">
+            <div className="bg-red-500/10 p-4 rounded-full">
+              <XCircle className="w-10 h-10 text-red-500" />
             </div>
           </div>
-          <h2 className="text-2xl font-bold text-white mb-2">Token inválido</h2>
-          <p className="text-gray-400 mb-6">
+          <h2 className="text-3xl font-semibold text-white tracking-tight mb-2">Token inválido</h2>
+          <p className="text-neutral-500 text-[15px] mb-8">
             O link de redefinição de senha é inválido ou expirou.
           </p>
           <Button
             onClick={() => router.push("/recuperar-senha")}
-            className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white"
+            className="w-full bg-red-600 hover:bg-red-700 text-white h-14 rounded-2xl text-[16px] font-semibold transition-colors duration-200"
           >
             Solicitar novo link
           </Button>
@@ -131,12 +139,7 @@ export default function ResetPasswordPage() {
         {!isSuccess ? (
           <>
             <div className="text-center mb-10">
-              <div className="flex justify-center mb-6">
-                <div className="bg-red-500/10 p-4 rounded-2xl">
-                  <Lock className="w-8 h-8 text-red-500" />
-                </div>
-              </div>
-              <h1 className="text-3xl font-semibold text-white tracking-tight mb-3">
+              <h1 className="text-4xl font-semibold text-white tracking-tight mb-3">
                 Nova Senha
               </h1>
               <p className="text-neutral-500 text-[15px]">
@@ -166,7 +169,7 @@ export default function ResetPasswordPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     required
-                    className="w-full bg-white/5 border-white/5 h-12 rounded-xl text-white placeholder:text-neutral-600 focus-visible:ring-1 focus-visible:ring-red-500/50 transition-all pr-12"
+                    className="w-full bg-white/[0.04] border-white/10 h-12 rounded-xl text-white placeholder:text-neutral-600 focus-visible:border-red-500/50 focus-visible:ring-0 transition-colors pr-12"
                   />
                   <button
                     type="button"
@@ -200,7 +203,7 @@ export default function ResetPasswordPage() {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
                     required
-                    className="w-full bg-white/5 border-white/5 h-12 rounded-xl text-white placeholder:text-neutral-600 focus-visible:ring-1 focus-visible:ring-red-500/50 transition-all pr-12"
+                    className="w-full bg-white/[0.04] border-white/10 h-12 rounded-xl text-white placeholder:text-neutral-600 focus-visible:border-red-500/50 focus-visible:ring-0 transition-colors pr-12"
                   />
                   <button
                     type="button"
@@ -220,7 +223,7 @@ export default function ResetPasswordPage() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-red-600 hover:bg-red-700 text-white h-14 rounded-2xl text-[16px] font-semibold transition-all duration-300 disabled:opacity-50"
+                  className="w-full bg-red-600 hover:bg-red-700 text-white h-14 rounded-2xl text-[16px] font-semibold transition-colors duration-200 disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <div className="flex items-center gap-2">
@@ -228,12 +231,15 @@ export default function ResetPasswordPage() {
                       <span>Redefinindo...</span>
                     </div>
                   ) : (
-                    <>
-                      <Lock className="mr-2 h-4 w-4" />
-                      Alterar Senha
-                    </>
+                    "Alterar senha"
                   )}
                 </Button>
+
+                {showWakingMsg && (
+                  <p className="text-[10px] text-center text-red-400 animate-pulse font-medium uppercase tracking-widest pt-2">
+                    Aguardando servidor... (Cold Start pode levar 30s)
+                  </p>
+                )}
               </div>
             </form>
 

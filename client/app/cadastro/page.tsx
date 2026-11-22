@@ -118,7 +118,7 @@ export default function RegisterPage() {
               onChange={(e) => setName(e.target.value)}
               placeholder="João Silva"
               required
-              className="w-full bg-white/5 border-white/5 h-12 rounded-xl text-white placeholder:text-neutral-600 focus-visible:ring-1 focus-visible:ring-red-500/50 transition-all"
+              className="w-full bg-white/[0.04] border-white/10 h-12 rounded-xl text-white placeholder:text-neutral-600 focus-visible:border-red-500/50 focus-visible:ring-0 transition-colors"
             />
           </div>
 
@@ -136,7 +136,7 @@ export default function RegisterPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="seu@email.com"
               required
-              className="w-full bg-white/5 border-white/5 h-12 rounded-xl text-white placeholder:text-neutral-600 focus-visible:ring-1 focus-visible:ring-red-500/50 transition-all"
+              className="w-full bg-white/[0.04] border-white/10 h-12 rounded-xl text-white placeholder:text-neutral-600 focus-visible:border-red-500/50 focus-visible:ring-0 transition-colors"
             />
           </div>
 
@@ -155,7 +155,7 @@ export default function RegisterPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="w-full bg-white/5 border-white/5 h-12 rounded-xl text-white placeholder:text-neutral-600 focus-visible:ring-1 focus-visible:ring-red-500/50 transition-all pr-12"
+                className="w-full bg-white/[0.04] border-white/10 h-12 rounded-xl text-white placeholder:text-neutral-600 focus-visible:border-red-500/50 focus-visible:ring-0 transition-colors pr-12"
               />
               <button
                 type="button"
@@ -189,7 +189,7 @@ export default function RegisterPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="w-full bg-white/5 border-white/5 h-12 rounded-xl text-white placeholder:text-neutral-600 focus-visible:ring-1 focus-visible:ring-red-500/50 transition-all pr-12"
+                className="w-full bg-white/[0.04] border-white/10 h-12 rounded-xl text-white placeholder:text-neutral-600 focus-visible:border-red-500/50 focus-visible:ring-0 transition-colors pr-12"
               />
               <button
                 type="button"

@@ -389,14 +389,14 @@ export default function Header() {
                         >
                           <Button
                             onClick={() => { router.push("/login"); handleNavClick(); }}
-                            className="w-full bg-white text-black hover:bg-white/90 text-sm font-black uppercase tracking-widest h-12 rounded-xl"
+                            className="w-full bg-white text-black hover:bg-neutral-200 text-xs font-bold uppercase tracking-widest h-11 rounded-full transition-colors"
                           >
                             Entrar
                           </Button>
                           <Button
                             onClick={() => { router.push("/cadastro"); handleNavClick(); }}
                             variant="outline"
-                            className="w-full bg-transparent border-white/10 hover:bg-white/5 text-sm font-black uppercase tracking-widest h-12 rounded-xl"
+                            className="w-full bg-white/[0.04] border-white/10 hover:bg-white/[0.1] hover:border-white/25 text-white text-xs font-bold uppercase tracking-widest h-11 rounded-full transition-colors"
                           >
                             Criar Conta
                           </Button>
@@ -467,10 +467,9 @@ export default function Header() {
               <Button
                 variant="ghost"
                 onClick={() => router.push("/login")}
-                className="rounded-full text-white/80 hover:bg-transparent hover:text-white hidden md:flex items-center justify-center gap-2 transition-colors duration-300 relative overflow-hidden"
+                className="h-9 px-4 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 hover:border-white/25 text-white/90 hover:text-white text-xs font-semibold hidden md:inline-flex items-center justify-center gap-2 transition-colors duration-200"
               >
-                <div className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 bg-red-500/10 transition-opacity duration-300"></div>
-                <User className="h-4 w-4" />
+                <User className="h-3.5 w-3.5 text-neutral-300" />
                 <span>Entrar</span>
               </Button>
             )}

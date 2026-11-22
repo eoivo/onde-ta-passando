@@ -13,12 +13,18 @@ import { toast } from "sonner";
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showWakingMsg, setShowWakingMsg] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setShowWakingMsg(false);
+
+    const wakingTimer = setTimeout(() => {
+      setShowWakingMsg(true);
+    }, 4000);
 
     try {
       await forgotPassword(email);
@@ -28,7 +34,9 @@ export default function ForgotPasswordPage() {
       toast.error(err.message || "Erro ao enviar email. Tente novamente.");
       console.error("Erro ao solicitar reset:", err);
     } finally {
+      clearTimeout(wakingTimer);
       setIsSubmitting(false);
+      setShowWakingMsg(false);
     }
   };
 
@@ -55,13 +63,8 @@ export default function ForgotPasswordPage() {
         {!isSuccess ? (
           <>
             <div className="text-center mb-10">
-              <div className="flex justify-center mb-6">
-                <div className="bg-red-500/10 p-4 rounded-2xl">
-                  <Mail className="w-8 h-8 text-red-500" />
-                </div>
-              </div>
-              <h1 className="text-3xl font-semibold text-white tracking-tight mb-3">
-                Esqueci minha senha
+              <h1 className="text-4xl font-semibold text-white tracking-tight mb-3">
+                Recuperar Senha
               </h1>
               <p className="text-neutral-500 text-[15px]">
                 Digite seu email e enviaremos um link para redefinir sua senha
@@ -83,27 +86,32 @@ export default function ForgotPasswordPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="seu@email.com"
                   required
-                  className="w-full bg-white/5 border-white/5 h-12 rounded-xl text-white placeholder:text-neutral-600 focus-visible:ring-1 focus-visible:ring-red-500/50 transition-all"
+                  className="w-full bg-white/[0.04] border-white/10 h-12 rounded-xl text-white placeholder:text-neutral-600 focus-visible:border-red-500/50 focus-visible:ring-0 transition-colors"
                 />
               </div>
 
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-red-600 hover:bg-neutral-100 hover:text-black text-white h-14 rounded-2xl text-[16px] font-semibold transition-all duration-300 shadow-xl disabled:opacity-50"
-              >
-                {isSubmitting ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="h-5 w-5 animate-spin" /> 
-                    <span>Enviando...</span>
-                  </div>
-                ) : (
-                  <>
-                    <Mail className="mr-2 h-4 w-4" />
-                    Enviar link
-                  </>
+              <div className="space-y-4 pt-2">
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white h-14 rounded-2xl text-[16px] font-semibold transition-colors duration-200 disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <span>Enviando...</span>
+                    </div>
+                  ) : (
+                    "Enviar link de recuperação"
+                  )}
+                </Button>
+
+                {showWakingMsg && (
+                  <p className="text-[10px] text-center text-red-400 animate-pulse font-medium uppercase tracking-widest pt-2">
+                    Aguardando servidor... (Cold Start pode levar 30s)
+                  </p>
                 )}
-              </Button>
+              </div>
             </form>
 
             <div className="mt-8 text-center">
@@ -150,7 +158,7 @@ export default function ForgotPasswordPage() {
             <div className="space-y-4">
               <Button
                 onClick={() => router.push("/login")}
-                className="w-full bg-red-600 hover:bg-neutral-100 hover:text-black text-white h-14 rounded-2xl text-[16px] font-semibold transition-all duration-300 shadow-xl"
+                className="w-full bg-red-600 hover:bg-red-700 text-white h-14 rounded-2xl text-[16px] font-semibold transition-colors duration-200"
               >
                 Voltar para o login
               </Button>
