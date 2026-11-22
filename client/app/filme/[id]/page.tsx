@@ -96,7 +96,8 @@ export default async function MoviePage({
 
   const releaseDate = new Date(movie.release_date).toLocaleDateString("pt-BR");
   const ageRating = extractBrazilianRating(movie, "movie");
-  const director = credits.crew?.find((person: any) => person.job === "Director")?.name;
+  const directorPerson = credits.crew?.find((person: any) => person.job === "Director");
+  const director = directorPerson?.name;
   const collectionInfo = movie.belongs_to_collection;
 
   // Preparar contexto para o chat bot
@@ -263,7 +264,12 @@ export default async function MoviePage({
                 <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-neutral-400">
                   <div>
                     <span className="font-semibold text-white">Direção:</span>{" "}
-                    {director}
+                    <Link
+                      href={`/pessoa/${directorPerson.id}`}
+                      className="text-neutral-200 hover:text-white underline-offset-4 hover:underline transition-colors"
+                    >
+                      {director}
+                    </Link>
                   </div>
                 </div>
               )}

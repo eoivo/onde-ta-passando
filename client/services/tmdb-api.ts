@@ -240,6 +240,22 @@ export async function getMovieCredits(movieId: string) {
   return await fetchFromTMDB(`/movie/${movieId}/credits`);
 }
 
+export async function getPersonDetails(personId: string) {
+  let data = await fetchFromTMDB(`/person/${personId}`, {
+    append_to_response: "combined_credits",
+  });
+
+  // Biografia ausente em PT-BR é comum no TMDB: usa EN-US como fallback
+  if (data && data.id && !data.biography) {
+    const en = await fetchFromTMDB(`/person/${personId}`, { language: "en-US" });
+    if (en?.biography) {
+      data = { ...data, biography: en.biography, biography_lang: "en" };
+    }
+  }
+
+  return data;
+}
+
 export async function getTvCredits(tvId: string) {
   return await fetchFromTMDB(`/tv/${tvId}/credits`);
 }

@@ -104,10 +104,7 @@ export default async function TVShowPage({
 
   const status = statusMap[tvShow.status] || tvShow.status;
   const ageRating = extractBrazilianRating(tvShow, "tv");
-  const creators =
-    tvShow.created_by && tvShow.created_by.length > 0
-      ? tvShow.created_by.map((c: any) => c.name).join(", ")
-      : null;
+  const creators: any[] = tvShow.created_by || [];
 
   const seriesContext: MovieContext = {
     title: tvShow.name,
@@ -324,10 +321,20 @@ export default async function TVShowPage({
               </div>
 
               <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-neutral-400">
-                {creators && (
+                {creators.length > 0 && (
                   <div>
                     <span className="font-semibold text-white">Criação:</span>{" "}
-                    {creators}
+                    {creators.map((c: any, i: number) => (
+                      <span key={c.id}>
+                        <Link
+                          href={`/pessoa/${c.id}`}
+                          className="text-neutral-200 hover:text-white underline-offset-4 hover:underline transition-colors"
+                        >
+                          {c.name}
+                        </Link>
+                        {i < creators.length - 1 ? ", " : ""}
+                      </span>
+                    ))}
                   </div>
                 )}
                 <div>

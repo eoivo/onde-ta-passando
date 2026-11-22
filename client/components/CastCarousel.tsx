@@ -3,7 +3,8 @@
 import { useRef } from "react";
 import { useDragScroll } from "@/hooks/useDragScroll";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import Link from "next/link";
+import { ChevronLeft, ChevronRight, ArrowRight, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import {
@@ -42,13 +43,6 @@ export default function CastCarousel({ cast }: CastCarouselProps) {
     }
   };
 
-  // Função para buscar o nome do ator no Google
-  const handleActorClick = (actorName: string) => {
-    const searchQuery = encodeURIComponent(actorName);
-    const googleSearchUrl = `https://www.google.com/search?q=${searchQuery}`;
-    window.open(googleSearchUrl, "_blank", "noopener,noreferrer");
-  };
-
   return (
     <TooltipProvider>
       <div className="relative group">
@@ -66,9 +60,9 @@ export default function CastCarousel({ cast }: CastCarouselProps) {
             >
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div
-                    className="rounded-xl overflow-hidden cursor-pointer group/actor border border-white/10 hover:border-white/25 transition-all duration-300 hover:shadow-lg"
-                    onClick={() => handleActorClick(person.name)}
+                  <Link
+                    href={`/pessoa/${person.id}`}
+                    className="block rounded-xl overflow-hidden cursor-pointer group/actor border border-white/10 hover:border-white/25 transition-all duration-300 hover:shadow-lg"
                   >
                     {person.profile_path ? (
                       <div className="relative h-[210px] w-[140px]">
@@ -78,37 +72,38 @@ export default function CastCarousel({ cast }: CastCarouselProps) {
                           width={140}
                           height={210}
                           quality={90}
+                          draggable={false}
                           className="object-cover w-full h-full group-hover/actor:scale-[1.03] transition-transform duration-300"
                         />
-                        {/* Overlay com ícone de busca */}
-                        <div className="absolute inset-0 bg-black/55 flex items-center justify-center opacity-0 group-hover/actor:opacity-100 transition-opacity duration-300">
-                          <div className="bg-black/65 border border-white/20 backdrop-blur-md rounded-full p-2.5">
-                            <Search className="w-5 h-5 text-white" />
-                          </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover/actor:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-3">
+                          <span className="h-7 px-3 rounded-full bg-black/65 border border-white/20 backdrop-blur-md text-[11px] font-semibold text-white inline-flex items-center gap-1 leading-none">
+                            Ver filmografia
+                            <ArrowRight className="w-3 h-3" />
+                          </span>
                         </div>
                       </div>
                     ) : (
                       <div className="w-full h-[210px] bg-white/[0.04] flex flex-col items-center justify-center hover:bg-white/[0.08] transition-colors">
-                        <Search className="w-6 h-6 text-neutral-500 mb-2" />
+                        <User className="w-7 h-7 text-neutral-600 mb-2" />
                         <span className="text-neutral-500 text-xs text-center px-2">
-                          Buscar no Google
+                          Ver filmografia
                         </span>
                       </div>
                     )}
-                  </div>
+                  </Link>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Clique para buscar {person.name} no Google</p>
+                  <p>Ver filmografia de {person.name}</p>
                 </TooltipContent>
               </Tooltip>
 
               <div className="mt-2.5">
-                <p
-                  className="font-semibold text-[13.5px] text-neutral-100 hover:text-white transition-colors cursor-pointer leading-snug truncate"
-                  onClick={() => handleActorClick(person.name)}
+                <Link
+                  href={`/pessoa/${person.id}`}
+                  className="block font-semibold text-[13.5px] text-neutral-100 hover:text-white transition-colors leading-snug truncate"
                 >
                   {person.name}
-                </p>
+                </Link>
                 <p className="text-xs text-neutral-400 truncate mt-0.5">{person.character}</p>
               </div>
             </motion.div>

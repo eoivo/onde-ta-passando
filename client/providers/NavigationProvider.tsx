@@ -62,6 +62,7 @@ export default function NavigationProvider({
   const getTitleFromPath = (path: string): string | null => {
     if (path.includes("/filme/")) return "filme";
     if (path.includes("/serie/")) return "série";
+    if (path.includes("/pessoa/")) return "pessoa";
     if (path.includes("/filmes")) return "filmes";
     if (path.includes("/series")) return "séries";
     if (path.includes("/busca")) return "resultados";
