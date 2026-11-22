@@ -18,18 +18,19 @@ import {
 } from "@/components/ui/accordion";
 import {
   Film,
-  Sparkles,
   Star,
   Calendar,
   Clock,
   PlayCircle,
   Globe,
   Clapperboard,
+  ArrowRight,
 } from "lucide-react";
 import LoadingReset from "@/components/LoadingReset";
 import ShareButton from "@/components/ShareButton";
 import EnhancedStreamingProviders from "@/components/EnhancedStreamingProviders";
 import Pagination from "@/components/Pagination";
+import MovieCard from "@/components/MovieCard";
 import { notFound } from "next/navigation";
 
 export const dynamicParams = true;
@@ -211,11 +212,11 @@ export default async function CollectionDetailPage({
       )}
 
       <div className="relative z-20 px-4 md:px-8 max-w-7xl mx-auto -mt-[35vh] md:-mt-[38vh] pt-0 md:pt-12">
-        <div className="flex flex-col md:flex-row gap-8">
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
           {/* Poster */}
           {posterUrl && (
             <div className="flex-shrink-0 mx-auto md:mx-0">
-              <div className="relative w-[200px] md:w-[300px] aspect-[2/3] rounded-lg overflow-hidden shadow-2xl">
+              <div className="relative w-[200px] md:w-[280px] aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl border border-white/10">
                 <Image
                   src={posterUrl}
                   alt={collectionName}
@@ -227,16 +228,16 @@ export default async function CollectionDetailPage({
           )}
 
           {/* Info */}
-          <div className="flex-1 space-y-6 pb-8">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <CategoryIcon className="w-5 h-5 text-red-500" />
-                  <Badge variant="outline" className="text-sm">
-                    {categoryMeta.label}
-                  </Badge>
+          <div className="flex-1 flex flex-col items-center text-center md:items-start md:text-left space-y-5 pb-4 md:pb-8 w-full">
+            <div className="w-full flex flex-col md:flex-row items-center md:items-start justify-between gap-4">
+              <div className="flex flex-col items-center md:items-start">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="h-7 px-3 rounded-full bg-red-600/15 border border-red-500/30 inline-flex items-center gap-1.5 text-red-400 text-[11px] font-bold uppercase tracking-wider leading-none">
+                    <CategoryIcon className="w-3.5 h-3.5 text-red-500" />
+                    <span>{categoryMeta.label}</span>
+                  </div>
                 </div>
-                <h1 className="text-3xl md:text-5xl font-bold mb-4">
+                <h1 className="font-bebas text-4xl sm:text-5xl md:text-6xl text-white uppercase tracking-wider leading-none drop-shadow-lg">
                   {collectionName}
                 </h1>
               </div>
@@ -244,35 +245,37 @@ export default async function CollectionDetailPage({
             </div>
 
             {description && (
-              <p className="text-lg text-gray-300 leading-relaxed">
+              <p className="text-sm md:text-base text-neutral-300 leading-relaxed max-w-3xl">
                 {description}
               </p>
             )}
 
-            <div className="flex flex-wrap items-center gap-3 text-gray-400">
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 backdrop-blur-md border border-white/10 rounded-full">
-                <Film className="w-4 h-4 text-red-500" />
-                <span className="font-bold text-white text-[11px] uppercase tracking-widest leading-none">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5 text-neutral-300">
+              <div className="h-8 px-3.5 bg-white/[0.04] backdrop-blur-md border border-white/10 rounded-full inline-flex items-center gap-2 leading-none">
+                <Film className="w-3.5 h-3.5 text-red-500" />
+                <span className="font-bold text-white text-[11px] uppercase tracking-wider leading-none">
                   {totalVisibleResults} {totalVisibleResults !== 1 ? "filmes" : "filme"}
                 </span>
               </div>
               {averageRating > 0 && (
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 backdrop-blur-md border border-white/10 rounded-full">
-                  <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                  <span className="font-bold text-white text-[11px] uppercase tracking-widest leading-none">
-                    {averageRating.toFixed(1)} CF
+                <div className="h-8 px-3.5 bg-white/[0.04] backdrop-blur-md border border-white/10 rounded-full inline-flex items-center gap-1.5 leading-none">
+                  <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
+                  <span className="font-bold text-white text-[11px] uppercase tracking-wider leading-none">
+                    {averageRating.toFixed(1)}
                   </span>
                 </div>
               )}
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 backdrop-blur-md border border-white/10 rounded-full">
-                <Calendar className="w-4 h-4 text-neutral-400" />
-                <span className="font-bold text-white text-[11px] uppercase tracking-widest leading-none">{yearsSpan}</span>
+              <div className="h-8 px-3.5 bg-white/[0.04] backdrop-blur-md border border-white/10 rounded-full inline-flex items-center gap-2 leading-none">
+                <Calendar className="w-3.5 h-3.5 text-neutral-400" />
+                <span className="font-bold text-white text-[11px] uppercase tracking-wider leading-none">
+                  {yearsSpan}
+                </span>
               </div>
               
               {firstRelease && lastRelease && category === "saga" && (
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-red-600/10 backdrop-blur-md border border-red-600/20 rounded-full">
-                  <Clock className="w-4 h-4 text-red-500" />
-                  <span className="font-bold text-red-500 text-[11px] uppercase tracking-widest leading-none">
+                <div className="h-8 px-3.5 bg-red-600/10 backdrop-blur-md border border-red-500/25 rounded-full inline-flex items-center gap-2 leading-none">
+                  <Clock className="w-3.5 h-3.5 text-red-500" />
+                  <span className="font-bold text-red-400 text-[11px] uppercase tracking-wider leading-none">
                     {lastRelease.getFullYear() - firstRelease.getFullYear() > 0
                       ? `${lastRelease.getFullYear() - firstRelease.getFullYear()} ANOS DE SAGA`
                       : "1 ANO DE SAGA"}
@@ -280,37 +283,29 @@ export default async function CollectionDetailPage({
                 </div>
               )}
             </div>
-
-            {firstRelease && lastRelease && category === "saga" && (
-              <div className="flex items-center gap-2 text-gray-400">
-                <span className="text-sm text-gray-500">Duração da saga:</span>
-                <span className="font-medium text-white">
-                  {lastRelease.getFullYear() - firstRelease.getFullYear() > 0
-                    ? `${lastRelease.getFullYear() - firstRelease.getFullYear()} anos`
-                    : "1 ano"}
-                </span>
-              </div>
-            )}
           </div>
         </div>
 
         {/* Acordeões */}
-        <div className="mt-12">
-          <Accordion type="single" collapsible className="w-full space-y-6">
+        <div className="mt-10">
+          <Accordion type="single" collapsible className="w-full space-y-4">
             {/* Linha do Tempo — apenas para Sagas */}
             {category === "saga" && (
               <AccordionItem
                 value="timeline"
-                className="bg-white/5 backdrop-blur-xl rounded-[32px] px-8 border border-white/10 overflow-hidden transition-colors duration-500 data-[state=open]:border-red-600/30 transform-gpu translate-z-0"
+                className="bg-white/[0.03] backdrop-blur-xl rounded-3xl px-5 md:px-8 border border-white/10 overflow-hidden transition-colors duration-300 data-[state=open]:border-white/20 transform-gpu translate-z-0"
               >
-                <AccordionTrigger className="py-6 text-xl font-normal font-bebas tracking-wider hover:no-underline group uppercase">
+                <AccordionTrigger className="py-5 text-xl font-normal font-bebas tracking-wider hover:no-underline group uppercase cursor-pointer">
                   <div className="flex items-center gap-3">
-                    <Clock className="w-6 h-6 text-red-600 group-hover:scale-110 transition-transform" />
-                    <span className="text-2xl">Linha do Tempo</span>
+                    <Clock className="w-5 h-5 text-red-500" />
+                    <span className="text-2xl text-white">Linha do Tempo</span>
+                    <span className="h-6 px-2.5 rounded-full bg-white/[0.06] border border-white/10 text-[11px] font-sans font-semibold text-neutral-300 inline-flex items-center leading-none">
+                      {allMovies.length} filmes
+                    </span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <div className="space-y-3 pb-8 pt-2">
+                  <div className="space-y-2.5 pb-6 pt-2">
                     {allMovies.map((movie, index) => {
                       const releaseYear = movie.release_date
                         ? new Date(movie.release_date).getFullYear()
@@ -319,30 +314,49 @@ export default async function CollectionDetailPage({
                         <Link
                           key={movie.id}
                           href={`/filme/${movie.id}`}
-                          className="flex items-center gap-6 p-4 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 hover:border-red-500/30 transition-all duration-500 group"
+                          className="flex items-center gap-3.5 md:gap-5 p-3 md:p-3.5 bg-white/[0.03] border border-white/10 rounded-2xl hover:bg-white/[0.07] hover:border-white/25 transition-colors duration-200 group"
                         >
-                          <div className="flex-shrink-0 w-16 text-center border-r border-white/10">
-                            <div className="text-3xl font-normal font-bebas text-red-600 group-hover:scale-110 transition-transform leading-none">
-                              {String(index + 1).padStart(2, '0')}
+                          <div className="flex-shrink-0 w-12 md:w-14 text-center border-r border-white/10 pr-2">
+                            <div className="text-2xl md:text-3xl font-normal font-bebas text-red-500 leading-none">
+                              {String(index + 1).padStart(2, "0")}
                             </div>
-                            <div className="text-[10px] font-black uppercase text-neutral-500 tracking-tighter mt-1">
+                            <div className="text-[10px] font-bold uppercase text-neutral-400 mt-1">
                               {releaseYear}
                             </div>
                           </div>
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-white group-hover:text-red-500 transition-colors text-[16px] tracking-tight">
+
+                          {movie.poster_path && (
+                            <div className="relative w-10 h-14 rounded-lg overflow-hidden flex-shrink-0 border border-white/10 bg-neutral-900">
+                              <Image
+                                src={`https://image.tmdb.org/t/p/w185${movie.poster_path}`}
+                                alt={movie.title}
+                                fill
+                                sizes="40px"
+                                className="object-cover"
+                              />
+                            </div>
+                          )}
+
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-white group-hover:text-red-400 transition-colors text-sm md:text-base truncate">
                               {movie.title}
                             </h3>
                             {movie.overview && (
-                              <p className="text-[13px] text-neutral-500 line-clamp-1 mt-1 font-light italic">
+                              <p className="text-xs md:text-[13px] text-neutral-400 line-clamp-1 mt-0.5">
                                 {movie.overview}
                               </p>
                             )}
                           </div>
-                          <div className="flex items-center gap-1.5 flex-shrink-0 bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
-                            <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
-                            <span className="text-[13px] font-bold text-white">
-                              {movie.vote_average?.toFixed(1) || "N/A"}
+
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <div className="h-7 px-2.5 rounded-full bg-white/[0.05] border border-white/10 inline-flex items-center gap-1 leading-none">
+                              <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                              <span className="text-xs font-bold text-white leading-none">
+                                {movie.vote_average?.toFixed(1) || "N/A"}
+                              </span>
+                            </div>
+                            <span className="hidden sm:flex w-7 h-7 rounded-full bg-white/[0.05] border border-white/10 group-hover:bg-white/[0.12] group-hover:border-white/25 items-center justify-center text-neutral-400 group-hover:text-white transition-colors">
+                              <ArrowRight className="w-3.5 h-3.5" />
                             </span>
                           </div>
                         </Link>
@@ -357,18 +371,18 @@ export default async function CollectionDetailPage({
             {category === "saga" && streamingProviders && (
               <AccordionItem
                 value="streaming"
-                className="bg-white/5 backdrop-blur-xl rounded-[32px] px-8 border border-white/10 overflow-hidden transition-colors duration-500 data-[state=open]:border-red-600/30 transform-gpu translate-z-0"
+                className="bg-white/[0.03] backdrop-blur-xl rounded-3xl px-5 md:px-8 border border-white/10 overflow-hidden transition-colors duration-300 data-[state=open]:border-white/20 transform-gpu translate-z-0"
               >
-                <AccordionTrigger className="py-6 text-xl font-normal font-bebas tracking-wider hover:no-underline group uppercase">
+                <AccordionTrigger className="py-5 text-xl font-normal font-bebas tracking-wider hover:no-underline group uppercase cursor-pointer">
                   <div className="flex items-center gap-3">
-                    <PlayCircle className="w-6 h-6 text-red-600 group-hover:scale-110 transition-transform" />
-                    <span className="text-2xl">Onde Assistir</span>
+                    <PlayCircle className="w-5 h-5 text-red-500" />
+                    <span className="text-2xl text-white">Onde Assistir</span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <div className="pb-8 pt-2">
-                    <p className="text-neutral-500 mb-8 text-[15px] font-light leading-relaxed max-w-2xl italic">
-                      Monitoramos as principais plataformas do Brasil para você maratonar esta saga com o máximo de conforto.
+                  <div className="pb-6 pt-2">
+                    <p className="text-neutral-400 mb-6 text-sm leading-relaxed max-w-2xl">
+                      Confira as plataformas de streaming onde os filmes principais desta saga estão disponíveis no Brasil:
                     </p>
                     <EnhancedStreamingProviders
                       providers={streamingProviders}
@@ -389,23 +403,31 @@ export default async function CollectionDetailPage({
           <div className="mt-12 pb-12">
             {collection.groups && collection.groups.length > 0 ? (
               /* RENDERIZAÇÃO DE MEGA-SAGA (Agrupada por Eras) */
-              <div className="space-y-16">
+              <div className="space-y-14">
                 {collection.groups.map((group, idx) => (
                   <section key={idx} className="scroll-mt-24">
-                    <div className="mb-6">
-                      <h2 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
-                        <span className="w-1.5 h-8 bg-red-600 rounded-full" />
-                        {group.name}
-                      </h2>
+                    <div className="mb-6 pb-3 border-b border-white/10">
+                      <div className="flex items-center gap-3">
+                        <h2 className="font-bebas text-3xl md:text-4xl text-white uppercase tracking-wider leading-none">
+                          {group.name}
+                        </h2>
+                        <span className="h-6 px-2.5 rounded-full bg-white/[0.06] border border-white/10 text-[11px] font-semibold text-neutral-300 inline-flex items-center leading-none">
+                          {group.movies.length} filmes
+                        </span>
+                      </div>
                       {group.description && (
-                        <p className="text-gray-400 mt-2 text-sm md:text-base max-w-4xl">
+                        <p className="text-neutral-400 mt-1.5 text-xs md:text-sm max-w-4xl">
                           {group.description}
                         </p>
                       )}
                     </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-                      {group.movies.map((movie) => (
-                        <MovieGridItem key={movie.id} movie={movie} />
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
+                      {group.movies.map((movie, mIdx) => (
+                        <MovieCard
+                          key={movie.id}
+                          movie={{ ...(movie as any), media_type: "movie" }}
+                          index={mIdx}
+                        />
                       ))}
                     </div>
                   </section>
@@ -414,12 +436,21 @@ export default async function CollectionDetailPage({
             ) : (
               /* RENDERIZAÇÃO PADRÃO (Lista única) */
               <>
-                <h2 className="text-2xl md:text-3xl font-bold mb-6">
-                  {moviesLabel}
-                </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-                  {sortedMovies.map((movie) => (
-                    <MovieGridItem key={movie.id} movie={movie} />
+                <div className="flex items-center gap-3 mb-6 pb-3 border-b border-white/10">
+                  <h2 className="font-bebas text-3xl md:text-4xl text-white uppercase tracking-wider leading-none">
+                    {moviesLabel}
+                  </h2>
+                  <span className="h-6 px-2.5 rounded-full bg-white/[0.06] border border-white/10 text-[11px] font-semibold text-neutral-300 inline-flex items-center leading-none">
+                    {totalVisibleResults} filmes
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
+                  {sortedMovies.map((movie, mIdx) => (
+                    <MovieCard
+                      key={movie.id}
+                      movie={{ ...(movie as any), media_type: "movie" }}
+                      index={mIdx}
+                    />
                   ))}
                 </div>
 
@@ -440,13 +471,20 @@ export default async function CollectionDetailPage({
             {/* Seção de Franquias */}
             {franchises.length > 0 && (
               <div className="mt-10">
-                <div className="mb-4">
-                  <h2 className="text-2xl md:text-3xl font-bold">Franquias</h2>
-                  <p className="text-sm text-gray-500 mt-1">
+                <div className="mb-6 pb-3 border-b border-white/10">
+                  <div className="flex items-center gap-3">
+                    <h2 className="font-bebas text-3xl md:text-4xl text-white uppercase tracking-wider leading-none">
+                      Franquias
+                    </h2>
+                    <span className="h-6 px-2.5 rounded-full bg-white/[0.06] border border-white/10 text-[11px] font-semibold text-neutral-300 inline-flex items-center leading-none">
+                      {franchises.length} coleções
+                    </span>
+                  </div>
+                  <p className="text-xs md:text-sm text-neutral-400 mt-1">
                     Coleções que compõem este universo
                   </p>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {franchises.map((franchise, i) => (
                     <FranchiseCard key={franchise.id} franchise={franchise} index={i} />
                   ))}
@@ -457,15 +495,26 @@ export default async function CollectionDetailPage({
             {/* Filmes Solo */}
             {soloFilms.length > 0 && (
               <div className="mt-12 pb-12">
-                <div className="mb-6">
-                  <h2 className="text-2xl md:text-3xl font-bold">Filmes Solo</h2>
-                  <p className="text-sm text-gray-500 mt-1">
+                <div className="mb-6 pb-3 border-b border-white/10">
+                  <div className="flex items-center gap-3">
+                    <h2 className="font-bebas text-3xl md:text-4xl text-white uppercase tracking-wider leading-none">
+                      Filmes Solo
+                    </h2>
+                    <span className="h-6 px-2.5 rounded-full bg-white/[0.06] border border-white/10 text-[11px] font-semibold text-neutral-300 inline-flex items-center leading-none">
+                      {soloFilms.length} filmes
+                    </span>
+                  </div>
+                  <p className="text-xs md:text-sm text-neutral-400 mt-1">
                     Filmes que não fazem parte de uma franquia específica
                   </p>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-                  {soloFilms.map((movie) => (
-                    <MovieGridItem key={movie.id} movie={movie} />
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
+                  {soloFilms.map((movie, mIdx) => (
+                    <MovieCard
+                      key={movie.id}
+                      movie={{ ...(movie as any), media_type: "movie" }}
+                      index={mIdx}
+                    />
                   ))}
                 </div>
 
@@ -481,12 +530,21 @@ export default async function CollectionDetailPage({
             {/* Fallback: nenhuma franquia mapeada, mostrar tudo */}
             {franchises.length === 0 && (
               <div className="mt-12 pb-12">
-                <h2 className="text-2xl md:text-3xl font-bold mb-6">
-                  {moviesLabel}
-                </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-                  {sortedMovies.map((movie) => (
-                    <MovieGridItem key={movie.id} movie={movie} />
+                <div className="flex items-center gap-3 mb-6 pb-3 border-b border-white/10">
+                  <h2 className="font-bebas text-3xl md:text-4xl text-white uppercase tracking-wider leading-none">
+                    {moviesLabel}
+                  </h2>
+                  <span className="h-6 px-2.5 rounded-full bg-white/[0.06] border border-white/10 text-[11px] font-semibold text-neutral-300 inline-flex items-center leading-none">
+                    {totalVisibleResults} filmes
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
+                  {sortedMovies.map((movie, mIdx) => (
+                    <MovieCard
+                      key={movie.id}
+                      movie={{ ...(movie as any), media_type: "movie" }}
+                      index={mIdx}
+                    />
                   ))}
                 </div>
 
@@ -509,53 +567,9 @@ export default async function CollectionDetailPage({
 // Sub-componentes locais
 // ---------------------------------------------------------------------------
 
-/** Card de poster para grids de filmes */
-function MovieGridItem({ movie }: { movie: CollectionMovie }) {
-  return (
-    <Link
-      href={`/filme/${movie.id}`}
-      className="group transition-transform hover:scale-105 duration-200"
-    >
-      <div className="relative aspect-[2/3] rounded-lg overflow-hidden">
-        {movie.poster_path ? (
-          <Image
-            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-            alt={movie.title}
-            fill
-            quality={90}
-            className="object-cover"
-            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-          />
-        ) : (
-          <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-            <span className="text-gray-400 text-xs text-center px-2">
-              {movie.title}
-            </span>
-          </div>
-        )}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-          <div className="flex items-center gap-1 mb-1">
-            <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-            <span className="text-sm font-medium">
-              {movie.vote_average?.toFixed(1) || "N/A"}
-            </span>
-          </div>
-          <p className="text-xs text-gray-300">
-            {movie.release_date
-              ? new Date(movie.release_date).getFullYear()
-              : "N/A"}
-          </p>
-        </div>
-      </div>
-      <h3 className="mt-2 text-sm font-medium line-clamp-2">{movie.title}</h3>
-    </Link>
-  );
-}
-
 /** Card de franquia (landscape) — links para /colecao/saga/[id] */
 function FranchiseCard({
   franchise,
-  index,
 }: {
   franchise: UnifiedCollection;
   index: number;
@@ -569,7 +583,7 @@ function FranchiseCard({
   return (
     <Link
       href={`/colecao/saga/${franchise.id}`}
-      className="w-full aspect-video rounded-xl overflow-hidden relative group shadow-md block"
+      className="w-full aspect-video rounded-xl overflow-hidden relative group shadow-lg bg-neutral-900 border border-white/10 hover:border-white/25 transition-all duration-300 block"
     >
       {backdropUrl ? (
         <Image
@@ -578,28 +592,31 @@ function FranchiseCard({
           fill
           quality={80}
           sizes="400px"
-          className="object-cover transition-transform duration-500 group-hover:scale-110"
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
       ) : (
-        <div className="w-full h-full bg-gray-900 flex items-center justify-center">
-          <span className="text-gray-600 text-xs text-center px-3">
+        <div className="w-full h-full bg-neutral-900 flex items-center justify-center">
+          <span className="text-neutral-500 text-xs text-center px-3">
             {franchise.name}
           </span>
         </div>
       )}
 
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
 
-      <div className="absolute bottom-0 left-0 right-0 p-3">
-        <h3 className="font-normal font-bebas text-lg uppercase tracking-wide text-white leading-tight line-clamp-1">
-          {franchise.name}
-        </h3>
-        <p className="text-xs text-gray-400 mt-0.5">
-          {franchise.movies.length} filmes
-        </p>
+      <div className="absolute bottom-0 left-0 right-0 p-3.5 flex items-end justify-between gap-2">
+        <div className="min-w-0">
+          <h3 className="font-normal font-bebas text-xl uppercase tracking-wider text-white leading-tight truncate group-hover:text-red-400 transition-colors">
+            {franchise.name}
+          </h3>
+          <p className="text-[11px] text-neutral-400 font-medium mt-0.5">
+            {franchise.movies.length} filmes
+          </p>
+        </div>
+        <span className="w-7 h-7 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+          <ArrowRight className="w-3.5 h-3.5" />
+        </span>
       </div>
-
-      <div className="absolute inset-0 rounded-xl ring-1 ring-transparent group-hover:ring-red-600/40 transition-all duration-300 pointer-events-none" />
     </Link>
   );
 }

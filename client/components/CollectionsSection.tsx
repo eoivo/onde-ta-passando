@@ -120,15 +120,17 @@ function CategoryRow({ section }: { section: CategorySection }) {
 
   return (
     <div className="space-y-4 group/row">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between border-b border-white/10 pb-3">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            {section.icon}
-            <h2 className="text-3xl md:text-4xl font-normal font-bebas tracking-wide bg-gradient-to-r from-red-500 to-red-700 text-transparent bg-clip-text uppercase">
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-3xl md:text-4xl font-normal font-bebas tracking-wider text-white uppercase leading-none">
               {section.label}
             </h2>
+            <span className="h-6 px-2.5 rounded-full bg-white/[0.06] border border-white/10 text-[11px] font-semibold text-neutral-300 inline-flex items-center leading-none">
+              {section.collections.length}
+            </span>
           </div>
-          <p className="text-sm text-gray-500">{section.subtitle}</p>
+          <p className="text-xs md:text-sm text-neutral-400 mt-1">{section.subtitle}</p>
         </div>
       </div>
 
@@ -141,13 +143,13 @@ function CategoryRow({ section }: { section: CategorySection }) {
           </div>
         ) : (
           <>
-            {/* Setas Flutuantes (Hover Desktop) - Estilo Padronizado */}
+            {/* Setas Flutuantes (Hover Desktop) - Estilo Dark Glass Padronizado */}
             {(showLeftArrow || true) && (
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => scroll("left")}
-                className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-40 bg-black/50 hover:bg-black/80 text-white rounded-full opacity-0 group-hover/row:opacity-100 transition-opacity ml-2"
+                className="hidden lg:flex absolute left-2 top-1/2 -translate-y-1/2 z-40 w-11 h-11 rounded-full bg-black/55 hover:bg-black/80 backdrop-blur-md border border-white/15 hover:border-white/30 text-white shadow-xl opacity-0 group-hover/row:opacity-100 transition-all duration-200 cursor-pointer"
               >
                 <ChevronLeft className="h-6 w-6" />
               </Button>
@@ -158,7 +160,7 @@ function CategoryRow({ section }: { section: CategorySection }) {
                 variant="ghost"
                 size="icon"
                 onClick={() => scroll("right")}
-                className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-40 bg-black/50 hover:bg-black/80 text-white rounded-full opacity-0 group-hover/row:opacity-100 transition-opacity mr-2"
+                className="hidden lg:flex absolute right-2 top-1/2 -translate-y-1/2 z-40 w-11 h-11 rounded-full bg-black/55 hover:bg-black/80 backdrop-blur-md border border-white/15 hover:border-white/30 text-white shadow-xl opacity-0 group-hover/row:opacity-100 transition-all duration-200 cursor-pointer"
               >
                 <ChevronRight className="h-6 w-6" />
               </Button>
@@ -325,21 +327,26 @@ function UniverseCard({ collection }: { collection: UnifiedCollection }) {
 
       {/* Content */}
       <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-end z-20">
-        <div className="flex items-center gap-3 mb-2 md:mb-3">
+        <div className="flex items-center gap-2 mb-2.5">
           <span
-            className={`${theme.badge} text-[10px] px-2 py-0.5 rounded-full text-white font-bold uppercase tracking-tighter`}
+            className={`${theme.badge} h-6 px-3 rounded-full text-[10px] text-white font-bold uppercase tracking-wider inline-flex items-center leading-none`}
           >
             {theme.name}
           </span>
+          {(collection.total_results || collection.movies?.length) > 0 && (
+            <span className="h-6 px-2.5 rounded-full bg-black/55 border border-white/15 backdrop-blur-md text-[10px] text-neutral-200 font-semibold uppercase tracking-wider inline-flex items-center leading-none">
+              {collection.total_results || collection.movies.length} títulos
+            </span>
+          )}
         </div>
 
         <h3 className="font-bebas text-4xl md:text-6xl text-white uppercase tracking-wider leading-none drop-shadow-lg">
           {collection.name}
         </h3>
 
-        <div className="flex items-center gap-2 mt-4 text-white/50 text-xs font-medium opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
-          EXPLORAR FRANQUIAS E LINHAS DO TEMPO
-          <ChevronRight className="w-3 h-3 text-red-500" />
+        <div className="flex items-center gap-1.5 mt-3 text-neutral-300 text-xs font-semibold opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0">
+          <span>Explorar franquias e títulos</span>
+          <ChevronRight className="w-3.5 h-3.5 text-red-500" />
         </div>
       </div>
 
