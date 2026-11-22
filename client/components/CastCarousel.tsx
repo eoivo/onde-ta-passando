@@ -67,30 +67,30 @@ export default function CastCarousel({ cast }: CastCarouselProps) {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div
-                    className="rounded-lg overflow-hidden cursor-pointer group/actor hover:scale-105 transition-all duration-300 hover:shadow-lg"
+                    className="rounded-xl overflow-hidden cursor-pointer group/actor border border-white/10 hover:border-white/25 transition-all duration-300 hover:shadow-lg"
                     onClick={() => handleActorClick(person.name)}
                   >
                     {person.profile_path ? (
-                      <div className="relative">
+                      <div className="relative h-[210px] w-[140px]">
                         <Image
                           src={`https://image.tmdb.org/t/p/h632${person.profile_path}`}
                           alt={person.name}
                           width={140}
                           height={210}
                           quality={90}
-                          className="object-cover aspect-[2/3]"
+                          className="object-cover w-full h-full group-hover/actor:scale-[1.03] transition-transform duration-300"
                         />
                         {/* Overlay com ícone de busca */}
-                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover/actor:opacity-100 transition-opacity duration-300">
-                          <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
-                            <Search className="w-6 h-6 text-white" />
+                        <div className="absolute inset-0 bg-black/55 flex items-center justify-center opacity-0 group-hover/actor:opacity-100 transition-opacity duration-300">
+                          <div className="bg-black/65 border border-white/20 backdrop-blur-md rounded-full p-2.5">
+                            <Search className="w-5 h-5 text-white" />
                           </div>
                         </div>
                       </div>
                     ) : (
-                      <div className="w-full h-[210px] bg-gray-800 flex flex-col items-center justify-center hover:bg-gray-700 transition-colors">
-                        <Search className="w-8 h-8 text-gray-400 mb-2" />
-                        <span className="text-gray-400 text-xs text-center px-2">
+                      <div className="w-full h-[210px] bg-white/[0.04] flex flex-col items-center justify-center hover:bg-white/[0.08] transition-colors">
+                        <Search className="w-6 h-6 text-neutral-500 mb-2" />
+                        <span className="text-neutral-500 text-xs text-center px-2">
                           Buscar no Google
                         </span>
                       </div>
@@ -102,36 +102,36 @@ export default function CastCarousel({ cast }: CastCarouselProps) {
                 </TooltipContent>
               </Tooltip>
 
-              <div className="mt-2">
+              <div className="mt-2.5">
                 <p
-                  className="font-medium text-sm hover:text-primary transition-colors cursor-pointer"
+                  className="font-semibold text-[13.5px] text-neutral-100 hover:text-white transition-colors cursor-pointer leading-snug truncate"
                   onClick={() => handleActorClick(person.name)}
                 >
                   {person.name}
                 </p>
-                <p className="text-xs text-gray-400">{person.character}</p>
+                <p className="text-xs text-neutral-400 truncate mt-0.5">{person.character}</p>
               </div>
             </motion.div>
           ))}
         </div>
 
-        {/* Navigation buttons */}
+        {/* Navigation buttons — centralizados exatamente em 105px (metade da foto de 210px) */}
         <Button
           variant="ghost"
           size="icon"
-          className="absolute left-0 top-1/3 -translate-y-1/2 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hidden lg:flex"
+          className="absolute left-2 top-[105px] -translate-y-1/2 h-10 w-10 bg-black/75 hover:bg-black/90 backdrop-blur-md border border-white/15 hover:border-white/30 text-white rounded-full shadow-xl opacity-0 group-hover:opacity-100 transition-all hidden lg:flex"
           onClick={() => scroll("left")}
         >
-          <ChevronLeft className="h-6 w-6" />
+          <ChevronLeft className="h-5 w-5" />
         </Button>
 
         <Button
           variant="ghost"
           size="icon"
-          className="absolute right-0 top-1/3 -translate-y-1/2 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hidden lg:flex"
+          className="absolute right-2 top-[105px] -translate-y-1/2 h-10 w-10 bg-black/75 hover:bg-black/90 backdrop-blur-md border border-white/15 hover:border-white/30 text-white rounded-full shadow-xl opacity-0 group-hover:opacity-100 transition-all hidden lg:flex"
           onClick={() => scroll("right")}
         >
-          <ChevronRight className="h-6 w-6" />
+          <ChevronRight className="h-5 w-5" />
         </Button>
       </div>
     </TooltipProvider>

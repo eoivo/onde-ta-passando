@@ -18,10 +18,69 @@ const bebas = Bebas_Neue({
   variable: "--font-bebas"
 });
 
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || "https://onde-ta-passando.netlify.app";
+
 export const metadata: Metadata = {
-  title: "Onde Tá Passando? - Descubra onde assistir seus filmes e séries",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Onde Tá Passando? - Descubra onde assistir seus filmes e séries",
+    template: "%s | Onde Tá Passando?",
+  },
   description:
-    "Encontre facilmente em quais plataformas de streaming seus filmes e séries favoritos estão disponíveis",
+    "Encontre facilmente em quais plataformas de streaming no Brasil seus filmes e séries favoritos estão disponíveis, descubra obras na mesma sintonia e converse com a Murphy AI.",
+  keywords: [
+    "onde assistir",
+    "onde tá passando",
+    "streaming brasil",
+    "netflix",
+    "prime video",
+    "max",
+    "disney plus",
+    "apple tv",
+    "filmes",
+    "séries",
+    "catálogo de streaming",
+  ],
+  authors: [{ name: "Ivo Fernandes" }],
+  creator: "Ivo Fernandes",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    url: SITE_URL,
+    siteName: "Onde Tá Passando?",
+    title: "Onde Tá Passando? - Descubra onde assistir filmes e séries",
+    description:
+      "Descubra em tempo real em quais streamings do Brasil seus filmes e séries favoritos estão disponíveis.",
+    images: [
+      {
+        url: "/images/logos/icon_full_name.png",
+        width: 1200,
+        height: 630,
+        alt: "Onde Tá Passando?",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Onde Tá Passando? - Descubra onde assistir filmes e séries",
+    description:
+      "Descubra em tempo real em quais streamings do Brasil seus filmes e séries favoritos estão disponíveis.",
+    images: ["/images/logos/icon_full_name.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   icons: {
     icon: [
       { url: "/images/logos/icon.png", type: "image/png" },

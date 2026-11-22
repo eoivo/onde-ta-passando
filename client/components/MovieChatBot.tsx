@@ -355,28 +355,13 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
       </AlertDialog>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <div 
-          className="relative w-full md:w-auto"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
+        <div className="relative w-full md:w-auto">
           <Button
             onClick={handleChatButtonClick}
             size="lg"
-            className="relative gap-2.5 bg-black/55 backdrop-blur-xl border border-white/15 text-white hover:bg-white/10 hover:border-white/30 shadow-2xl transition-all duration-200 hover:-translate-y-0.5 w-full md:w-auto justify-center rounded-full h-12 pl-2.5 pr-5 overflow-hidden group"
+            className="relative gap-2.5 bg-black/55 backdrop-blur-xl border border-white/15 text-white hover:bg-white/10 hover:border-white/30 shadow-2xl transition-colors duration-200 w-full md:w-auto justify-center rounded-full h-12 pl-2.5 pr-5 overflow-hidden"
           >
-            {/* Efeito Shimmer Animado */}
-            <motion.div
-              initial={{ x: "-100%" }}
-              animate={{ x: "200%" }}
-              transition={{ repeat: Infinity, duration: 3, ease: "linear", repeatDelay: 4 }}
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent pointer-events-none"
-            />
-
-            <motion.div
-              animate={isHovered ? { scale: 1.06 } : { scale: 1 }}
-              className="w-7 h-7 rounded-full overflow-hidden border border-white/20 bg-neutral-900 flex-shrink-0"
-            >
+            <div className="w-7 h-7 rounded-full overflow-hidden border border-white/20 bg-neutral-900 flex-shrink-0">
               <Image
                 src="/images/murphy.png"
                 alt="Murphy"
@@ -384,14 +369,11 @@ export default function MovieChatBot({ movieContext }: MovieChatBotProps) {
                 height={28}
                 className="w-full h-full object-cover"
               />
-            </motion.div>
+            </div>
 
             <span className="font-medium tracking-wide flex items-center gap-2.5 text-sm">
               Conversar com a Murphy
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
-              </span>
+              <span className="inline-flex rounded-full h-2 w-2 bg-red-600"></span>
             </span>
           </Button>
         </div>

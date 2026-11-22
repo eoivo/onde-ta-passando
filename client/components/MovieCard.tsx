@@ -183,29 +183,31 @@ export default function MovieCard({ movie, index = 0 }: MovieCardProps) {
 
       {isTrailerOpen && activeVideo && (
         <div
-          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4"
           onClick={handleBackdropClick}
         >
           <div
             ref={modalRef}
-            className="relative w-full max-w-2xl aspect-video mx-auto"
+            className="relative w-full max-w-3xl aspect-video mx-auto"
           >
-            <iframe
-              src={`https://www.youtube.com/embed/${activeVideo}?autoplay=1`}
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full rounded"
-            ></iframe>
-
-            <Button
-              variant="default"
-              size="icon"
-              className="absolute -top-12 -right-1 md:-top-12 md:-right-12 bg-red-600 hover:bg-red-700 rounded-full shadow-lg z-10"
+            <button
+              type="button"
               onClick={handleCloseTrailer}
+              aria-label="Fechar trailer"
+              className="absolute -top-11 right-0 h-9 w-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-neutral-300 hover:text-white flex items-center justify-center transition-colors z-10 cursor-pointer"
             >
-              <X className="h-6 w-6" />
-            </Button>
+              <X className="h-4 w-4" />
+            </button>
+
+            <div className="w-full h-full rounded-2xl overflow-hidden border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.9)] bg-black">
+              <iframe
+                src={`https://www.youtube.com/embed/${activeVideo}?autoplay=1`}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              ></iframe>
+            </div>
           </div>
         </div>
       )}

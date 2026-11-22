@@ -194,13 +194,9 @@ export default function HeroCarousel({
           />
         </div>
 
-        <div className="relative invisible">
-          <Hero movie={movies[0]} priority={false} />
+        <div className="relative invisible pointer-events-none" aria-hidden="true">
+          <Hero movie={movies[activeSlide === "A" ? slideA.index : slideB.index]} priority={false} />
         </div>
-      </div>
-
-      <div className="absolute bottom-4 left-0 right-0 text-center text-sm text-white/60 md:hidden">
-        Deslize para navegar
       </div>
 
       {movies.length > 1 && (

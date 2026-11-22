@@ -5,6 +5,7 @@ import {
   getTvVideos,
 } from "@/services/tmdb-api";
 import Image from "next/image";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { StarIcon, Calendar } from "lucide-react";
 import StreamingProviders from "@/components/StreamingProviders";
@@ -18,10 +19,62 @@ import DynamicMediaActions from "@/components/DynamicMediaActions";
 import EnhancedStreamingProviders from "@/components/EnhancedStreamingProviders";
 import MovieChatBot from "@/components/MovieChatBot";
 import { MovieContext } from "@/services/gemini-api";
+import type { Metadata } from "next";
 import SintonizeButton from "@/components/SintonizeButton";
 
 export const dynamicParams = true;
 export const revalidate = 0;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }> | { id: string };
+}): Promise<Metadata> {
+  try {
+    const routeParams = await params;
+    const tvShow = await getTvDetails(routeParams.id);
+    if (!tvShow || !tvShow.name) {
+      return { title: "Série" };
+    }
+
+    const year = tvShow.first_air_date
+      ? new Date(tvShow.first_air_date).getFullYear()
+      : "";
+    const titleWithYear = year && !isNaN(year) ? `${tvShow.name} (${year})` : tvShow.name;
+    const pageTitle = `Onde assistir ${titleWithYear} no streaming`;
+    const description =
+      tvShow.overview?.slice(0, 160) ||
+      `Descubra em quais plataformas de streaming no Brasil a série ${titleWithYear} está disponível para assistir.`;
+    const ogImage = tvShow.backdrop_path
+      ? `https://image.tmdb.org/t/p/w1280${tvShow.backdrop_path}`
+      : tvShow.poster_path
+      ? `https://image.tmdb.org/t/p/w780${tvShow.poster_path}`
+      : "/images/logos/icon_full_name.png";
+
+    return {
+      title: pageTitle,
+      description,
+      alternates: {
+        canonical: `/serie/${routeParams.id}`,
+      },
+      openGraph: {
+        type: "video.tv_show",
+        title: `${pageTitle} | Onde Tá Passando?`,
+        description,
+        url: `/serie/${routeParams.id}`,
+        images: [{ url: ogImage, width: 1280, height: 720, alt: tvShow.name }],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${pageTitle} | Onde Tá Passando?`,
+        description,
+        images: [ogImage],
+      },
+    };
+  } catch {
+    return { title: "Série" };
+  }
+}
 
 export default async function TVShowPage({
   params,
@@ -64,8 +117,35 @@ export default async function TVShowPage({
     streamingServices: streamingServices,
   };
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "TVSeries",
+    name: tvShow.name,
+    description: tvShow.overview,
+    image: tvShow.poster_path
+      ? `https://image.tmdb.org/t/p/w780${tvShow.poster_path}`
+      : undefined,
+    datePublished: tvShow.first_air_date || undefined,
+    numberOfSeasons: tvShow.number_of_seasons || undefined,
+    numberOfEpisodes: tvShow.number_of_episodes || undefined,
+    genre: tvShow.genres?.map((g: any) => g.name) || [],
+    aggregateRating:
+      tvShow.vote_average && tvShow.vote_count
+        ? {
+            "@type": "AggregateRating",
+            ratingValue: Number(tvShow.vote_average.toFixed(1)),
+            bestRating: 10,
+            ratingCount: tvShow.vote_count,
+          }
+        : undefined,
+  };
+
   return (
     <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <LoadingReset />
 
       <div className="relative h-[85vh] w-full overflow-hidden">
@@ -284,19 +364,49 @@ export default async function TVShowPage({
           </div>
         </div>
 
-        <div className="mt-16">
-          <h2 className="text-2xl md:text-3xl font-normal font-bebas mb-6 uppercase tracking-wider text-red-600/90 flex items-center gap-3">
-            <span className="w-8 h-px bg-red-600/30" />
-            Elenco principal
-          </h2>
-          <CastCarousel cast={credits.cast.slice(0, 10)} />
-        </div>
+        {credits.cast && credits.cast.length > 0 && (
+          <div className="mt-16">
+            <div className="flex items-center gap-3 mb-5">
+              <h2 className="text-2xl md:text-3xl font-normal font-bebas uppercase tracking-wider text-white leading-none">
+                Elenco Principal
+              </h2>
+              <span className="h-6 px-2.5 rounded-full bg-white/[0.06] border border-white/10 text-[10px] font-bold uppercase tracking-widest text-neutral-400 inline-flex items-center leading-none">
+                {Math.min(credits.cast.length, 18)} {Math.min(credits.cast.length, 18) === 1 ? "ator" : "atores"}
+              </span>
+            </div>
+            <CastCarousel cast={credits.cast.slice(0, 18)} />
+          </div>
+        )}
 
         <div className="mt-16">
-          <h2 className="text-2xl md:text-3xl font-normal font-bebas mb-6 uppercase tracking-wider text-red-600/90 flex items-center gap-3">
-            <span className="w-8 h-px bg-red-600/30" />
-            Recomendações
-          </h2>
+          <div className="flex items-center justify-between gap-4 mb-5">
+            <h2 className="text-2xl md:text-3xl font-normal font-bebas uppercase tracking-wider text-white leading-none">
+              Recomendações
+            </h2>
+            <Link
+              href={`/sintonia?id=${id}&type=tv`}
+              className="h-8 px-3.5 rounded-full bg-white/[0.04] border border-white/10 hover:bg-red-600/15 hover:border-red-500/45 text-neutral-300 hover:text-white text-[11px] font-semibold inline-flex items-center gap-1.5 transition-colors"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-3.5 h-3.5 text-red-500"
+                aria-hidden="true"
+              >
+                <path d="M2 10v3" />
+                <path d="M6 6v11" />
+                <path d="M10 3v18" />
+                <path d="M14 8v7" />
+                <path d="M18 5v13" />
+                <path d="M22 10v3" />
+              </svg>
+              <span>Ver mais na Sintonia</span>
+            </Link>
+          </div>
           <Suspense
             fallback={
               <div className="h-64 flex items-center justify-center">

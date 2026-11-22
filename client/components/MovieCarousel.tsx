@@ -36,8 +36,12 @@ export default function MovieCarousel({ title, movies }: MovieCarouselProps) {
   };
 
   return (
-    <div className="space-y-2 py-4">
-      <h2 className="text-2xl md:text-3xl font-normal font-bebas tracking-wider uppercase">{title}</h2>
+    <div className={title ? "space-y-2 py-4" : ""}>
+      {title && (
+        <h2 className="text-2xl md:text-3xl font-normal font-bebas tracking-wider uppercase">
+          {title}
+        </h2>
+      )}
 
       <div className="relative group">
         <div
@@ -54,23 +58,23 @@ export default function MovieCarousel({ title, movies }: MovieCarouselProps) {
           ))}
         </div>
 
-        {/* Navigation buttons */}
+        {/* Navigation buttons — descontam metade do pb-4 (8px) para cravar no centro exato do pôster */}
         <Button
           variant="ghost"
           size="icon"
-          className="absolute left-0 top-1/2 -translate-y-1/2 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hidden lg:flex"
+          className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 h-10 w-10 bg-black/75 hover:bg-black/90 backdrop-blur-md border border-white/15 hover:border-white/30 text-white rounded-full shadow-xl opacity-0 group-hover:opacity-100 transition-all hidden lg:flex"
           onClick={() => scroll("left")}
         >
-          <ChevronLeft className="h-6 w-6" />
+          <ChevronLeft className="h-5 w-5" />
         </Button>
 
         <Button
           variant="ghost"
           size="icon"
-          className="absolute right-0 top-1/2 -translate-y-1/2 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hidden lg:flex"
+          className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 h-10 w-10 bg-black/75 hover:bg-black/90 backdrop-blur-md border border-white/15 hover:border-white/30 text-white rounded-full shadow-xl opacity-0 group-hover:opacity-100 transition-all hidden lg:flex"
           onClick={() => scroll("right")}
         >
-          <ChevronRight className="h-6 w-6" />
+          <ChevronRight className="h-5 w-5" />
         </Button>
       </div>
     </div>

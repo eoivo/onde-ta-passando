@@ -1,12 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import { Info } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import VideoPlayer from "./VideoPlayer";
 import { useEffect, useState } from "react";
-import { getMovieVideos, getTvVideos, getMovieDetails, getTvDetails } from "@/services/tmdb-api";
+import {
+  getMovieVideos,
+  getTvVideos,
+  getMovieDetails,
+  getTvDetails,
+} from "@/services/tmdb-api";
 import { motion } from "framer-motion";
 
 interface HeroProps {
@@ -31,7 +35,7 @@ export default function Hero({ movie, onTrailerStateChange, priority = false }: 
             : getMovieVideos(movie.id.toString()),
           mediaType === "tv"
             ? getTvDetails(movie.id.toString())
-            : getMovieDetails(movie.id.toString())
+            : getMovieDetails(movie.id.toString()),
         ]);
 
         setVideos(videosData);
@@ -47,7 +51,7 @@ export default function Hero({ movie, onTrailerStateChange, priority = false }: 
   if (!movie) return null;
 
   return (
-    <div className="relative h-auto min-h-[70vh] md:h-[85vh] w-full overflow-hidden">
+    <div className="relative h-auto md:h-[85vh] w-full overflow-hidden">
       {/* Backdrop image with Ken Burns effect */}
       <motion.div
         animate={{
@@ -78,7 +82,7 @@ export default function Hero({ movie, onTrailerStateChange, priority = false }: 
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10" />
 
       {/* Content */}
-      <div className="relative md:absolute inset-0 z-20 flex flex-col justify-start md:justify-center md:pb-16 pt-[15vh] md:pt-32 pb-12">
+      <div className="relative md:absolute inset-0 z-20 flex flex-col justify-start md:justify-center pt-28 pb-14 md:pt-32 md:pb-16">
         <div className="max-w-2xl w-full px-4 md:px-8 md:ml-16 space-y-4">
           <h1 className="text-4xl md:text-6xl font-black leading-tight tracking-tight uppercase">
             {movie.title || movie.name}
@@ -126,39 +130,24 @@ export default function Hero({ movie, onTrailerStateChange, priority = false }: 
             {movie.overview}
           </p>
 
-          <div className="flex flex-col md:flex-row gap-4">
-            {videos.length > 0 ? (
-              <VideoPlayer
-                videos={videos}
-                onTrailerStateChange={onTrailerStateChange}
-              />
-            ) : (
+          <div className="pt-1">
+            <div className="inline-flex items-center gap-1 p-1 rounded-full bg-neutral-950/65 backdrop-blur-xl border border-white/15 max-w-full">
               <Link
-                href={`/${movie.media_type === "tv" ? "serie" : "filme"}/${movie.id
-                  }`}
-                className="w-full md:w-auto"
+                href={`/${movie.media_type === "tv" ? "serie" : "filme"}/${movie.id}`}
+                className="h-11 px-5 rounded-full bg-white hover:bg-neutral-200 text-black text-sm font-semibold inline-flex items-center gap-2 transition-colors duration-200 whitespace-nowrap"
               >
-                <Button
-                  size="lg"
-                  className="bg-white text-black hover:bg-white/90 w-full md:w-[170px]"
-                >
-                  <Info className="mr-2 h-5 w-5" /> Ver detalhes
-                </Button>
+                <span>Onde assistir</span>
+                <ArrowRight className="w-4 h-4 text-neutral-700" />
               </Link>
-            )}
-            <Link
-              href={`/${movie.media_type === "tv" ? "serie" : "filme"}/${movie.id
-                }`}
-              className="w-full md:w-auto"
-            >
-              <Button
-                size="lg"
-                variant="outline"
-                className="w-full md:w-[170px] bg-black/20 border-white/20 hover:bg-white/10"
-              >
-                <Info className="mr-2 h-5 w-5" /> Onde assistir
-              </Button>
-            </Link>
+
+              {videos.length > 0 && (
+                <VideoPlayer
+                  videos={videos}
+                  onTrailerStateChange={onTrailerStateChange}
+                  variant="capsule-quiet"
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>

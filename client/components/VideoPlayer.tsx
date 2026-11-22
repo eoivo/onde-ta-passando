@@ -8,12 +8,14 @@ interface VideoPlayerProps {
   videos: any[];
   onTrailerStateChange?: (isOpen: boolean) => void;
   btnWidth?: string;
+  variant?: "default" | "capsule-quiet";
 }
 
 export default function VideoPlayer({
   videos,
   onTrailerStateChange,
   btnWidth = "md:w-[170px]",
+  variant = "default",
 }: VideoPlayerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
@@ -78,40 +80,53 @@ export default function VideoPlayer({
 
   return (
     <>
-      <Button
-        onClick={handlePlay}
-        className={`h-12 px-7 rounded-full bg-white text-black hover:bg-neutral-200 font-semibold flex items-center justify-center gap-2.5 w-full transition-all duration-200 hover:-translate-y-0.5 ${btnWidth}`}
-        size="lg"
-      >
-        <Play className="h-4 w-4 fill-black" />
-        Assistir trailer
-      </Button>
+      {variant === "capsule-quiet" ? (
+        <button
+          type="button"
+          onClick={handlePlay}
+          className="h-11 px-5 rounded-full bg-transparent hover:bg-white/10 text-neutral-200 hover:text-white text-sm font-medium inline-flex items-center gap-2 transition-colors duration-200 whitespace-nowrap cursor-pointer"
+        >
+          <Play className="h-3.5 w-3.5 fill-current text-neutral-300" />
+          <span>Trailer</span>
+        </button>
+      ) : (
+        <Button
+          onClick={handlePlay}
+          className={`h-12 px-7 rounded-full bg-white text-black hover:bg-neutral-200 font-semibold flex items-center justify-center gap-2.5 w-full transition-colors duration-200 ${btnWidth}`}
+          size="lg"
+        >
+          <Play className="h-4 w-4 fill-black" />
+          Assistir trailer
+        </Button>
+      )}
 
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4"
           onClick={handleBackdropClick}
         >
           <div
             ref={modalRef}
-            className="relative w-full max-w-2xl aspect-video mx-auto"
+            className="relative w-full max-w-3xl aspect-video mx-auto"
           >
-            <iframe
-              src={`https://www.youtube.com/embed/${activeVideo}?autoplay=1`}
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full rounded"
-            ></iframe>
-
-            <Button
-              variant="default"
-              size="icon"
-              className="absolute -top-12 -right-1 md:-top-12 md:-right-12 bg-red-600 hover:bg-red-700 rounded-full shadow-lg z-10"
+            <button
+              type="button"
               onClick={handleClose}
+              aria-label="Fechar trailer"
+              className="absolute -top-11 right-0 h-9 w-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-neutral-300 hover:text-white flex items-center justify-center transition-colors z-10 cursor-pointer"
             >
-              <X className="h-6 w-6" />
-            </Button>
+              <X className="h-4 w-4" />
+            </button>
+
+            <div className="w-full h-full rounded-2xl overflow-hidden border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.9)] bg-black">
+              <iframe
+                src={`https://www.youtube.com/embed/${activeVideo}?autoplay=1`}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              ></iframe>
+            </div>
           </div>
         </div>
       )}

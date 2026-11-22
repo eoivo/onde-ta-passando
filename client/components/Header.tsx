@@ -151,7 +151,7 @@ export default function Header() {
                   >
                     {label}
                     {isNew && (
-                      <span className="bg-red-500 text-[8px] font-black px-1 py-0.5 rounded-sm text-white animate-pulse">NEW</span>
+                      <span className="bg-red-600 text-[8px] font-black px-1.5 py-0.5 rounded-full text-white animate-pulse">NOVO</span>
                     )}
                     <span className={`absolute -bottom-1.5 left-0 h-0.5 bg-red-600 transition-all duration-300 group-hover:w-full ${pathname === href ? "w-full opacity-100" : "w-0 opacity-0 group-hover:opacity-100"}`}></span>
                   </Link>
@@ -279,7 +279,30 @@ export default function Header() {
                         { href: "/", label: "Início", icon: <Home className="h-5 w-5" /> },
                         { href: "/filmes", label: "Filmes", icon: <Film className="h-5 w-5" /> },
                         { href: "/series", label: "Séries", icon: <Tv className="h-5 w-5" /> },
-                        { href: "/sintonia", label: "Sintonia", icon: <Search className="h-5 w-5" />, isNew: true },
+                        {
+                          href: "/sintonia",
+                          label: "Sintonia",
+                          icon: (
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="h-5 w-5"
+                              aria-hidden="true"
+                            >
+                              <path d="M2 10v3" />
+                              <path d="M6 6v11" />
+                              <path d="M10 3v18" />
+                              <path d="M14 8v7" />
+                              <path d="M18 5v13" />
+                              <path d="M22 10v3" />
+                            </svg>
+                          ),
+                          isNew: true,
+                        },
                       ].map(({ href, label, icon, isNew }, idx) => (
                         <motion.div
                           key={href}

@@ -70,48 +70,54 @@ export default function Pagination({ currentPage, totalPages, baseUrl, currentFi
   }
 
   return (
-    <div className="flex justify-center items-center mt-8 gap-1 md:gap-2">
-      <Button
-        variant="outline"
-        size={isMobile ? "icon" : "default"}
+    <div className="flex justify-center items-center mt-10 gap-1.5 md:gap-2">
+      <button
+        type="button"
         onClick={() => navigateToPage(currentPage - 1)}
         disabled={currentPage === 1}
+        aria-label="Página anterior"
+        className="h-10 px-4 rounded-full bg-white/[0.04] border border-white/10 hover:bg-white/[0.1] hover:border-white/25 text-neutral-200 hover:text-white text-xs font-semibold inline-flex items-center justify-center gap-1.5 transition-colors disabled:opacity-35 disabled:pointer-events-none cursor-pointer"
       >
         <ChevronLeft className="h-4 w-4" />
-        {!isMobile && <span className="ml-1">Anterior</span>}
-      </Button>
+        {!isMobile && <span>Anterior</span>}
+      </button>
 
       {getPageNumbers().map((page, index) => {
         if (page === "...") {
           return (
-            <span key={`ellipsis-${index}`} className="px-2 text-gray-500">
+            <span key={`ellipsis-${index}`} className="px-2 text-neutral-500 text-xs">
               ...
             </span>
           )
         }
 
+        const isActive = currentPage === page
         return (
-          <Button
+          <button
+            type="button"
             key={`page-${page}`}
-            variant={currentPage === page ? "default" : "outline"}
-            size="icon"
             onClick={() => navigateToPage(Number(page))}
-            className={currentPage === page ? "bg-primary" : ""}
+            className={`h-10 min-w-[40px] px-3 rounded-full text-xs font-bold inline-flex items-center justify-center transition-colors cursor-pointer ${
+              isActive
+                ? "bg-red-600 border border-red-500 text-white"
+                : "bg-white/[0.04] border border-white/10 text-neutral-300 hover:bg-white/[0.1] hover:border-white/25 hover:text-white"
+            }`}
           >
             {page}
-          </Button>
+          </button>
         )
       })}
 
-      <Button
-        variant="outline"
-        size={isMobile ? "icon" : "default"}
+      <button
+        type="button"
         onClick={() => navigateToPage(currentPage + 1)}
         disabled={currentPage === totalPages}
+        aria-label="Próxima página"
+        className="h-10 px-4 rounded-full bg-white/[0.04] border border-white/10 hover:bg-white/[0.1] hover:border-white/25 text-neutral-200 hover:text-white text-xs font-semibold inline-flex items-center justify-center gap-1.5 transition-colors disabled:opacity-35 disabled:pointer-events-none cursor-pointer"
       >
-        {!isMobile && <span className="mr-1">Próximo</span>}
+        {!isMobile && <span>Próximo</span>}
         <ChevronRight className="h-4 w-4" />
-      </Button>
+      </button>
     </div>
   )
 }
