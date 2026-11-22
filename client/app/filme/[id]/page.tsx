@@ -7,7 +7,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { StarIcon, Clock, Calendar } from "lucide-react";
+import { StarIcon, Clock, Calendar, Film, ArrowRight } from "lucide-react";
 import StreamingProviders from "@/components/StreamingProviders";
 import CastCarousel from "@/components/CastCarousel";
 import MovieRecommendations from "@/components/MovieRecommendations";
@@ -21,6 +21,7 @@ import MovieChatBot from "@/components/MovieChatBot";
 import { MovieContext } from "@/services/gemini-api";
 import type { Metadata } from "next";
 import SintonizeButton from "@/components/SintonizeButton";
+import AgeRatingBadge, { extractBrazilianRating } from "@/components/AgeRatingBadge";
 
 export const dynamicParams = true;
 export const revalidate = 0;
@@ -94,6 +95,9 @@ export default async function MoviePage({
   const formattedRuntime = `${hours}h ${minutes}m`;
 
   const releaseDate = new Date(movie.release_date).toLocaleDateString("pt-BR");
+  const ageRating = extractBrazilianRating(movie, "movie");
+  const director = credits.crew?.find((person: any) => person.job === "Director")?.name;
+  const collectionInfo = movie.belongs_to_collection;
 
   // Preparar contexto para o chat bot
   const movieContext: MovieContext = {
@@ -225,6 +229,8 @@ export default async function MoviePage({
               </div>
 
               <div className="flex flex-wrap gap-2 items-center">
+                {ageRating && <AgeRatingBadge rating={ageRating} />}
+
                 {movie.genres.map((genre: any) => (
                   <Badge
                     key={genre.id}
@@ -252,6 +258,15 @@ export default async function MoviePage({
                   <span>{releaseDate}</span>
                 </div>
               </div>
+
+              {director && (
+                <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-neutral-400">
+                  <div>
+                    <span className="font-semibold text-white">Direção:</span>{" "}
+                    {director}
+                  </div>
+                </div>
+              )}
             </div>
 
             <p className="text-base md:text-[17px] text-neutral-100/90 leading-[1.65] max-w-3xl font-normal">
@@ -276,6 +291,59 @@ export default async function MoviePage({
                 mediaType="movie"
               />
             </div>
+
+            {collectionInfo && collectionInfo.id && (
+              <div className="pt-2">
+                <Link
+                  href={`/colecao/saga/${collectionInfo.id}`}
+                  className="group relative overflow-hidden rounded-2xl border border-white/10 hover:border-white/25 bg-white/[0.03] hover:bg-white/[0.06] p-4 md:p-5 flex items-center justify-between gap-4 transition-all duration-300 max-w-3xl"
+                >
+                  {collectionInfo.backdrop_path && (
+                    <div className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity">
+                      <Image
+                        src={`https://image.tmdb.org/t/p/w780${collectionInfo.backdrop_path}`}
+                        alt={collectionInfo.name}
+                        fill
+                        sizes="780px"
+                        className="object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
+                    </div>
+                  )}
+
+                  <div className="relative z-10 flex items-center gap-3.5 min-w-0">
+                    {collectionInfo.poster_path ? (
+                      <div className="relative w-11 h-16 rounded-lg overflow-hidden flex-shrink-0 border border-white/15 shadow-md bg-neutral-900">
+                        <Image
+                          src={`https://image.tmdb.org/t/p/w185${collectionInfo.poster_path}`}
+                          alt={collectionInfo.name}
+                          fill
+                          sizes="44px"
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-red-600/15 border border-red-500/30 flex items-center justify-center flex-shrink-0">
+                        <Film className="w-4 h-4 text-red-500" />
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-red-400 block">
+                        Faz parte da saga
+                      </span>
+                      <h3 className="font-bebas text-2xl md:text-3xl text-white uppercase tracking-wider leading-none truncate mt-0.5">
+                        {collectionInfo.name.replace(/\s*[-–:]?\s*Coleção$/i, "")}
+                      </h3>
+                    </div>
+                  </div>
+
+                  <div className="relative z-10 h-9 px-4 rounded-full bg-white/[0.08] border border-white/15 group-hover:bg-white group-hover:text-black text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors shrink-0 leading-none">
+                    <span className="hidden sm:inline">Ver saga completa</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </div>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
 

@@ -225,11 +225,15 @@ export async function discoverTVShows({
 }
 
 export async function getMovieDetails(movieId: string) {
-  return await fetchFromTMDB(`/movie/${movieId}`, { append_to_response: "external_ids" });
+  return await fetchFromTMDB(`/movie/${movieId}`, {
+    append_to_response: "external_ids,release_dates",
+  });
 }
 
 export async function getTvDetails(tvId: string) {
-  return await fetchFromTMDB(`/tv/${tvId}`, { append_to_response: "external_ids" });
+  return await fetchFromTMDB(`/tv/${tvId}`, {
+    append_to_response: "external_ids,content_ratings",
+  });
 }
 
 export async function getMovieCredits(movieId: string) {

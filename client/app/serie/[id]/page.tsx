@@ -21,6 +21,7 @@ import MovieChatBot from "@/components/MovieChatBot";
 import { MovieContext } from "@/services/gemini-api";
 import type { Metadata } from "next";
 import SintonizeButton from "@/components/SintonizeButton";
+import AgeRatingBadge, { extractBrazilianRating } from "@/components/AgeRatingBadge";
 
 export const dynamicParams = true;
 export const revalidate = 0;
@@ -102,6 +103,11 @@ export default async function TVShowPage({
   };
 
   const status = statusMap[tvShow.status] || tvShow.status;
+  const ageRating = extractBrazilianRating(tvShow, "tv");
+  const creators =
+    tvShow.created_by && tvShow.created_by.length > 0
+      ? tvShow.created_by.map((c: any) => c.name).join(", ")
+      : null;
 
   const seriesContext: MovieContext = {
     title: tvShow.name,
@@ -292,6 +298,8 @@ export default async function TVShowPage({
               </div>
 
               <div className="flex flex-wrap gap-2 items-center">
+                {ageRating && <AgeRatingBadge rating={ageRating} />}
+
                 {tvShow.genres.map((genre: any) => (
                   <Badge
                     key={genre.id}
@@ -316,6 +324,12 @@ export default async function TVShowPage({
               </div>
 
               <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-neutral-400">
+                {creators && (
+                  <div>
+                    <span className="font-semibold text-white">Criação:</span>{" "}
+                    {creators}
+                  </div>
+                )}
                 <div>
                   <span className="font-semibold text-white">Temporadas:</span>{" "}
                   {tvShow.number_of_seasons}

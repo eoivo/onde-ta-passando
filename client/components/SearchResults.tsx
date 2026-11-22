@@ -21,8 +21,13 @@ export default function SearchResults({ results }: SearchResultsProps) {
 
   if (results.length === 0) {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center">
-        <p className="text-xl text-gray-400">Nenhum resultado encontrado</p>
+      <div className="bg-white/[0.02] border border-white/10 rounded-3xl p-14 text-center my-8">
+        <p className="text-base font-semibold text-neutral-300">
+          Nenhum resultado encontrado
+        </p>
+        <p className="text-xs text-neutral-500 mt-1">
+          Tente buscar por outro título ou altere o filtro entre Filmes e Séries.
+        </p>
       </div>
     );
   }
