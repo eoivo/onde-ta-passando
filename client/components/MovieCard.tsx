@@ -5,18 +5,17 @@ import type React from "react";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import { Play, ArrowRight, Star, X } from "lucide-react";
 import { useLoadingStore } from "@/store/loading-store";
 import { getMovieVideos, getTvVideos } from "@/services/tmdb-api";
-import { Button } from "@/components/ui/button";
 
 interface MovieCardProps {
   movie: any;
   index?: number;
+  priority?: boolean;
 }
 
-export default function MovieCard({ movie, index = 0 }: MovieCardProps) {
+export default function MovieCard({ movie, priority = false }: MovieCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [videos, setVideos] = useState<any[]>([]);
   const [isTrailerOpen, setIsTrailerOpen] = useState(false);
@@ -115,11 +114,8 @@ export default function MovieCard({ movie, index = 0 }: MovieCardProps) {
 
   return (
     <>
-      <motion.div
-        className="relative aspect-[2/3] min-w-[150px] h-full rounded-xl overflow-hidden border border-white/10 hover:border-white/20 transition-colors duration-200"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: index * 0.05 }}
+      <div
+        className="group/card relative aspect-[2/3] min-w-[150px] h-full rounded-xl overflow-hidden border border-white/10 hover:border-white/20 transition-colors duration-200 bg-neutral-950"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -132,10 +128,12 @@ export default function MovieCard({ movie, index = 0 }: MovieCardProps) {
             src={imageUrl || "/placeholder.svg"}
             alt={title}
             fill
-            quality={90}
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover transition-transform duration-300 ease-in-out"
-            style={{ transform: isHovered ? "scale(1.05)" : "scale(1)" }}
+            quality={85}
+            priority={priority}
+            loading={priority ? "eager" : "lazy"}
+            decoding="async"
+            sizes="(max-width: 640px) 165px, 210px"
+            className="object-cover transition-transform duration-300 ease-out group-hover/card:scale-105"
           />
 
           {isHovered && (
@@ -195,7 +193,7 @@ export default function MovieCard({ movie, index = 0 }: MovieCardProps) {
             </div>
           )}
         </a>
-      </motion.div>
+      </div>
 
       {isTrailerOpen && activeVideo && (
         <div

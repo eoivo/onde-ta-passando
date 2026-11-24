@@ -1,6 +1,7 @@
 import HeroCarousel from "@/components/HeroCarousel";
 import MovieCarousel from "@/components/MovieCarousel";
 import CollectionsSection from "@/components/CollectionsSection";
+import LazySection from "@/components/LazySection";
 import {
   getTrending,
   getTopRated,
@@ -43,9 +44,27 @@ export default async function Home() {
   const topRatedMovies = [...topRatedMoviesP1, ...topRatedMoviesP2];
   const upcomingMovies = [...upcomingMoviesP1, ...upcomingMoviesP2];
 
-  const sagas = Object.values(sagasData).filter((u) => u?.movies.length > 0);
-  const universes = Object.values(universesData).filter((u) => u?.movies.length > 0);
-  const studios = Object.values(studiosData).filter((u) => u?.movies.length > 0);
+  const slimCollection = (u: any) => ({
+    id: u.id,
+    name: u.name,
+    type: u.type,
+    category: u.category,
+    overview: "",
+    poster_path: u.poster_path,
+    backdrop_path: u.backdrop_path || u.movies?.[0]?.backdrop_path || null,
+    total_results: u.total_results || u.movies?.length || 0,
+    movies: [],
+  });
+
+  const sagas = Object.values(sagasData)
+    .filter((u) => u && u.movies.length > 0)
+    .map(slimCollection);
+  const universes = Object.values(universesData)
+    .filter((u) => u && u.movies.length > 0)
+    .map(slimCollection);
+  const studios = Object.values(studiosData)
+    .filter((u) => u && u.movies.length > 0)
+    .map(slimCollection);
 
   // 2. Buscas para seções temáticas (Moods) - 3 páginas para garantir 40 únicos no final
   const [
@@ -80,15 +99,32 @@ export default async function Home() {
   // 4. Lógica de Desduplicação Global
   const shownGlobal = new Set<string>();
 
+  // Reduz o payload JSON hidratado no cliente mantendo apenas os campos usados pelos cards
+  const slimMedia = (m: any) => ({
+    id: m.id,
+    title: m.title,
+    name: m.name,
+    poster_path: m.poster_path,
+    backdrop_path: m.backdrop_path,
+    vote_average: m.vote_average,
+    release_date: m.release_date,
+    first_air_date: m.first_air_date,
+    overview: m.overview,
+    media_type: m.media_type || (m.first_air_date && !m.title ? "tv" : "movie"),
+  });
+
   // Auxiliar para garantir unicidade em UMA ÚNICA fileira (Evita erro de Key do React)
   const ensureUnique = (movies: any[]) => {
     const seen = new Set<string>();
-    return movies.filter(m => {
+    const out: any[] = [];
+    for (const m of movies) {
       const idStr = m.id.toString();
-      if (seen.has(idStr)) return false;
-      seen.add(idStr);
-      return true;
-    });
+      if (!seen.has(idStr)) {
+        seen.add(idStr);
+        out.push(slimMedia(m));
+      }
+    }
+    return out;
   };
 
   // Auxiliar para as vitrines (Evita repetição entre elas)
@@ -132,35 +168,64 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen pb-20">
-      <HeroCarousel movies={heroItems} />
+      <HeroCarousel movies={heroItems.map(slimMedia)} />
       
       <div className="px-4 md:px-12 space-y-3 md:space-y-10 -mt-8 md:-mt-8 relative z-10">
-        <MovieCarousel title="Filmes em alta" movies={ensureUnique(trendingMovies).slice(0, 40)} />
-        <MovieCarousel title="Séries em alta" movies={ensureUnique(trendingTVShows).slice(0, 40)} />
-        <MovieCarousel title="Mais bem avaliados" movies={ensureUnique(topRatedMovies).slice(0, 40)} />
-        <MovieCarousel title="Próximas Estreias" movies={ensureUnique(upcomingMovies).slice(0, 40)} />
+        {/* Dobra inicial renderizada imediatamente */}
+        <MovieCarousel
+          title="Filmes em alta"
+          movies={ensureUnique(trendingMovies).slice(0, 40)}
+          priority={true}
+        />
+        <MovieCarousel
+          title="Séries em alta"
+          movies={ensureUnique(trendingTVShows).slice(0, 40)}
+        />
+
+        {/* Demais vitrines montadas progressivamente antes de entrarem na viewport */}
+        <LazySection minHeight={310}>
+          <MovieCarousel
+            title="Mais bem avaliados"
+            movies={ensureUnique(topRatedMovies).slice(0, 40)}
+          />
+        </LazySection>
+
+        <LazySection minHeight={310}>
+          <MovieCarousel
+            title="Próximas Estreias"
+            movies={ensureUnique(upcomingMovies).slice(0, 40)}
+          />
+        </LazySection>
 
         {/* Seção de Sagas, Universos e Estúdios */}
         <div id="colecoes" className="scroll-mt-24">
-          <CollectionsSection
-            sagas={sagas}
-            universes={universes}
-            studios={studios}
-          />
+          <LazySection minHeight={720}>
+            <CollectionsSection
+              sagas={sagas}
+              universes={universes}
+              studios={studios}
+            />
+          </LazySection>
         </div>
 
         {/* Vitrines Temáticas (Moods) */}
-        {moodSections.map((section, idx) => (
-          section.movies.length > 0 && (
-            <MovieCarousel key={idx} title={section.title} movies={section.movies} />
-          )
-        ))}
+        {moodSections.map((section, idx) =>
+          section.movies.length > 0 ? (
+            <LazySection key={idx} minHeight={310}>
+              <MovieCarousel title={section.title} movies={section.movies} />
+            </LazySection>
+          ) : null
+        )}
 
         {/* Seções de Streaming */}
         {FEATURED_PROVIDERS.map((provider) => {
           const content = streamingContent[provider.id] || [];
           if (content.length === 0) return null;
-          return <MovieCarousel key={provider.id} title={provider.name} movies={content.slice(0, 40)} />;
+          return (
+            <LazySection key={provider.id} minHeight={310}>
+              <MovieCarousel title={provider.name} movies={content.slice(0, 40)} />
+            </LazySection>
+          );
         })}
       </div>
     </main>

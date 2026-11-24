@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDragScroll } from "@/hooks/useDragScroll";
@@ -9,13 +10,29 @@ import MovieCard from "./MovieCard";
 interface MovieCarouselProps {
   title: string;
   movies: any[];
+  priority?: boolean;
 }
 
-export default function MovieCarousel({ title, movies }: MovieCarouselProps) {
+const INITIAL_RENDER_COUNT = 12;
+
+export default function MovieCarousel({
+  title,
+  movies,
+  priority = false,
+}: MovieCarouselProps) {
   const carouselRef = useRef<HTMLDivElement>(null);
+  const [expanded, setExpanded] = useState(movies.length <= INITIAL_RENDER_COUNT);
   useDragScroll(carouselRef);
 
+  const ensureExpanded = () => {
+    if (!expanded) setExpanded(true);
+  };
+
   const scroll = (direction: "left" | "right") => {
+    if (!expanded) {
+      flushSync(() => setExpanded(true));
+    }
+
     if (carouselRef.current) {
       const { scrollLeft, clientWidth, scrollWidth } = carouselRef.current;
       const maxScroll = scrollWidth - clientWidth;
@@ -35,8 +52,15 @@ export default function MovieCarousel({ title, movies }: MovieCarouselProps) {
     }
   };
 
+  const visibleMovies = expanded ? movies : movies.slice(0, INITIAL_RENDER_COUNT);
+
   return (
-    <div className={title ? "space-y-2 py-4" : ""}>
+    <div
+      className={title ? "space-y-2 py-4" : ""}
+      onMouseEnter={ensureExpanded}
+      onTouchStart={ensureExpanded}
+      onFocus={ensureExpanded}
+    >
       {title && (
         <h2 className="text-2xl md:text-3xl font-normal font-bebas tracking-wider uppercase">
           {title}
@@ -46,14 +70,19 @@ export default function MovieCarousel({ title, movies }: MovieCarouselProps) {
       <div className="relative group">
         <div
           ref={carouselRef}
+          onScroll={ensureExpanded}
           className="flex gap-2 overflow-x-auto scrollbar-hide pb-4"
         >
-          {movies.map((movie, index) => (
+          {visibleMovies.map((movie, index) => (
             <div
               key={movie.id}
               className="flex-shrink-0 w-[150px] md:w-[180px]"
             >
-              <MovieCard movie={movie} index={index} />
+              <MovieCard
+                movie={movie}
+                index={index}
+                priority={priority && index < 6}
+              />
             </div>
           ))}
         </div>

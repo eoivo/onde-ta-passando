@@ -14,12 +14,13 @@ export default function HeroCarousel({
   interval = 10000,
 }: HeroCarouselProps) {
   const [slideA, setSlideA] = useState({ index: 0, visible: true });
-  const [slideB, setSlideB] = useState({ index: 0, visible: false });
+  const [slideB, setSlideB] = useState<{ index: number; visible: boolean } | null>(null);
   const [showControls, setShowControls] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [trailerOpen, setTrailerOpen] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const activeSlide = slideA.visible ? "A" : "B";
+  const activeIndex = activeSlide === "A" ? slideA.index : (slideB?.index ?? 0);
 
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
@@ -37,7 +38,7 @@ export default function HeroCarousel({
     if (movies.length <= 1 || isTransitioning || trailerOpen) return;
 
     timerRef.current = setTimeout(() => {
-      goToSlide((activeSlide === "A" ? slideA.index : slideB.index) + 1);
+      goToSlide(activeIndex + 1);
     }, interval);
 
     return () => {
@@ -46,10 +47,8 @@ export default function HeroCarousel({
       }
     };
   }, [
-    slideA.index,
-    slideB.index,
+    activeIndex,
     slideA.visible,
-    slideB.visible,
     isTransitioning,
     movies.length,
     trailerOpen,
@@ -65,9 +64,7 @@ export default function HeroCarousel({
     const normalizedIndex =
       ((targetIndex % movies.length) + movies.length) % movies.length;
 
-    const currentSlide = activeSlide === "A" ? slideA : slideB;
-
-    if (normalizedIndex === currentSlide.index) return;
+    if (normalizedIndex === activeIndex) return;
 
     setIsTransitioning(true);
 
@@ -76,7 +73,7 @@ export default function HeroCarousel({
 
       setTimeout(() => {
         setSlideA((prev) => ({ ...prev, visible: false }));
-        setSlideB((prev) => ({ ...prev, visible: true }));
+        setSlideB({ index: normalizedIndex, visible: true });
 
         setTimeout(() => {
           setIsTransitioning(false);
@@ -86,8 +83,8 @@ export default function HeroCarousel({
       setSlideA({ index: normalizedIndex, visible: false });
 
       setTimeout(() => {
-        setSlideB((prev) => ({ ...prev, visible: false }));
-        setSlideA((prev) => ({ ...prev, visible: true }));
+        setSlideB((prev) => (prev ? { ...prev, visible: false } : null));
+        setSlideA({ index: normalizedIndex, visible: true });
 
         setTimeout(() => {
           setIsTransitioning(false);
@@ -97,13 +94,11 @@ export default function HeroCarousel({
   };
 
   const goToPrevious = () => {
-    const currentIndex = activeSlide === "A" ? slideA.index : slideB.index;
-    goToSlide(currentIndex - 1);
+    goToSlide(activeIndex - 1);
   };
 
   const goToNext = () => {
-    const currentIndex = activeSlide === "A" ? slideA.index : slideB.index;
-    goToSlide(currentIndex + 1);
+    goToSlide(activeIndex + 1);
   };
 
   const handleTouchStart = (e: TouchEvent<HTMLDivElement>) => {
@@ -165,7 +160,7 @@ export default function HeroCarousel({
     >
       <div className="relative">
         <div
-          className="absolute inset-0 w-full"
+          className={slideA.visible ? "relative w-full" : "absolute inset-0 w-full pointer-events-none"}
           style={{
             opacity: slideA.visible ? 1 : 0,
             transition: "opacity 2s ease-in-out",
@@ -176,27 +171,27 @@ export default function HeroCarousel({
             movie={movies[slideA.index]}
             onTrailerStateChange={handleTrailerStateChange}
             priority={slideA.index === 0}
+            isActive={slideA.visible}
           />
         </div>
 
-        <div
-          className="absolute inset-0 w-full"
-          style={{
-            opacity: slideB.visible ? 1 : 0,
-            transition: "opacity 2s ease-in-out",
-            zIndex: slideB.visible ? 2 : 1,
-          }}
-        >
-          <Hero
-            movie={movies[slideB.index]}
-            onTrailerStateChange={handleTrailerStateChange}
-            priority={false}
-          />
-        </div>
-
-        <div className="relative invisible pointer-events-none" aria-hidden="true">
-          <Hero movie={movies[activeSlide === "A" ? slideA.index : slideB.index]} priority={false} />
-        </div>
+        {slideB !== null && (
+          <div
+            className={slideB.visible ? "relative w-full" : "absolute inset-0 w-full pointer-events-none"}
+            style={{
+              opacity: slideB.visible ? 1 : 0,
+              transition: "opacity 2s ease-in-out",
+              zIndex: slideB.visible ? 2 : 1,
+            }}
+          >
+            <Hero
+              movie={movies[slideB.index]}
+              onTrailerStateChange={handleTrailerStateChange}
+              priority={false}
+              isActive={slideB.visible}
+            />
+          </div>
+        )}
       </div>
 
       {movies.length > 1 && (

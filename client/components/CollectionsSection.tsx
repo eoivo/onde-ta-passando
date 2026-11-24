@@ -3,7 +3,6 @@
 import { ReactNode } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import { Film, Globe, Clapperboard, ChevronRight, ChevronLeft } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { useDragScroll } from "@/hooks/useDragScroll";
@@ -64,7 +63,9 @@ export default function CollectionsSection({
     },
   ];
 
-  const hasContent = sections.some((s) => s.collections.length > 0);
+  const hasContent = sections.some(
+    (s) => s.collections.length > 0
+  );
   if (!hasContent) return null;
 
   return (
@@ -203,30 +204,28 @@ function CollectionCard({
   const router = useRouter();
 
   const backdropUrl = collection.backdrop_path
-    ? `https://image.tmdb.org/t/p/w1280${collection.backdrop_path}`
+    ? `https://image.tmdb.org/t/p/w780${collection.backdrop_path}`
     : collection.movies[0]?.backdrop_path
-    ? `https://image.tmdb.org/t/p/w1280${collection.movies[0].backdrop_path}`
+    ? `https://image.tmdb.org/t/p/w780${collection.movies[0].backdrop_path}`
     : null;
 
   const countLabel = category === "universo" ? "títulos" : "filmes";
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.06, duration: 0.3 }}
-      whileHover={{ y: -5 }}
+    <div
       onClick={() => router.push(`/colecao/${category}/${collection.id}`)}
-      className="flex-shrink-0 w-[260px] md:w-[310px] aspect-video rounded-xl overflow-hidden relative cursor-pointer group shadow-lg bg-black transition-all duration-500 hover:shadow-[0_0_20px_rgba(220,38,38,0.15)]"
+      className="flex-shrink-0 w-[260px] md:w-[310px] aspect-video rounded-xl overflow-hidden relative cursor-pointer group shadow-lg bg-black transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(220,38,38,0.15)]"
     >
       {backdropUrl ? (
         <Image
           src={backdropUrl}
           alt={collection.name}
           fill
-          quality={90}
-          sizes="(max-width: 768px) 500px, 600px"
-          className="object-cover transition-transform duration-1000 group-hover:scale-110"
+          quality={85}
+          loading="lazy"
+          decoding="async"
+          sizes="(max-width: 768px) 280px, 340px"
+          className="object-cover transition-transform duration-700 group-hover:scale-110"
         />
       ) : (
         <div className="w-full h-full bg-gray-900 flex items-center justify-center">
@@ -258,7 +257,7 @@ function CollectionCard({
       {/* Border Mask & Hover Ring */}
       <div className="absolute inset-0 rounded-xl ring-[2px] ring-inset ring-black z-10" />
       <div className="absolute inset-0 rounded-xl ring-1 ring-transparent group-hover:ring-red-600/40 transition-all duration-300 pointer-events-none z-30" />
-    </motion.div>
+    </div>
   );
 }
 
@@ -294,20 +293,19 @@ function UniverseCard({ collection }: { collection: UnifiedCollection }) {
     : null;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      whileHover={{ y: -5 }}
+    <div
       onClick={() => router.push(`/colecao/universo/${collection.id}`)}
-      className={`relative aspect-[21/9] md:aspect-[16/7] rounded-2xl overflow-hidden cursor-pointer group transition-all duration-500 bg-black ${theme.glow}`}
+      className={`relative aspect-[21/9] md:aspect-[16/7] rounded-2xl overflow-hidden cursor-pointer group transition-all duration-300 hover:-translate-y-1 bg-black ${theme.glow}`}
     >
       {backdropUrl ? (
         <Image
           src={backdropUrl}
           alt={collection.name}
           fill
+          loading="lazy"
+          decoding="async"
           sizes="(max-width: 768px) 100vw, 50vw"
-          className="object-cover transition-transform duration-1000 group-hover:scale-105"
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
         />
       ) : (
         <div className="w-full h-full bg-gray-900 flex items-center justify-center p-8">
@@ -354,6 +352,6 @@ function UniverseCard({ collection }: { collection: UnifiedCollection }) {
       <div
         className={`absolute inset-0 rounded-2xl ring-[2px] ring-inset ring-black z-10 transition-all duration-500 ${theme.ring}`}
       />
-    </motion.div>
+    </div>
   );
 }

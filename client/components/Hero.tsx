@@ -17,17 +17,35 @@ interface HeroProps {
   movie: any;
   onTrailerStateChange?: (isOpen: boolean) => void;
   priority?: boolean;
+  isActive?: boolean;
 }
 
-export default function Hero({ movie, onTrailerStateChange, priority = false }: HeroProps) {
+const heroDataCache = new Map<string, { videos: any[]; details: any }>();
+
+export default function Hero({
+  movie,
+  onTrailerStateChange,
+  priority = false,
+  isActive = true,
+}: HeroProps) {
   const [videos, setVideos] = useState<any[]>([]);
   const [details, setDetails] = useState<any>(null);
 
   useEffect(() => {
-    async function fetchHeroData() {
-      if (!movie) return;
+    if (!movie || !isActive) return;
 
-      const mediaType = movie.media_type || "movie";
+    const mediaType = movie.media_type || "movie";
+    const cacheKey = `${mediaType}-${movie.id}`;
+    const cached = heroDataCache.get(cacheKey);
+
+    if (cached) {
+      setVideos(cached.videos);
+      setDetails(cached.details);
+      return;
+    }
+
+    let cancelled = false;
+    async function fetchHeroData() {
       try {
         const [videosData, detailsData] = await Promise.all([
           mediaType === "tv"
@@ -38,57 +56,69 @@ export default function Hero({ movie, onTrailerStateChange, priority = false }: 
             : getMovieDetails(movie.id.toString()),
         ]);
 
-        setVideos(videosData);
-        setDetails(detailsData);
+        if (!cancelled) {
+          heroDataCache.set(cacheKey, { videos: videosData, details: detailsData });
+          setVideos(videosData);
+          setDetails(detailsData);
+        }
       } catch (error) {
         console.error("Erro ao carregar dados da hero:", error);
       }
     }
 
     fetchHeroData();
-  }, [movie]);
+    return () => {
+      cancelled = true;
+    };
+  }, [movie, isActive]);
 
   if (!movie) return null;
 
   return (
     <div className="relative h-auto md:h-[85vh] w-full overflow-hidden">
-      {/* Backdrop image with Ken Burns effect */}
+      {/* Backdrop image with Ken Burns effect (ativo apenas no slide visível) */}
       <motion.div
-        animate={{
-          scale: [1, 1.15],
-          x: [0, -20],
-          y: [0, -10],
-        }}
+        animate={
+          isActive
+            ? {
+                scale: [1, 1.12],
+                x: [0, -16],
+                y: [0, -8],
+              }
+            : false
+        }
         transition={{
           duration: 25,
           repeat: Infinity,
           repeatType: "reverse",
           ease: "linear",
         }}
-        className="absolute inset-0 z-0"
+        className="absolute inset-0 z-0 will-change-transform"
       >
         <Image
           src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
           alt={movie.title || movie.name}
           fill
           priority={priority}
+          loading={priority ? "eager" : "lazy"}
+          decoding="async"
           unoptimized={true}
-          className="object-cover"
+          className="object-cover brightness-[1.12] contrast-[1.04] saturate-[1.08]"
         />
       </motion.div>
 
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent z-10" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10" />
+      {/* Gradient overlays: protege leitura à esquerda e abre o brilho no centro/direita */}
+      <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/95 via-black/70 to-black/20 md:bg-[linear-gradient(90deg,rgba(0,0,0,0.92)_0%,rgba(0,0,0,0.72)_30%,rgba(0,0,0,0.25)_58%,rgba(0,0,0,0.02)_100%)]" />
+      <div className="absolute inset-0 z-10 bg-[linear-gradient(0deg,#000000_0%,rgba(0,0,0,0.6)_14%,rgba(0,0,0,0)_42%)]" />
 
       {/* Content */}
       <div className="relative md:absolute inset-0 z-20 flex flex-col justify-start md:justify-center pt-28 pb-14 md:pt-32 md:pb-16">
         <div className="max-w-2xl w-full px-4 md:px-8 md:ml-16 space-y-4">
-          <h1 className="text-4xl md:text-6xl font-black leading-tight tracking-tight uppercase">
+          <h1 className="text-4xl md:text-6xl font-black leading-tight tracking-tight uppercase drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)]">
             {movie.title || movie.name}
           </h1>
 
-          <div className="flex flex-wrap items-center gap-x-2 text-[10px] md:text-xs font-semibold text-gray-500 uppercase tracking-widest">
+          <div className="flex flex-wrap items-center gap-x-2 text-[10px] md:text-xs font-semibold text-neutral-400 uppercase tracking-widest drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
             <span>
               {(() => {
                 const dateStr = movie.release_date || movie.first_air_date;
@@ -126,7 +156,7 @@ export default function Hero({ movie, onTrailerStateChange, priority = false }: 
             )}
           </div>
 
-          <p className="text-lg text-gray-300 line-clamp-3 md:line-clamp-4 pt-1">
+          <p className="text-lg text-neutral-200 line-clamp-3 md:line-clamp-4 pt-1 drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)]">
             {movie.overview}
           </p>
 
