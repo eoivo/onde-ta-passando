@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, TouchEvent, MouseEvent } from "react";
+import { useState, useEffect, useRef, useCallback, TouchEvent, MouseEvent } from "react";
 import Hero from "./Hero";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -54,9 +54,18 @@ export default function HeroCarousel({
     trailerOpen,
   ]);
 
-  const handleTrailerStateChange = (isOpen: boolean) => {
+  useEffect(() => {
+    const syncGlobalTrailer = (e: Event) => {
+      const custom = e as CustomEvent<boolean>;
+      setTrailerOpen(Boolean(custom.detail));
+    };
+    window.addEventListener("trailer-modal-change", syncGlobalTrailer);
+    return () => window.removeEventListener("trailer-modal-change", syncGlobalTrailer);
+  }, []);
+
+  const handleTrailerStateChange = useCallback((isOpen: boolean) => {
     setTrailerOpen(isOpen);
-  };
+  }, []);
 
   const goToSlide = (targetIndex: number) => {
     if (isTransitioning) return;

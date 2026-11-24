@@ -30,6 +30,16 @@ export default function Hero({
 }: HeroProps) {
   const [videos, setVideos] = useState<any[]>([]);
   const [details, setDetails] = useState<any>(null);
+  const [anyTrailerOpen, setAnyTrailerOpen] = useState(false);
+
+  useEffect(() => {
+    const syncTrailerState = (e: Event) => {
+      const custom = e as CustomEvent<boolean>;
+      setAnyTrailerOpen(Boolean(custom.detail));
+    };
+    window.addEventListener("trailer-modal-change", syncTrailerState);
+    return () => window.removeEventListener("trailer-modal-change", syncTrailerState);
+  }, []);
 
   useEffect(() => {
     if (!movie || !isActive) return;
@@ -76,10 +86,10 @@ export default function Hero({
 
   return (
     <div className="relative h-auto md:h-[85vh] w-full overflow-hidden">
-      {/* Backdrop image with Ken Burns effect (ativo apenas no slide visível) */}
+      {/* Backdrop image with Ken Burns effect (pausado em slides ocultos ou quando há trailer aberto) */}
       <motion.div
         animate={
-          isActive
+          isActive && !anyTrailerOpen
             ? {
                 scale: [1, 1.12],
                 x: [0, -16],
@@ -103,13 +113,13 @@ export default function Hero({
           loading={priority ? "eager" : "lazy"}
           decoding="async"
           unoptimized={true}
-          className="object-cover brightness-[1.12] contrast-[1.04] saturate-[1.08]"
+          className="object-cover"
         />
       </motion.div>
 
-      {/* Gradient overlays: protege leitura à esquerda e abre o brilho no centro/direita */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/95 via-black/70 to-black/20 md:bg-[linear-gradient(90deg,rgba(0,0,0,0.92)_0%,rgba(0,0,0,0.72)_30%,rgba(0,0,0,0.25)_58%,rgba(0,0,0,0.02)_100%)]" />
-      <div className="absolute inset-0 z-10 bg-[linear-gradient(0deg,#000000_0%,rgba(0,0,0,0.6)_14%,rgba(0,0,0,0)_42%)]" />
+      {/* Gradient overlays: protege leitura à esquerda e abre o brilho no centro/direita sem custo de filter na GPU */}
+      <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/95 via-black/70 to-black/15 md:bg-[linear-gradient(90deg,rgba(0,0,0,0.90)_0%,rgba(0,0,0,0.68)_30%,rgba(0,0,0,0.18)_56%,rgba(0,0,0,0)_100%)]" />
+      <div className="absolute inset-0 z-10 bg-[linear-gradient(0deg,#000000_0%,rgba(0,0,0,0.55)_14%,rgba(0,0,0,0)_40%)]" />
 
       {/* Content */}
       <div className="relative md:absolute inset-0 z-20 flex flex-col justify-start md:justify-center pt-28 pb-14 md:pt-32 md:pb-16">

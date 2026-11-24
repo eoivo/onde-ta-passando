@@ -2,12 +2,13 @@
 
 import type React from "react";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Play, ArrowRight, Star, X } from "lucide-react";
+import { Play, ArrowRight, Star } from "lucide-react";
 import { useLoadingStore } from "@/store/loading-store";
 import { getMovieVideos, getTvVideos } from "@/services/tmdb-api";
+import TrailerModal from "./TrailerModal";
 
 interface MovieCardProps {
   movie: any;
@@ -20,7 +21,6 @@ export default function MovieCard({ movie, priority = false }: MovieCardProps) {
   const [videos, setVideos] = useState<any[]>([]);
   const [isTrailerOpen, setIsTrailerOpen] = useState(false);
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
-  const modalRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { setLoading } = useLoadingStore();
 
@@ -92,25 +92,18 @@ export default function MovieCard({ movie, priority = false }: MovieCardProps) {
     e.stopPropagation();
 
     if (trailer) {
+      setIsHovered(false);
       setActiveVideo(trailer.key);
       setIsTrailerOpen(true);
-      document.body.style.overflow = "hidden";
     } else {
       handleNavigateToDetails(e);
     }
   };
 
-  const handleCloseTrailer = () => {
+  const handleCloseTrailer = useCallback(() => {
     setIsTrailerOpen(false);
     setActiveVideo(null);
-    document.body.style.overflow = "auto";
-  };
-
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-      handleCloseTrailer();
-    }
-  };
+  }, []);
 
   return (
     <>
@@ -195,36 +188,11 @@ export default function MovieCard({ movie, priority = false }: MovieCardProps) {
         </a>
       </div>
 
-      {isTrailerOpen && activeVideo && (
-        <div
-          className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4"
-          onClick={handleBackdropClick}
-        >
-          <div
-            ref={modalRef}
-            className="relative w-full max-w-3xl aspect-video mx-auto"
-          >
-            <button
-              type="button"
-              onClick={handleCloseTrailer}
-              aria-label="Fechar trailer"
-              className="absolute -top-11 right-0 h-9 w-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-neutral-300 hover:text-white flex items-center justify-center transition-colors z-10 cursor-pointer"
-            >
-              <X className="h-4 w-4" />
-            </button>
-
-            <div className="w-full h-full rounded-2xl overflow-hidden border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.9)] bg-black">
-              <iframe
-                src={`https://www.youtube.com/embed/${activeVideo}?autoplay=1`}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="w-full h-full"
-              ></iframe>
-            </div>
-          </div>
-        </div>
-      )}
+      <TrailerModal
+        videoKey={activeVideo}
+        isOpen={isTrailerOpen}
+        onClose={handleCloseTrailer}
+      />
     </>
   );
 }

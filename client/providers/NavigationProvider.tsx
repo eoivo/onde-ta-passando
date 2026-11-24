@@ -86,6 +86,7 @@ export default function NavigationProvider({
 
     const handleLinkClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
+      if (target.closest("button")) return;
       const link = target.closest("a");
 
       const isInternalLink =
